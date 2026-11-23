@@ -77,7 +77,7 @@ circle and lives, learns to go where it is told, and goes to Orla's plates. Then
   hurt, and he never knew what it really wanted, until today.
 - **Orla.** The four go up to the tower with the threads. Orla tells them what they are:
   far more than threads to tamper with brooms; the leavings of the soul of a wizard killed
-  by a black spell, evil itself made a thing by that death; they bring death and pain and
+  by a dark spell, evil itself made a thing by that death; they bring death and pain and
   destroy friendship and the soul. She locks them away, and believes them.
 - **Korvel.** Then she tells the rest. The voice is Korvel's. Long ago he wrote
   enchantments on the castle itself, at first to make it better, safer, more comfortable,
@@ -208,7 +208,7 @@ the wizard protected someone before being born.
       on the lectern. `{friend}`: «Son hilos para trucar escobas.» They tell everything, that
       they were out of bed that night too.
    5. Orla, who does not touch them: «Son mucho más que eso. Son los desechos del alma de un
-      mago al que mataron con un hechizo negro. Son la esencia del mal, hecha cosa por esa
+      mago al que mataron con un hechizo oscuro. Son la esencia del mal, hecha cosa por esa
       muerte.»
    6. Orla: «Causan males que no se pueden contar. Atraen la muerte y el dolor. Destruyen la
       amistad, y el alma.» `{friend}`, voiceless: «Los he tenido meses en una caja.» Orla:

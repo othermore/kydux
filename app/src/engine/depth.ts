@@ -91,7 +91,7 @@ export function lightDepth(rows: number): number {
 }
 
 /** The cells a scene draws a figure lower on: each range is its first and last cell,
- * and by how much of a cell (D95). */
+ * and by how much of a cell (D95), higher when less than 0 (D282). */
 export type Lowered = { cells: [Tile, Tile]; by: number }[];
 
 /** How much lower, as a part of a cell, a figure is drawn on a tile (D95). */

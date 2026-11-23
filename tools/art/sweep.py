@@ -1165,12 +1165,13 @@ def main(name: str) -> int:
 #: much of it may be covered on a cell where nothing is to hide it, and must be on a
 #: cell where the painted wall is drawn over it (`hides` in the scene's settings), at
 #: least half, as it is at a mouth's edge walking out of it; on a cell where a rim is
-#: drawn over its feet (`rims`, D282), some of it is covered, and no more than its feet
-#: and legs.
+#: drawn over its feet (`rims`, D282), the rim covers something of it, and no more than
+#: its paws.
 FAMILIAR = "familiar-fox-red"
 FAMILIAR_SEEN = 0.1
 FAMILIAR_HIDDEN = 0.5
-FAMILIAR_FEET = 0.35
+FAMILIAR_TOUCHED = 0.02
+FAMILIAR_PAWS = 0.15
 
 
 def familiar_on(scene: Scene, x: int, y: int, facing: str = "down") -> Placed:
@@ -1245,7 +1246,7 @@ def passage_ways(cells: list[tuple[int, int]]) -> dict[tuple[int, int], tuple[st
 def familiars(scene: Scene, name: str) -> list[Problem]:
     """A familiar on every cell only a familiar walks on (D270), walked through the
     passage both ways, facing as it goes: whole where nothing is to hide it, hidden where
-    the scene's settings say the painted wall is drawn over it (`hides`), its feet alone
+    the scene's settings say the painted wall is drawn over it (`hides`), its paws alone
     behind a rim where they say one is drawn over them (`rims`, D282); the sheets
     small-<scene>.png (walked in) and small-<scene>-out.png show each, and the problems
     are returned."""
@@ -1274,7 +1275,7 @@ def familiars(scene: Scene, name: str) -> list[Problem]:
                 found.append(
                     Problem("shown", cell, "a familiar under the wall", round(share * 100))
                 )
-            elif cell in rims and not FAMILIAR_SEEN <= share <= FAMILIAR_FEET:
+            elif cell in rims and not FAMILIAR_TOUCHED <= share <= FAMILIAR_PAWS:
                 found.append(
                     Problem("covered", cell, "a familiar behind the rim", round(share * 100))
                 )

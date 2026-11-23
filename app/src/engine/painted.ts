@@ -411,7 +411,8 @@ export function thingDepthOn(art: Art, id: string, tile: Tile, placed: ThingPlac
  * colours unlike the wizard's and each other's (D90), and the wizard is drawn in
  * the look the child chose. */
 export function figureName(id: string, look: Look): string {
-  // A first-year of Ilda's class: a friend's figure in its other set of colours, so
+  // A pupil of another year, as the second-years of The flying lesson are (the first
+  // year is the three friends, D311): a friend's figure in its other set of colours, so
   // that no one takes it for the friend or the mate (39.6).
   if (id === 'classmate_boy' || id === 'classmate_girl') {
     const friend = id === 'classmate_boy' ? 'teku' : 'nuri';

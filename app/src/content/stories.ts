@@ -74,6 +74,9 @@ export interface Story {
   id: string;
   title: string;
   steps: StoryStep[];
+  /** Words said on the dark before a part that opens after time has passed, by its first
+   * step's index (D309). */
+  later?: Record<number, string>;
   /** The scene the story is played on, with the wizard and the actors placed. */
   world: LevelJson;
   /** The tile the camera starts on, before any step (D74). */
@@ -124,10 +127,11 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
   const url = (file: string) => contentUrl(`stories/${id}/${file}`);
   const staging = await json<StoryJson>(url('story.json'));
   if (!staging) throw new StoryNotFound(id);
-  const text =
-    (await json<{ title: string; steps: string[] }>(url(`text.${lang}.json`))) ??
-    (await json<{ title: string; steps: string[] }>(url(`text.${fallbackLanguage}.json`)));
+  type Text = { title: string; steps: string[]; later?: Record<string, string> };
+  const text = (await json<Text>(url(`text.${lang}.json`))) ?? (await json<Text>(url(`text.${fallbackLanguage}.json`)));
   if (!text) throw new StoryNotFound(id);
+  // The words on the dark are keyed by the step's number, counted from 1 (D309).
+  const later = Object.entries(text.later ?? {}).map(([step, words]) => [Number(step) - 1, forWizard(words)] as const);
   return {
     id,
     // The wizard's words go in as the text is read (D37).
@@ -141,6 +145,7 @@ export async function loadStory(id: string, lang: Language): Promise<Story> {
     ...(staging.opening === true ? { opening: true } : {}),
     ...(typeof staging.speaker === 'string' ? { speaker: staging.speaker } : {}),
     ...(staging.still === 'castle' ? { still: 'castle' as const } : {}),
+    ...(later.length > 0 ? { later: Object.fromEntries(later) } : {}),
   };
 }
 

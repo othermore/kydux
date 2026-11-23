@@ -3087,6 +3087,24 @@ a.stop-body:focus-visible {
   opacity: 1;
 }
 
+/* Words said on the dark between two parts (D309): a bubble's box with no tail, in the
+   middle of the dark. */
+.story-dark-words {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: min(60%, 420px);
+  margin: 0;
+  padding: 7px 10px;
+  border: 2px solid #1f2330;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2330;
+  font: 15px system-ui, sans-serif;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .story-dark {
     transition: none;

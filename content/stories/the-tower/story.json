@@ -22,22 +22,13 @@
       "facing": "right"
     },
     {
-      "id": "classmate_boy",
-      "kind": "friend",
-      "at": [
-        12,
-        12
-      ],
-      "facing": "down"
-    },
-    {
-      "id": "classmate_girl",
+      "id": "friend",
       "kind": "friend",
       "at": [
         12,
         9
       ],
-      "facing": "down"
+      "facing": "right"
     }
   ],
   "steps": [
@@ -76,69 +67,16 @@
       },
       "do": [
         {
-          "by": "classmate_boy",
+          "by": "friend",
           "walk": [
             12,
             13
           ]
         },
         {
-          "by": "classmate_boy",
+          "by": "friend",
           "open": "front_door"
         },
-        {
-          "by": "classmate_boy",
-          "walk": [
-            [
-              12,
-              15
-            ],
-            [
-              11,
-              15
-            ]
-          ]
-        },
-        {
-          "by": "classmate_boy",
-          "face": "right"
-        },
-        {
-          "by": "classmate_boy",
-          "face": "left"
-        },
-        {
-          "by": "classmate_boy",
-          "walk": [
-            0,
-            15
-          ],
-          "vanish": true
-        },
-        {
-          "by": "classmate_girl",
-          "walk": [
-            12,
-            15
-          ]
-        },
-        {
-          "by": "classmate_girl",
-          "close": "front_door"
-        },
-        {
-          "by": "classmate_girl",
-          "walk": [
-            0,
-            15
-          ],
-          "vanish": true
-        }
-      ]
-    },
-    {
-      "who": "voice",
-      "do": [
         {
           "by": "mate",
           "walk": [
@@ -152,30 +90,9 @@
             ],
             [
               12,
-              13
+              12
             ]
           ]
-        },
-        {
-          "by": "mate",
-          "open": "front_door"
-        },
-        {
-          "by": "mate",
-          "walk": [
-            [
-              12,
-              15
-            ],
-            [
-              11,
-              15
-            ]
-          ]
-        },
-        {
-          "by": "mate",
-          "face": "right"
         },
         {
           "by": "wizard",
@@ -198,8 +115,70 @@
             ],
             [
               12,
+              11
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "who": "voice",
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            [
+              12,
+              15
+            ],
+            [
+              11,
               15
             ]
+          ]
+        },
+        {
+          "by": "friend",
+          "face": "right"
+        },
+        {
+          "by": "friend",
+          "face": "left"
+        },
+        {
+          "by": "friend",
+          "walk": [
+            0,
+            15
+          ],
+          "vanish": true
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              12,
+              15
+            ],
+            [
+              14,
+              15
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            0,
+            15
+          ],
+          "vanish": true
+        },
+        {
+          "by": "wizard",
+          "walk": [
+            12,
+            15
           ]
         },
         {
@@ -208,7 +187,11 @@
         },
         {
           "by": "wizard",
-          "face": "left"
+          "walk": [
+            0,
+            15
+          ],
+          "vanish": true
         }
       ]
     },
@@ -420,17 +403,10 @@
             ],
             [
               14,
-              9
-            ],
-            [
-              13,
-              9
-            ],
-            [
-              13,
               6
             ]
-          ]
+          ],
+          "vanish": true
         },
         {
           "by": "mate",
@@ -447,7 +423,8 @@
               14,
               6
             ]
-          ]
+          ],
+          "vanish": true
         }
       ]
     },

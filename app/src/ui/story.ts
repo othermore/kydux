@@ -26,6 +26,7 @@ import { marked } from 'marked';
 import { itemHash } from '../content/course';
 import { type Story, type StoryPart, type StoryStep, storyEvents } from '../content/stories';
 import { lookOf } from '../engine/looks';
+import { readingMs } from '../engine/bubble';
 import type { SceneHandle, SceneOptions } from '../engine/scene';
 import type { StoryFraming } from '../engine/zooming';
 import { characterName, forWizard, t } from '../i18n';
@@ -182,8 +183,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     parts.letter && letterPicture
       ? element('div', { id: 'story-letter', className: 'story-letter', hidden: true }, [letterPicture, letterWords])
       : null;
-  // The dark the scene goes into and comes back out of while time passes (D280).
-  const dark = element('div', { id: 'story-dark', className: 'story-dark' });
+  // The dark the scene goes into and comes back out of while time passes (D280), and
+  // the words said on it, in a box with no tail (D309).
+  const darkWords = element('p', { id: 'story-dark-words', className: 'story-dark-words', hidden: true });
+  const dark = element('div', { id: 'story-dark', className: 'story-dark' }, [darkWords]);
   const frame = element('div', { className: 'scene-frame story-frame' }, [
     still,
     ...(letter ? [letter] : []),
@@ -469,6 +472,11 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     sceneParent.dataset.state = 'loading';
     frame.dataset.passing = 'dark';
     const darkFrom = performance.now();
+    // Words on the dark, if the part has any: the dark waits for their reading (D309).
+    const said = story.later?.[partsOf()[index]?.step ?? -1];
+    darkWords.textContent = said ?? '';
+    darkWords.hidden = !said;
+    const darkMs = Math.max(PASS_DARK, said ? readingMs(said) : 0);
     const after = (then: () => void, ms: number) =>
       setTimeout(() => {
         if (token === passing && !destroyed) then();
@@ -480,9 +488,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
           frame.dataset.passing = 'back';
           after(() => {
             delete frame.dataset.passing;
+            darkWords.hidden = true;
             play();
           }, PASS_FADE);
-        }, Math.max(0, darkFrom + PASS_FADE + PASS_DARK - performance.now()));
+        }, Math.max(0, darkFrom + PASS_FADE + darkMs - performance.now()));
       });
     }, PASS_FADE);
   };
@@ -495,6 +504,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
       // started again for it.
       passing += 1;
       delete frame.dataset.passing;
+      darkWords.hidden = true;
       if (!scene || loadingPart !== -1) {
         loadingPart = -1;
         shownPart = -1;

@@ -470,6 +470,9 @@ test("the hall goes dark while the children tell Orla, and comes back in the eve
   await expect(frame).toHaveAttribute('data-passing', 'dark');
   await expect(scene).not.toHaveAttribute('data-speaker', 'orla');
   await expect(page.locator('#story-speaker')).toHaveCount(0);
+  // The words on the dark, in a box with no tail (D309).
+  await expect(page.locator('#story-dark-words')).toHaveText('It takes you a good while to tell the whole story.');
+  await expect(page.locator('#story-dark-words')).toBeVisible();
   await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-hall-dark.png' });
   await expect(frame).not.toHaveAttribute('data-passing', /./, { timeout: ciTimes(15_000) });
   await expect(scene).toHaveAttribute('data-hour', 'sunset');
@@ -511,4 +514,59 @@ test("the trail's step 8: the friend's bubble has its tail over her head (D306)"
   await expect(scene).toHaveAttribute('data-tail', /./);
   const tail = Number(await scene.getAttribute('data-tail'));
   expect(Math.abs(tail)).toBeLessThanOrEqual(0.25);
+});
+
+test('the wizard faces Orla from the first frame of the hall parts and of The end of the year (D308)', async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(240_000));
+  await seedWizard(page);
+  // Every way the wizard is drawn facing, from the moment it is asked.
+  const watch = () =>
+    page.locator('#scene').evaluate((node) => {
+      const seen: string[] = [];
+      (window as unknown as { facings: string[] }).facings = seen;
+      new MutationObserver(() => {
+        const facing = node.getAttribute('data-wizard-facing');
+        if (facing && facing !== seen[seen.length - 1]) seen.push(facing);
+      }).observe(node, { attributes: true, attributeFilter: ['data-wizard-facing'] });
+    });
+  const facings = () => page.evaluate(() => (window as unknown as { facings: string[] }).facings);
+  await page.goto('/#story/what-the-familiar-brought');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  // Step 11 opens the hall: the wizard faces up as it is drawn, and turns no more.
+  await storyNext(page, 9);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  await page.locator('#story-next').click();
+  await expect(scene).toHaveAttribute('data-wizard-facing', 'up', { timeout: ciTimes(30_000) });
+  await watch();
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
+  expect(await facings()).not.toContain('down');
+  await page.goto('/#story/the-end-of-the-year');
+  await expect(scene).toHaveAttribute('data-wizard-facing', 'up', { timeout: ciTimes(90_000) });
+  await watch();
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  expect(await facings()).not.toContain('down');
+});
+
+test("in The tower the three leave the dormitory by the left, and go into the arch's dark (D310, D311)", async ({
+  page,
+}) => {
+  test.setTimeout(ciTimes(240_000));
+  await seedWizard(page);
+  await page.goto('/#story/the-tower');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(90_000) });
+  await expect(scene).not.toHaveAttribute('data-actors', /classmate/);
+  // Step 6: the three out of the door and gone by the left.
+  await storyNext(page, 5);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await expect(scene).not.toHaveAttribute('data-actors', /(^|;)(friend|mate):/);
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-tower-6.png' });
+  // Step 17: none stays in the arch.
+  await storyNext(page, 11);
+  await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
+  await expect(scene).not.toHaveAttribute('data-actors', /(^|;)(friend|mate):/);
+  await page.locator('.scene-frame').screenshot({ path: 'e2e/shots/the-tower-17.png' });
 });

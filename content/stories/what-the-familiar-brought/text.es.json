@@ -29,5 +29,8 @@
     "Atesora las amistades que te hacen ser mejor…",
     "…pues solo con grandes amigos podemos las personas llegar allí donde estamos llamados a llegar.",
     "Hay algo que debéis saber, y tú más que nadie, {wizard}."
-  ]
+  ],
+  "later": {
+    "13": "Tardáis un buen rato en contar la historia completa."
+  }
 }

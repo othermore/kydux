@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { type StoryStep, storyEvents } from './stories';
+import { describe, expect, it, vi } from 'vitest';
+import { loadStory, type StoryStep, storyEvents } from './stories';
 
 const world = { map: ['#####', '#S..#', '#...#', '#####'], actors: [{ id: 'nuri', kind: 'friend', at: [3, 2] }] };
 
@@ -254,5 +254,26 @@ describe('a familiar in a story walks at twice the pace (D277)', () => {
       [2, 'move', null],
     ]);
     expect(lengths.size).toBe(0);
+  });
+});
+
+describe('the words on the dark before a part that opens later (D309)', () => {
+  it("are kept by the part's first step, counted from 0, and read as a text is", async () => {
+    const files: Record<string, unknown> = {
+      'story.json': { steps: [{ who: 'voice' }, { who: 'orla' }], world: { id: 'w' }, camera: [0, 0] },
+      'text.es.json': { title: 'Una historia', steps: ['Uno.', 'Dos.'], later: { '2': 'Pasa un buen rato.' } },
+    };
+    vi.stubGlobal('fetch', async (url: string) => {
+      const name = /[^/?]+(?=\?|$)/.exec(url)?.[0] ?? '';
+      return { ok: name in files, headers: new Headers({ 'content-type': 'application/json' }), json: async () => files[name] };
+    });
+    try {
+      const story = await loadStory('a-story', 'es');
+      expect(story.later).toEqual({ 1: 'Pasa un buen rato.' });
+      files['text.es.json'] = { title: 'Una historia', steps: ['Uno.', 'Dos.'] };
+      expect((await loadStory('a-story', 'es')).later).toBeUndefined();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

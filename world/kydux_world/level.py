@@ -2067,6 +2067,10 @@ def story_on_scene(
     if "scene" not in data:
         raise LevelError(f"{story_id}: a story is told on a scene")
     wizard = _story_tile(data.get("wizard"), "wizard", story_id)
+    # Which way the wizard faces from the first frame (D308).
+    facing = data.get("facing", "down")
+    if facing not in FACINGS:
+        raise LevelError(f"{story_id}: the wizard faces up, down, left or right")
     actors = data.get("actors", [])
     if not isinstance(actors, list) or not all(isinstance(a, dict) for a in actors):
         raise LevelError(f"{story_id}: actors must be a list of objects")
@@ -2079,6 +2083,8 @@ def story_on_scene(
         },
         scene,
     )
+    if facing != "down":
+        built["facing"] = facing
     grid = built["map"]
     height, width = len(grid), len(grid[0])
     shut = {
@@ -2381,6 +2387,11 @@ def story_on_scene(
             else:
                 kind = "sleep" if "sleep" in action else "wake"
                 queue.append((kind, action.get("sleep")))
+        # Who speaks meanwhile may walk out of sight as the last of its actions, its words
+        # said as the step begins (D275, D310).
+        gone = step.get("meanwhile") is True and queues.get(who, [("", None)])[-1:] == [
+            ("vanish", None)
+        ]
         # In a step where a familiar walks, the figures play in half ticks: a familiar's
         # step takes one, every other doing two, as the page plays it (D277).
         quick = any(
@@ -2458,7 +2469,7 @@ def story_on_scene(
                         shut.update(doors[value])
         if vanishing:
             where[who] = None
-        if who != "voice" and who in where and where[who] is None and not vanishing:
+        if who != "voice" and who in where and where[who] is None and not vanishing and not gone:
             raise LevelError(f"{here}: {who} speaks out of sight")
 
     world_actors = []
@@ -2476,7 +2487,7 @@ def story_on_scene(
     if world_actors:
         built["actors"] = world_actors
     del built["id"]
-    staging = ("wizard", "actors", "things")
+    staging = ("wizard", "facing", "actors", "things")
     story = {key: value for key, value in data.items() if key not in staging}
     story["camera"] = list(camera)
     story["world"] = built
@@ -2486,7 +2497,17 @@ def story_on_scene(
 #: What a step that changes the story's scene gives of the new one (a story's own
 #: staging, for the steps from it on), and whether it opens after time has passed, the
 #: scene gone dark and back (`later`, D280).
-PART_STAGING = ("scene", "wizard", "actors", "things", "camera", "light", "flying", "later")
+PART_STAGING = (
+    "scene",
+    "wizard",
+    "facing",
+    "actors",
+    "things",
+    "camera",
+    "light",
+    "flying",
+    "later",
+)
 
 
 def story_on_scenes(

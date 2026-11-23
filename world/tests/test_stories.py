@@ -133,6 +133,48 @@ ROOM = Scene(
 MATE = {"id": "mate", "kind": "friend", "at": [2, 1], "asleep": "bed_1"}
 
 
+def test_a_story_says_which_way_its_wizard_faces_from_the_first_frame():
+    """D308: `facing` beside `wizard` reaches the built world's start; down when not said."""
+    assert staged(facing="up")["world"]["facing"] == "up"
+    assert "facing" not in staged()["world"]
+    assert "facing" not in staged(facing="left")
+    with pytest.raises(LevelError, match="faces up, down, left or right"):
+        staged(facing="north")
+
+
+def test_a_meanwhile_speaker_may_walk_out_of_sight_as_its_last_action():
+    """D310: who speaks meanwhile says the words as the step begins and may walk out of
+    sight at its end; without meanwhile, a speaker out of sight is refused."""
+    actors = [{"id": "nuri", "kind": "friend", "at": [3, 1]}]
+    walk = {"walk": [5, 1], "vanish": True}
+    staged(actors=actors, steps=[{"who": "nuri", "meanwhile": True, "do": walk}])
+    with pytest.raises(LevelError, match="speaks out of sight"):
+        staged(actors=actors, steps=[{"who": "nuri", "do": walk}])
+
+
+def test_the_tower_s_first_year_is_the_three_friends_who_leave_the_dormitory():
+    """D310, D311: The tower has no walk-on pupil; at the end of its first part the three
+    have left the dormitory by the left, none in sight, and at the end of its second the
+    wizard and the mate are gone into the arch's dark with the friend."""
+    import json
+    from pathlib import Path
+
+    from kydux_world.level import read_scene, story_on_scene
+
+    content = Path(__file__).resolve().parents[2] / "content"
+    story = json.loads((content / "stories" / "the-tower" / "story.json").read_text())
+    assert {actor["id"] for actor in story["actors"]} == {"mate", "friend"}
+    assert not any("classmate" in json.dumps(step) for step in story["steps"])
+    first = story_on_scene(
+        {**story, "steps": story["steps"][:6]}, read_scene(content / "scenes", story["scene"])
+    )
+    assert first["steps"][5]["do"][-1] == {"by": "wizard", "walk": [0, 15], "vanish": True}
+    six = [a for a in story["steps"][5]["do"] if a.get("vanish")]
+    assert sorted(a["by"] for a in six) == ["friend", "mate", "wizard"]
+    seventeen = [a for a in story["steps"][16]["do"] if a.get("vanish")]
+    assert sorted(a["by"] for a in seventeen) == ["friend", "mate", "wizard"]
+
+
 def in_the_room(steps, actors=(MATE,)):
     data = {"id": "a-night", "scene": "room", "wizard": [1, 2], "actors": list(actors)}
     return story_on_scene({**data, "steps": steps}, ROOM)

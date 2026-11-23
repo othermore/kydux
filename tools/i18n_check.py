@@ -144,8 +144,10 @@ def check_speakers(languages: dict[str, dict[str, str]]) -> list[str]:
 
 def check_stories(languages: dict[str, dict[str, str]]) -> list[str]:
     """Every story has its title and one text a step in every language, and every
-    figure who speaks in it has its name (D74)."""
+    figure who speaks in it has its name (D74); its words on the dark are for steps that
+    open later, the same in every language (D309)."""
     findings = []
+    later: dict[str, list[list[str]]] = {}
     for path in sorted((REPO / "content" / "stories").glob("*/story.json")):
         name = path.parent.relative_to(REPO).as_posix()
         story = json.loads(path.read_text(encoding="utf-8"))
@@ -168,9 +170,23 @@ def check_stories(languages: dict[str, dict[str, str]]) -> list[str]:
                 findings.append(
                     f"{name}/text.{lang}.json: {len(steps)} steps in story.json, not as many here"
                 )
+            # Words on the dark before a part that opens later (D309), by its step's number.
+            for key in text.get("later", {}):
+                number = int(key) if str(key).isdigit() else 0
+                scene = steps[number - 1].get("scene", {}) if 0 < number <= len(steps) else {}
+                if not isinstance(scene, dict) or scene.get("later") is not True:
+                    findings.append(
+                        f"{name}/text.{lang}.json: later {key} is no step opening later"
+                    )
+            later.setdefault(name, []).append(sorted(text.get("later", {})))
             for who in sorted(map(str, named)):
                 if f"characters.{who}" not in catalog:
                     findings.append(f"{name}: {who} has no name in i18n/{lang}.json")
+    for name, keys in later.items():
+        if any(one != keys[0] for one in keys):
+            findings.append(
+                f"{name}: the words on the dark are not the same steps in every language"
+            )
     return findings
 
 

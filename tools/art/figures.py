@@ -11,6 +11,9 @@ that the figures stay the same drawing and only their colours change.
     tools/art/figures.py --fly <boy|girl> <edit.png>
     tools/art/figures.py --drawn <figure> <drawing.png>
     tools/art/figures.py --drawn-fly <figure> <drawing.png>
+    tools/art/figures.py --drawn-sit <figure> <drawing.png>
+    tools/art/figures.py --familiar <kind> <colour> <drawing.png>
+    tools/art/figures.py --familiars-check
 
 A figure's standing frame, in every row of its sheet, has its feet together and its
 weight on both, and a walking frame is made from it (D147). --standing makes a
@@ -65,6 +68,19 @@ drawing of it riding the broom in the same four views (--drawn-fly), scaled as i
 standing views, bobbing as the wizard's; some views may be drawn again
 (--drawn-fly-view), each as tall as the one it replaces. figures.json says its rows in
 `sheets`.
+
+A drawn figure may sit on the floor (--drawn-sit, D273): four more rows after its
+walking and flying ones, from a drawing of it sitting in the four views, each view its
+row's three frames, as tall as DRAWN_SIT says; Rinlo hiding in the forgotten room.
+
+The familiars (--familiar, D273) are walking sheets of their own, one a kind and a colour
+(FAMILIARS): Gemini's drawing of the creature in four rows of three on flat magenta, each
+figure cut to its piece, scaled as its kind's standing figure facing down is FAMILIARS'
+height, about half a child's, its bottom on the frame's foot line, the magenta's shades
+round it cleared; the row to the right is the steadied row to the left turned over, and
+a colour that is not the kind's first is checked against the first's sheet, frame by
+frame. figures.json lists them (`familiars`) with their size (`familiar_height_cells`);
+--familiars-check writes art/raw/game-check/figures-check-5.png to look at.
 
 Each look's portrait (--portraits, D194) is its gender's base bust (PORTRAIT_BASES, cut
 from Gemini's portrait of the base sheet's figure) with each part in the look's colour:
@@ -131,9 +147,9 @@ FLY_BOB = 3
 DRAWN = {
     "zarek": (106, ("down", "right", "left", "up")),
     "rinlo": (106, ("down", "right", "left", "up")),
+    # The head of the school (D273), a grown-up, who wears no hat (D98).
+    "orla": (114, ("down", "right", "left", "up")),
 }
-#: A drawn figure's rows (figures.json's `sheets`): walking, and flying when it flies.
-DRAWN_ROWS = {"walk": 0, "fly": 4}
 FRIEND_ROWS = {"walk": 0, "sleep": 4}
 #: How tall the figure is, at most, in each picking-up frame, against its standing
 #: height: bending, at the ground, half up again. A frame the edit draws taller
@@ -278,7 +294,7 @@ def recolour_sheet(
 #: over its hat.
 SIZE = 0.82
 GROWN_UP = 0.9
-GROWN_UPS = ("wenna", "ilda", "dask", "baro")
+GROWN_UPS = ("wenna", "ilda", "dask", "baro", "orla")
 
 
 def sized(
@@ -734,14 +750,57 @@ def drawn_rows(
     return [by_way[way] for way in about["ways"]], scale
 
 
+#: A drawn figure's rows after its walking ones, in this order where it has them: flying
+#: (D188), and sitting on the floor (D273), four each, in the ways' order.
+DRAWN_PARTS = ("fly", "sit")
+
+
+def drawn_rows_of(name: str) -> dict[str, int]:
+    """A drawn figure's rows (figures.json's `sheets`): walking, then each part of
+    DRAWN_PARTS it has, four rows each."""
+    rows, next_row = {"walk": 0}, 4
+    for part in DRAWN_PARTS:
+        if (BASE_DIR / f"{name}-{part}.webp").is_file():
+            rows[part] = next_row
+            next_row += 4
+    return rows
+
+
 def drawn_sheet(name: str) -> Path:
-    """A drawn figure's sheet: its walking rows, and its flying rows when it has them."""
+    """A drawn figure's sheet: its walking rows, then its flying rows and its sitting
+    rows when it has them."""
     parts = [Image.open(BASE_DIR / f"{name}-standing.webp").convert("RGBA")]
-    if (BASE_DIR / f"{name}-fly.webp").is_file():
-        parts.append(Image.open(BASE_DIR / f"{name}-fly.webp").convert("RGBA"))
+    for part in DRAWN_PARTS:
+        if (BASE_DIR / f"{name}-{part}.webp").is_file():
+            parts.append(Image.open(BASE_DIR / f"{name}-{part}.webp").convert("RGBA"))
     target = FIGURES / f"{name}.webp"
     stacked(*parts).save(target, quality=90, method=6)
     return target
+
+
+#: How tall a drawn figure sitting on the floor is in its frame, facing down, in pixels:
+#: its head as big as standing, its body folded (D273).
+DRAWN_SIT = {"rinlo": 76}
+
+
+def make_drawn_sit(name: str, drawing: Path) -> Path:
+    """A drawn figure's sitting rows (D273), from a drawing of it sitting on the floor in
+    the four views, its view facing down as tall as DRAWN_SIT says and the others at the
+    same scale, each view its row's three frames, its bottom on the frame's foot line;
+    its sheet made."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    views = drawn_views(Image.open(drawing))
+    scale = DRAWN_SIT[name] / views[0].height
+    cells, _ = drawn_rows(name, drawing, scale)
+    rows = []
+    for cell in cells:
+        row = Image.new("RGBA", (fw * 3, fh), (0, 0, 0, 0))
+        for index in range(3):
+            row.alpha_composite(cell, (index * fw, 0))
+        rows.append(row)
+    stacked(*rows).save(BASE_DIR / f"{name}-sit.webp", quality=90, method=6)
+    return drawn_sheet(name)
 
 
 def make_drawn(name: str, drawing: Path) -> Path:
@@ -989,6 +1048,243 @@ def make_portraits() -> list[Path]:
     return written
 
 
+#: The familiars (D273): six kinds, each in its colours, the kind's first colour drawn by
+#: Gemini as a walking sheet, four rows of three on flat magenta, and its other colours
+#: Gemini's edits of that drawing. Each kind: how tall its standing figure facing down is
+#: in its frame, in pixels, about half a child's height (0.57 of a cell); and, for each way
+#: but the right, the three frames of its row (a step, standing, the other step), each
+#: the drawing's (row, column), and "turned" for a figure drawn facing the other way,
+#: turned over. The row to the right is the row to the left mirrored, so
+#: that every figure of it faces right and steps as the left one does.
+FAMILIARS = {
+    "fox": {
+        "colours": ("red", "white", "black"),
+        "height": 55,
+        "frames": {
+            "down": ((0, 0), (0, 1), (0, 2)),
+            "left": ((1, 0), (1, 1), (1, 2)),
+            "up": ((3, 0), (3, 1), (3, 2)),
+        },
+    },
+    "crow": {
+        "colours": ("black", "white"),
+        "height": 52,
+        "frames": {
+            "down": ((0, 0), (0, 1), (0, 2)),
+            # The drawing's third figure of that row faces right: the last of the row
+            # before it, which faces right, turned over.
+            "left": ((2, 0), (2, 1), (1, 2, "turned")),
+            "up": ((3, 0), (3, 1), (3, 2)),
+        },
+    },
+    "bat": {
+        "colours": ("black", "white"),
+        "height": 40,
+        # A bat flies low, a little above the floor, in pixels.
+        "lift": 8,
+        "frames": {
+            "down": ((0, 0), (0, 1), (0, 2)),
+            "left": ((1, 0), (1, 1), (1, 2)),
+            "up": ((3, 0), (3, 1), (3, 2)),
+        },
+    },
+    "hare": {
+        "colours": ("brown", "white", "grey"),
+        "height": 57,
+        "frames": {
+            "down": ((0, 2), (0, 0), (0, 2)),
+            "left": ((1, 1), (1, 0), (1, 2)),
+            "up": ((3, 0), (3, 1), (3, 2)),
+        },
+    },
+    "mouse": {
+        "colours": ("brown", "white"),
+        "height": 46,
+        "frames": {
+            "down": ((0, 0), (0, 1), (0, 2)),
+            "left": ((1, 0), (1, 1), (2, 0)),
+            "up": ((3, 0), (3, 1), (3, 2)),
+        },
+    },
+    "frog": {
+        "colours": ("green", "red"),
+        "height": 40,
+        "frames": {
+            "down": ((0, 1), (0, 0), (0, 2)),
+            "left": ((1, 1), (1, 0), (1, 2)),
+            "up": ((3, 0), (3, 2), (3, 0)),
+        },
+    },
+}
+#: How tall a familiar is, as a part of a cell, for whoever needs its size (figures.json).
+FAMILIAR_HEIGHT_CELLS = 0.57
+
+
+def familiar_id(kind: str, colour: str) -> str:
+    return f"familiar-{kind}-{colour}"
+
+
+def drawing_cells(
+    drawing: Image.Image, rows: int = 4, columns: int = 3
+) -> list[list[Image.Image]]:
+    """A drawing of figures on flat magenta in rows and columns, each figure keyed off
+    the magenta and cut to its own box, the magenta's spill on its edge greyed as a
+    drawn figure's is (drawn_views)."""
+    rgb = np.array(drawing.convert("RGB")).astype(int)
+    distance = np.abs(rgb - np.array([255, 0, 255])).sum(axis=2)
+    alpha = np.clip((distance - 90) * 3, 0, 255).astype(np.uint8)
+    spill = (rgb[..., 0] > rgb[..., 1] + 40) & (rgb[..., 2] > rgb[..., 1] + 40)
+    rgb[spill, 1] = ((rgb[spill, 0] + rgb[spill, 2]) // 2 * 0.6).astype(int)
+    keyed = np.dstack([rgb.astype(np.uint8), alpha])
+    height, width = alpha.shape
+    found = []
+    for row in range(rows):
+        line = []
+        for column in range(columns):
+            y0, y1 = row * height // rows, (row + 1) * height // rows
+            x0, x1 = column * width // columns, (column + 1) * width // columns
+            part = keyed[y0:y1, x0:x1]
+            solid = part[..., 3] > 150
+            ys, xs = np.nonzero(solid)
+            if not ys.size:
+                raise SystemExit(f"nothing drawn in row {row + 1}, column {column + 1}")
+            box = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
+            # Its largest piece alone: a shadow drawn under a flying bat goes.
+            piece = np.array(alone(Image.fromarray(part, "RGBA").crop(box)))
+            ys, xs = np.nonzero(piece[..., 3] > 150)
+            box = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
+            line.append(Image.fromarray(piece, "RGBA").crop(box))
+        found.append(line)
+    return found
+
+
+def familiar_sheet(kind: str, drawing: Image.Image) -> Image.Image:
+    """A familiar's walking sheet from Gemini's drawing of it (FAMILIARS): four rows of
+    three frames in the figures' frame, every figure scaled as its kind's standing figure
+    facing down is FAMILIARS' height, its bottom on the frame's foot line and its middle on
+    the frame's, the largest piece of it kept (a shadow drawn under it goes); the row to
+    the right the row to the left mirrored; steadied, as every sheet."""
+    import sprites  # noqa: PLC0415 - the cut's tools, only for the bases
+
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    foot = about["foot"]
+    own = FAMILIARS[kind]
+    cells = drawing_cells(drawing)
+    pieces = {
+        way: [
+            cells[pick[0]][pick[1]].transpose(Image.FLIP_LEFT_RIGHT)
+            if pick[2:] == ("turned",)
+            else cells[pick[0]][pick[1]]
+            for pick in own["frames"][way]
+        ]
+        for way in ("down", "left", "up")
+    }
+    standing = pieces["down"][1]
+    scale = own["height"] / standing.height
+    rows = {}
+    for way, views in pieces.items():
+        row = Image.new("RGBA", (fw * 3, fh), (0, 0, 0, 0))
+        for index, view in enumerate(views):
+            small = view.resize(
+                (max(1, round(view.width * scale)), max(1, round(view.height * scale))),
+                Image.LANCZOS,
+            )
+            if small.width > fw:
+                side = (small.width - fw) // 2
+                small = small.crop((side, 0, side + fw, small.height))
+            cell = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+            lift = own.get("lift", 0)
+            cell.alpha_composite(small, ((fw - small.width) // 2, fh - foot - lift - small.height))
+            # The magenta's shades round it cleared as far as they reach, a shadow painted
+            # under a bat too, then its largest piece alone.
+            cleaned = sprites.off_magenta_rim(np.array(cell), margin=FLY_MARGIN, bright=FLY_BRIGHT)
+            cell = alone(Image.fromarray(cleaned, "RGBA"))
+            row.alpha_composite(cell, (index * fw, 0))
+        rows[way] = row
+    rows["right"] = Image.new("RGBA", (fw * 3, fh), (0, 0, 0, 0))
+    sheet = steadied(stacked(*(rows[way] for way in about["ways"])), (fw, fh), reach=10)
+    # The row to the right, the steadied row to the left turned over, frame by frame.
+    left, right = about["ways"].index("left"), about["ways"].index("right")
+    for index in range(3):
+        cell = sheet.crop((index * fw, left * fh, (index + 1) * fw, (left + 1) * fh))
+        sheet.paste(cell.transpose(Image.FLIP_LEFT_RIGHT), (index * fw, right * fh))
+    return sheet
+
+
+def outline_match(sheet: Image.Image, first: Image.Image) -> list[float]:
+    """How alike two sheets' figures are, frame by frame: the share of their drawn
+    pixels they have in common (intersection over union), a colour edit checked against
+    its kind's first sheet."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    ours = np.array(sheet.convert("RGBA"))[..., 3] > 128
+    theirs = np.array(first.convert("RGBA"))[..., 3] > 128
+    shares = []
+    for top in range(0, ours.shape[0], fh):
+        for left in range(0, ours.shape[1], fw):
+            a = ours[top : top + fh, left : left + fw]
+            b = theirs[top : top + fh, left : left + fw]
+            union = int((a | b).sum())
+            shares.append(round(int((a & b).sum()) / union, 3) if union else 1.0)
+    return shares
+
+
+def make_familiar(kind: str, colour: str, drawing: Path) -> Path:
+    """A familiar's sheet, content/art/figures/familiar-<kind>-<colour>.webp, from Gemini's
+    drawing of it (--familiar); a colour that is not its kind's first is checked against
+    the first's sheet, frame by frame, and the shares printed."""
+    if colour not in FAMILIARS[kind]["colours"]:
+        raise SystemExit(f"a {kind} is one of {', '.join(FAMILIARS[kind]['colours'])}")
+    sheet = familiar_sheet(kind, Image.open(drawing))
+    target = FIGURES / f"{familiar_id(kind, colour)}.webp"
+    sheet.save(target, quality=90, method=6)
+    first = FIGURES / f"{familiar_id(kind, FAMILIARS[kind]['colours'][0])}.webp"
+    if colour != FAMILIARS[kind]["colours"][0] and first.is_file():
+        print("outlines alike, frame by frame:", outline_match(sheet, Image.open(first)))
+    return target
+
+
+def familiars_check() -> Path:
+    """The chapter 5's figures to look at (D273), art/raw/game-check/figures-check-5.png:
+    the fourteen familiars' sheets, each frame's lower half twice its size with the foot
+    line drawn, so that a stray pixel or a figure facing the wrong way shows; Orla's sheet
+    and Rinlo's with its sitting rows, whole; and the thread's and the trail's sprites."""
+    about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
+    fw, fh = tuple(about["frame"])
+    foot, keep, scale = about["foot"], fh // 2, 2
+    names = [
+        familiar_id(kind, colour) for kind, own in FAMILIARS.items() for colour in own["colours"]
+    ]
+    block = (fw * 3 * scale + 16, keep * 4 * scale + 8)
+    columns = 7
+    rows = (len(names) + columns - 1) // columns
+    people = [Image.open(FIGURES / f"{name}.webp").convert("RGBA") for name in ("orla", "rinlo")]
+    things = REPO / "content" / "art" / "things"
+    sprites = [Image.open(things / f"{name}.webp").convert("RGBA") for name in ("thread", "trail")]
+    width = max(block[0] * columns, sum(s.width + 16 for s in people + sprites))
+    height = block[1] * rows + max(s.height for s in people)
+    sheet = Image.new("RGBA", (width, height), (225, 215, 195, 255))
+    for index, name in enumerate(names):
+        drawn = Image.open(FIGURES / f"{name}.webp").convert("RGBA")
+        left, top = (index % columns) * block[0], (index // columns) * block[1]
+        for row in range(4):
+            part = drawn.crop((0, row * fh + fh - keep, fw * 3, (row + 1) * fh))
+            part = part.resize((part.width * scale, part.height * scale), Image.NEAREST)
+            y = top + row * keep * scale
+            line = Image.new("RGBA", (part.width, 1), (120, 160, 220, 255))
+            sheet.alpha_composite(line, (left, y + (keep - foot) * scale))
+            sheet.alpha_composite(part, (left, y))
+    x, y = 0, block[1] * rows
+    for shown in people + sprites:
+        sheet.alpha_composite(shown, (x, y))
+        x += shown.width + 16
+    target = RAW / "game-check" / "figures-check-5.png"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    sheet.convert("RGB").save(target)
+    return target
+
+
 def make(check: bool = False) -> list[Path]:
     about = json.loads((FIGURES / "figures.json").read_text(encoding="utf-8"))
     frame = tuple(about["frame"])
@@ -1054,11 +1350,22 @@ def make(check: bool = False) -> list[Path]:
     about["sheets"] = {
         f"{name}-{set_name}": FRIEND_ROWS for name in FRIENDS for set_name in sets[name]
     }
-    # A drawn figure says its rows, the flying ones where it has them (D188).
+    # A drawn figure says its rows, the flying ones and the sitting ones where it has
+    # them (D188, D273).
     for name in DRAWN:
         if (FIGURES / f"{name}.webp").is_file():
-            flying = (BASE_DIR / f"{name}-fly.webp").is_file()
-            about["sheets"][name] = DRAWN_ROWS if flying else {"walk": 0}
+            about["sheets"][name] = drawn_rows_of(name)
+    # The familiars (D273): a walking sheet each, about half a child's height.
+    familiars = [
+        familiar_id(kind, colour)
+        for kind, own in FAMILIARS.items()
+        for colour in own["colours"]
+        if (FIGURES / f"{familiar_id(kind, colour)}.webp").is_file()
+    ]
+    for name in familiars:
+        about["sheets"][name] = {"walk": 0}
+    about["familiars"] = sorted(familiars)
+    about["familiar_height_cells"] = FAMILIAR_HEIGHT_CELLS
     (FIGURES / "figures.json").write_text(json.dumps(about, indent=2) + "\n", encoding="utf-8")
     if check:
         # Every sheet written, then the drawn figures' and the things' sprites (D182),
@@ -1124,6 +1431,23 @@ def main() -> int:
         "--drawn", nargs=2, metavar=("FIGURE", "DRAWING"), help="make a figure from a drawing"
     )
     parser.add_argument(
+        "--drawn-sit",
+        nargs=2,
+        metavar=("FIGURE", "DRAWING"),
+        help="make a drawn figure's sitting rows from a drawing of it sitting",
+    )
+    parser.add_argument(
+        "--familiars-check",
+        action="store_true",
+        help="write the sheet of chapter 5's figures to look at",
+    )
+    parser.add_argument(
+        "--familiar",
+        nargs=3,
+        metavar=("KIND", "COLOUR", "DRAWING"),
+        help="make a familiar's walking sheet from a drawing of it",
+    )
+    parser.add_argument(
         "--drawn-fly",
         nargs=2,
         metavar=("FIGURE", "DRAWING"),
@@ -1143,6 +1467,16 @@ def main() -> int:
         return 0
     if args.drawn:
         print(make_drawn(args.drawn[0], Path(args.drawn[1])).relative_to(REPO))
+        return 0
+    if args.drawn_sit:
+        print(make_drawn_sit(args.drawn_sit[0], Path(args.drawn_sit[1])).relative_to(REPO))
+        return 0
+    if args.familiars_check:
+        print(familiars_check().relative_to(REPO))
+        return 0
+    if args.familiar:
+        kind, colour, drawing = args.familiar
+        print(make_familiar(kind, colour, Path(drawing)).relative_to(REPO))
         return 0
     if args.drawn_fly_view:
         name, way, drawing = args.drawn_fly_view

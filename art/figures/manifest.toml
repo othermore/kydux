@@ -104,3 +104,13 @@ licence = "GPL-3.0-or-later"
 source = "generated: gemini-3-pro-image, from the front frame of wizard-base-girl.webp, tools/art/prompts/portrait-wizard-girl.md; cut by tools/art/sprites.py portrait"
 author = "Kydux contributors"
 licence = "GPL-3.0-or-later"
+
+["orla-standing.webp"]
+source = "generated: gemini-3-pro-image, a drawing of Orla standing in the four views, tools/art/prompts/figure-orla-standing.md; each view put on its grid by tools/art/figures.py --drawn"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"
+
+["rinlo-sit.webp"]
+source = "generated: gemini-3-pro-image, a drawing of Rinlo sitting on the floor in the four views, tools/art/prompts/figure-rinlo-sitting.md; each view put on its grid by tools/art/figures.py --drawn-sit"
+author = "Kydux contributors"
+licence = "GPL-3.0-or-later"

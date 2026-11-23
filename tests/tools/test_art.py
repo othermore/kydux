@@ -754,7 +754,9 @@ def test_every_figure_passes_under_the_doors_it_walks_through():
     # The pupils a year older, taller than the first-years and shorter than the
     # grown-ups (D188).
     older = [n for n in names if n in ("zarek", "rinlo")]
-    grown = [n for n in names if n not in children and n not in older]
+    # The familiars, half a child's height (D273), pass under every door.
+    small = [n for n in names if n.startswith("familiar-")]
+    grown = [n for n in names if n not in children and n not in older and n not in small]
     child = max(standing_height(n) for n in children)
     adult = max(standing_height(n) for n in grown)
     assert child <= 1.15 and adult <= 1.31

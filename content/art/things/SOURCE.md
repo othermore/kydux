@@ -20,3 +20,8 @@ its foot stands in its cell (D182).
   Gemini 3 Pro Image from `tools/art/prompts/sprite-broom.md`, keyed out, its
   magenta rim and the lawn strip under it taken out, by
   `tools/art/sprites.py sprite --lawn`.
+- `thread.webp` and `trail.webp`: a piece of black thread with its knot, which a
+  familiar picks up, and a wisp of it lying on the floor, the trail (D270, D273):
+  painted side by side on flat magenta by Gemini 3 Pro Image from
+  `tools/art/prompts/sprite-thread.md` (the small passage given as its picture), each
+  cut from its box by `tools/art/sprites.py sprite`.

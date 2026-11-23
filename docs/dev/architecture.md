@@ -4959,7 +4959,7 @@ one overturns stays, marked as superseded.
   friend and the mate are the whole first year: no story, level or text shows or names
   another first-year, and the pupils seen leaving the first-years' dormitory are those
   three. A walk-on pupil (`classmate_boy`, `classmate_girl`) is of another year, as the
-  second-years of *The flying lesson* are.
+  second-years of *The flying lesson* are, and wears colours no first-year wears (D326).
 - **D312 — The theme's time on the page of themes.** Decided 2026-11-22 by the owner
   (*estaría bien en el debug poder tener un visor del tiempo (duración de la canción y
   poder deslizar a un punto concreto) para decirte exactamente en qué segundo pasa*). On
@@ -5257,3 +5257,16 @@ one overturns stays, marked as superseded.
   `app/test-results/`, which git ignores. Rules out a
   browser-test job on GitHub, one started by hand too, and a step that uploads an
   artifact from a run of the private repository.
+- **D326 — A walk-on pupil wears colours of its own.** Decided 2026-11-23 by the owner,
+  to the designer's proposal of a third set of colours for the pupils seen in passing
+  (*Veo bien hacer el tercer juego*). A walk-on pupil (D311) has a friend's figure, the
+  girl Nuri's and the boy Teku's, and one set of colours whoever the wizard is
+  (`CLASSMATE_SETS` in `looks.ts`): the girl a pale sky-blue robe with a slate-blue hat
+  and a yellow band, the boy a charcoal robe and hat with an orange band. Each robe
+  stands far, as seen (CIELAB's ΔE, over 40), from every look's robe, from the four
+  robes of the friends' sets (D90) and from the other pupil's, which a test holds, so
+  that a pupil of another year is never taken for the wizard, the friend or the mate
+  beside them. `tools/art/figures.py` draws the two sheets, `classmate-girl` and
+  `classmate-boy`, and `figureName` picks them. Rules out a walk-on pupil in a friend's
+  second set, which is the robe the friend of another look wears, and a set chosen by
+  the look, which the two friends' choice (D90) already spends.

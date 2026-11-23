@@ -1195,11 +1195,12 @@ later, like the rest of it.
   (`figure-cast-boy.md`, `figure-cast-girl.md`), each put back on its grid
   by `tools/art/figures.py`. The base sheets are in `art/figures/`.
 - `wizard-<look>.webp` for each look of the creator, its walking rows and
-  its casting rows, and `nuri-a`, `nuri-b`, `teku-a` and `teku-b`, each
-  friend in two sets of colours (D90), are those bases recoloured by
-  `tools/art/figures.py`: the robe, the hat, its band, the hair and the
-  skin in the look's colours (`app/src/engine/looks.ts`), their shading
-  kept.
+  its casting rows, `nuri-a`, `nuri-b`, `teku-a` and `teku-b`, each
+  friend in two sets of colours (D90), and `classmate-girl` and
+  `classmate-boy`, the walk-on pupils in theirs (D326), are those bases
+  recoloured by `tools/art/figures.py`: the robe, the hat, its band, the
+  hair and the skin in the look's colours (`app/src/engine/looks.ts`),
+  their shading kept.
 """
 
 

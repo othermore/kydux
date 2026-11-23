@@ -723,7 +723,10 @@ step frames keeping their legs.
 Each friend comes in two sets of colours (D90), `nuri-a`, `nuri-b`,
 `teku-a` and `teku-b`, recoloured from the friends' bases with the colours
 of `FRIEND_SETS` in `app/src/engine/looks.ts`; the game wears the set
-farthest from the wizard's look and from the other friend's.
+farthest from the wizard's look and from the other friend's. The walk-on
+pupils have the friends' figures in one set of colours each (D326,
+`CLASSMATE_SETS`), `classmate-girl` from Nuri's base and `classmate-boy`
+from Teku's.
 
 A door that opens may have a half-open state, between its closed and its
 open ones. It is an edit of the painting like the others, and the game

@@ -41,9 +41,10 @@ its step frames are the standing frame with its dress grown downward and its hem
 swung, left in one and right in the other, which the page cycles through while
 the figure stands (D120); figures.json lists them (`floating`).
 
-Writes content/art/figures/wizard-<look>.webp for every look and the friends'
-sheets named in FRIENDS, from the bases in art/figures/ (BASES), and their list in
-figures.json; --check writes art/raw/figures-check.png, every sheet side by
+Writes content/art/figures/wizard-<look>.webp for every look, the friends'
+sheets named in FRIENDS and the walk-on pupils' (CLASSMATES, D326), from the bases
+in art/figures/ (BASES), and their list in figures.json; --check writes
+art/raw/figures-check.png, every sheet side by
 side with the drawn figures, the things' sprites and the portraits, to look at. A wizard's
 sheet has four more rows after its walking ones, the same ways in the same
 order: casting, the wand raised, pointed with its light and lowered,
@@ -164,6 +165,9 @@ FRIENDS = {
     "teku": ("friend-boy", {"skin": "#a8714a", "hair": "#1f1a17"}),
     "nuri": ("friend-girl", {"skin": "#c98e5f", "hair": "#4a2c1a"}),
 }
+#: The walk-on pupils (D311, D326): the sheet of each and the friend whose figure,
+#: skin and hair it has, in the colours of looks.ts's CLASSMATE_SETS.
+CLASSMATES = {"classmate-girl": "nuri", "classmate-boy": "teku"}
 PARTS = ("skin", "hair", "robe", "hat", "band")
 #: How much of a figure, from its feet up, a step frame keeps of its own drawing:
 #: the boots and the robe's hem. The rest is the standing frame's.
@@ -212,6 +216,16 @@ def friend_sets() -> dict[str, dict[str, dict[str, str]]]:
             for name, fields in re.findall(r"(\w): \{([^}]*)\}", body)
         }
     return found
+
+
+def classmate_sets() -> dict[str, dict[str, str]]:
+    """The walk-on pupils' colours (D326), by the friend whose figure each is, read
+    from looks.ts's CLASSMATE_SETS."""
+    text = LOOKS_TS.read_text(encoding="utf-8").split("export const CLASSMATE_SETS")[1]
+    return {
+        friend: dict(re.findall(r"(\w+): '(#[0-9a-f]{6})'", fields))
+        for friend, fields in re.findall(r"(\w+): \{([^}]*)\}", text.split("};")[0])
+    }
 
 
 def _hsv(rgb: np.ndarray) -> np.ndarray:
@@ -1408,6 +1422,18 @@ def make(check: bool = False) -> list[Path]:
             sized(sheet, frame, about["foot"]).save(target, quality=90, method=6)
             written.append(target)
         (FIGURES / f"{name}.webp").unlink(missing_ok=True)
+    pupils = classmate_sets()
+    for sheet_name, friend in CLASSMATES.items():
+        key, own = FRIENDS[friend]
+        base, hues = bases[key]
+        both = {**own, **pupils[friend]}
+        sheet = stacked(
+            recolour_sheet(base, frame, both, hues),
+            recolour_sheet(sleeps[key], frame, both, hues),
+        )
+        target = FIGURES / f"{sheet_name}.webp"
+        sized(sheet, frame, about["foot"]).save(target, quality=90, method=6)
+        written.append(target)
     # The list is whatever sheets the folder holds: these, and the figures cut once
     # by export_scene.py (Wenna, Eldra, Dask).
     about["figures"] = sorted(p.stem for p in FIGURES.glob("*.webp"))
@@ -1419,6 +1445,7 @@ def make(check: bool = False) -> list[Path]:
     about["sheets"] = {
         f"{name}-{set_name}": FRIEND_ROWS for name in FRIENDS for set_name in sets[name]
     }
+    about["sheets"].update({name: FRIEND_ROWS for name in CLASSMATES})
     # A drawn figure says its rows, the flying ones and the sitting ones where it has
     # them (D188, D273).
     for name in DRAWN:

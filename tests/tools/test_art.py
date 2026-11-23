@@ -751,7 +751,9 @@ def test_every_figure_passes_under_the_doors_it_walks_through():
     # doorway to the top of its arch, a tenth of a cell taller than the tallest
     # figure that walks through.
     names = json.loads((FIGURES / "figures.json").read_text())["figures"]
-    children = [n for n in names if n.startswith(("wizard-", "nuri-", "teku-")) or n == "eldra"]
+    # A walk-on pupil has a friend's figure (D326).
+    young = ("wizard-", "nuri-", "teku-", "classmate-")
+    children = [n for n in names if n.startswith(young) or n == "eldra"]
     # The pupils a year older, taller than the first-years and shorter than the
     # grown-ups (D188).
     older = [n for n in names if n in ("zarek", "rinlo")]

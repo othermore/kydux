@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CLASSMATE_SETS,
   colourDistance,
   DEFAULT_LOOK,
   dormitoryMate,
@@ -55,6 +56,21 @@ describe("the friends' colours (D90)", () => {
       expect(colourDistance(teku, look.robe), `Teku for ${look.id}`).toBeGreaterThan(30);
       expect(colourDistance(nuri, teku), `the friends for ${look.id}`).toBeGreaterThan(30);
     }
+  });
+
+  it('give a walk-on pupil a robe far from every wizard, every friend and the other pupil (D326)', () => {
+    const worn = [
+      ...LOOKS.map((look) => [look.id, look.robe] as const),
+      ...(['nuri', 'teku'] as const).flatMap((friend) =>
+        (['a', 'b'] as const).map((set) => [`${friend}-${set}`, FRIEND_SETS[friend][set].robe] as const),
+      ),
+    ];
+    for (const pupil of ['nuri', 'teku'] as const) {
+      for (const [whose, robe] of worn) {
+        expect(colourDistance(CLASSMATE_SETS[pupil].robe, robe), `${pupil}'s pupil and ${whose}`).toBeGreaterThan(40);
+      }
+    }
+    expect(colourDistance(CLASSMATE_SETS.nuri.robe, CLASSMATE_SETS.teku.robe)).toBeGreaterThan(40);
   });
 
   it("names the sheet of a friend's set, the same for a look all the game", () => {

@@ -164,6 +164,16 @@ export const FRIEND_SETS: Record<'nuri' | 'teku', Record<'a' | 'b', FriendColour
   },
 };
 
+/** The colours of a walk-on pupil (D311, D326), by the friend whose figure it is: a
+ * third set, the girl's pale blue and the boy's charcoal, far from every look's robe,
+ * from the friends' four and from each other, so that no wizard meets its like in one
+ * of them. tools/art/figures.py draws a sheet for each, `classmate-girl` and
+ * `classmate-boy`. */
+export const CLASSMATE_SETS: Record<'nuri' | 'teku', FriendColours> = {
+  nuri: { robe: '#a8d8e0', hat: '#5f97a3', band: '#f2c14e' },
+  teku: { robe: '#5a5a60', hat: '#38383d', band: '#e89a3f' },
+};
+
 /** A colour in CIELAB, from its hex. */
 function lab(hex: string): [number, number, number] {
   const channel = (at: number) => {

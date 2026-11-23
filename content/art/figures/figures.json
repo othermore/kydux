@@ -16,6 +16,8 @@
   "standing": 1,
   "figures": [
     "baro",
+    "classmate-boy",
+    "classmate-girl",
     "dask",
     "eldra",
     "familiar-bat-black",
@@ -82,6 +84,14 @@
       "sleep": 4
     },
     "nuri-b": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "classmate-girl": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "classmate-boy": {
       "walk": 0,
       "sleep": 4
     },

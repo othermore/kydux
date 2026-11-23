@@ -5,7 +5,7 @@
 
 import type Phaser from 'phaser';
 import type { DoorLock } from './layout';
-import { DEFAULT_LOOK, dormitoryMate, FRIEND_SETS, friendSets, type HairStyle, type Look, teacherFriend } from './looks';
+import { CLASSMATE_SETS, DEFAULT_LOOK, dormitoryMate, FRIEND_SETS, friendSets, type HairStyle, type Look, teacherFriend } from './looks';
 
 export const TILE = 48;
 export const WIZARD_WIDTH = 36;
@@ -232,15 +232,20 @@ const GHOST: Figure = {
 
 /** The friends who teach, each in their own colours (D66, D77): Nuri, a girl,
  * and Teku, a boy, pupils with a hat like the wizard's; `friend` is the one of the
- * wizard's other gender and `mate` the one of its own (D84); Wenna, the librarian. A friend the game has no figure for
- * is drawn as a teacher. */
+ * wizard's other gender and `mate` the one of its own (D84); a walk-on pupil, one of
+ * the two in colours of its own (D326); Wenna, the librarian. A friend the game has no
+ * figure for is drawn as a teacher. */
 export function friendFigure(id: string, wizardGender: 'girl' | 'boy', look?: Pick<Look, 'robe'>): Figure {
   const who =
     id === 'friend' ? teacherFriend(wizardGender).id : id === 'mate' ? dormitoryMate(wizardGender).id : id;
-  if (who === 'nuri' || who === 'teku') {
-    // In the set of colours unlike the wizard's (D90); the first with no look given.
-    const colours = FRIEND_SETS[who][look ? friendSets(look)[who] : 'a'];
-    const nuri = who === 'nuri';
+  // A walk-on pupil is a friend's figure in colours of its own (D326).
+  const classmate = id === 'classmate_girl' ? 'nuri' : id === 'classmate_boy' ? 'teku' : null;
+  if (classmate || who === 'nuri' || who === 'teku') {
+    // A friend, in the set of colours unlike the wizard's (D90); the first with no look given.
+    const colours = classmate
+      ? CLASSMATE_SETS[classmate]
+      : FRIEND_SETS[who as 'nuri' | 'teku'][look ? friendSets(look)[who as 'nuri' | 'teku'] : 'a'];
+    const nuri = (classmate ?? who) === 'nuri';
     return {
       robe: colours.robe,
       hat: { colour: colours.hat, band: colours.band },

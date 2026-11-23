@@ -464,7 +464,9 @@
     "game_name": "El nombre de tu partida",
     "game_name_rule": "Un nombre puede tener letras, números, espacios, guiones y apóstrofos, hasta 30.",
     "game_name_taken": "Ya tienes una partida con ese nombre. Elige otro.",
-    "gender_first": "Elige primero cómo es tu personaje, y aquí aparecerá su aspecto."
+    "gender_first": "Elige primero cómo es tu personaje, y aquí aparecerá su aspecto.",
+    "once": "Elige con calma: después podrás cambiar los nombres, pero no cómo es tu personaje ni su aspecto.",
+    "fixed": "Cómo es tu personaje y su aspecto se eligen una sola vez, al empezar la partida."
   },
   "characters": {
     "ilda": "Ilda",

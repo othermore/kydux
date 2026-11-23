@@ -40,6 +40,11 @@ test('the creator, and Done opens the first lesson by name', async ({ page }) =>
   await expect(page.locator('#wizard-looks-first')).toBeVisible();
   await expect(page.locator('#wizard-done')).toBeDisabled();
   await expect(page.locator('#wizard-back')).toHaveCount(0);
+  // The gender and the look are for the whole game (D292).
+  await expect(page.locator('#wizard-once')).toHaveText(
+    'Choose calmly: later you can change the names, but not who your wizard is or their look.',
+  );
+  await expect(page.locator('#wizard-fixed')).toHaveCount(0);
 
   await page.locator('#wizard-name').fill('Ana');
   // A name alone is not enough: the wizard's gender is the child's to choose.
@@ -131,8 +136,15 @@ test('Change the names opens the wizard with both names; Back and Escape leave b
   await expect(page.locator('#wizard-name')).toHaveValue('Marta');
   // The game of before is named by its wizard (D291).
   await expect(page.locator('#game-name')).toHaveValue('Marta');
-  await expect(page.locator('#wizard-gender [data-value="girl"]')).toHaveAttribute('aria-checked', 'true');
-  await expect(page.locator('#wizard-looks .radio').nth(0)).toHaveAttribute('aria-checked', 'true');
+  // The gender and the look are chosen once (D292): shown, not offered.
+  await expect(page.locator('#wizard-gender')).toHaveCount(0);
+  await expect(page.locator('#wizard-looks')).toHaveCount(0);
+  await expect(page.locator('#wizard-once')).toHaveCount(0);
+  await expect(page.locator('#wizard-fixed')).toHaveText(
+    'Who your wizard is and their look are chosen once, when the game begins.',
+  );
+  expect(await portraitShown(page, '#wizard-preview')).toBe('wizard-teal');
+  await expect(page.locator('.wizard-screen .radio')).toHaveCount(0);
   // A wizard made: the game's name changes only by the child's hand.
   await page.locator('#wizard-name').fill('Mar');
   await expect(page.locator('#game-name')).toHaveValue('Marta');
@@ -153,6 +165,7 @@ test('Change the names opens the wizard with both names; Back and Escape leave b
   await page.locator('#wizard-done').click();
   await page.locator('#home').click();
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Mar');
+  expect(await portraitShown(page, '#start-figure')).toBe('wizard-teal');
   await expect(page.locator('#current-game')).toHaveText('You are in the game “My game”.');
   await page.locator('#load-game').click();
   await expect(page.locator('#games .game-name')).toHaveText(['My game']);

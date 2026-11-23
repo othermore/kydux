@@ -1,8 +1,10 @@
 // The wizard creator (D36): a name, the game's name (D290), a girl or a boy, and a
 // look among the game's. The game's name follows the wizard's, as the name a game
 // takes from its wizard (D291), until the child writes it. Done keeps the wizard and
-// the game's name together and goes on; when a wizard exists already, the screen
-// opens with it and the game's name, and Back leaves both as they were.
+// the game's name together and goes on. The gender and the look are chosen once
+// (D292): when a wizard exists already, the screen opens with its two names to
+// change, its look shown and neither offered, and Back leaves both names as they
+// were.
 
 import { looksFor } from '../engine/looks';
 import { t } from '../i18n';
@@ -242,10 +244,16 @@ export function wizardScreen(parts: WizardScreenParts): Screen {
           gameInput,
           gameRule,
           gameTaken,
-          element('p', { className: 'wizard-field' }, [t('wizard.gender')]),
-          genders,
-          element('p', { className: 'wizard-field' }, [t('wizard.looks')]),
-          looks,
+          // A wizard made keeps its gender and look (D292): they are told, not offered.
+          ...(before
+            ? [element('p', { id: 'wizard-fixed', className: 'wizard-note' }, [t('wizard.fixed')])]
+            : [
+                element('p', { className: 'wizard-field' }, [t('wizard.gender')]),
+                genders,
+                element('p', { className: 'wizard-field' }, [t('wizard.looks')]),
+                looks,
+                element('p', { id: 'wizard-once', className: 'wizard-note' }, [t('wizard.once')]),
+              ]),
         ]),
         element('div', { className: 'wizard-preview' }, [preview, previewName]),
       ]),

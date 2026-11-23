@@ -1888,6 +1888,13 @@ a.stop-body:focus-visible {
   font-size: 15px;
 }
 
+/* What the creator says of the gender and the look, chosen once (D292). */
+.wizard-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
 .radio-group {
   display: flex;
   flex-wrap: wrap;

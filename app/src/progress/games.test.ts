@@ -216,6 +216,19 @@ describe("a game's name (D290, D291)", () => {
     expect(progress.currentGameName()).toBeNull();
   });
 
+  it("keeps a made wizard's gender and look, whatever setWizard is given (D292)", () => {
+    progress.useGames(new GamesStore(memoryStorage(), clock()));
+    progress.setWizard(MARTA);
+    progress.setWizard({ name: 'Mar', gender: 'boy', look: 'amber' });
+    expect(progress.wizard()).toEqual({ name: 'Mar', gender: 'girl', look: 'teal' });
+    expect(progress.keepWizard({ name: 'Leo', gender: 'boy', look: 'amber' }, 'Leo')).toBe(true);
+    expect(progress.wizard()).toEqual({ name: 'Leo', gender: 'girl', look: 'teal' });
+    // A new game begins with no wizard, and there all is chosen (D64).
+    progress.newGame();
+    progress.setWizard(LEO);
+    expect(progress.wizard()).toEqual(LEO);
+  });
+
   it('naming refuses another game\'s name in any case of letters, and takes the game\'s own', () => {
     const games = new GamesStore(memoryStorage(), clock());
     progress.useGames(games);

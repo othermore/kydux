@@ -464,7 +464,9 @@
     "game_name": "Your game's name",
     "game_name_rule": "A name has letters, digits, spaces, hyphens and apostrophes, up to 30 of them.",
     "game_name_taken": "You already have a game with that name. Choose another.",
-    "gender_first": "Choose first who your wizard is, and their looks appear here."
+    "gender_first": "Choose first who your wizard is, and their looks appear here.",
+    "once": "Choose calmly: later you can change the names, but not who your wizard is or their look.",
+    "fixed": "Who your wizard is and their look are chosen once, when the game begins."
   },
   "characters": {
     "ilda": "Ilda",

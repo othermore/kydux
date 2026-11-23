@@ -245,9 +245,12 @@ export function wizard(): Wizard | null {
   return store.load().wizard;
 }
 
+/** The wizard kept. A wizard made keeps its gender and look, whatever it is given
+ * (D292): only its name changes. */
 export function setWizard(made: Wizard): void {
   change((progress) => {
-    progress.wizard = made;
+    const before = progress.wizard;
+    progress.wizard = before ? { ...made, gender: before.gender, look: before.look } : made;
   });
 }
 

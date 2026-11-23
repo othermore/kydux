@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bowed,
   frequency,
   lineFor,
   loopOf,
@@ -126,6 +127,33 @@ describe('the music (D192)', () => {
     expect(lineFor([], 0, 60)).toBe(-1);
   });
 
+  it("starts a pad's line from silence, and takes back the dying away only of a line that sounded", () => {
+    const { ctx, gains } = toldContext();
+    const out = ctx.createGain() as unknown as AudioNode;
+    const lines: Parameters<typeof bowed>[1] = [];
+    bowed(ctx, lines, 60, 2, 1, 0.5, out);
+    expect(lines).toHaveLength(1);
+    // A line just made is silent until its note swells: nothing takes its silence back.
+    expect(gains[1]).toEqual([
+      ['set', 0, 2],
+      ['target', 0.5 * 0.07, 2],
+      ['target', 0, 3],
+    ]);
+    // The note that follows sounds on the same line, whose dying away is taken back.
+    bowed(ctx, lines, 62, 3, 1, 0.5, out);
+    expect(lines).toHaveLength(1);
+    expect(gains[1]?.slice(3)).toEqual([
+      ['cancel', 3 - 0.02],
+      ['target', 0.5 * 0.07, 3],
+      ['target', 0, 4],
+    ]);
+    // A note while that line still sounds starts a line of its own, from silence too.
+    bowed(ctx, lines, 67, 3.5, 1, 0.5, out);
+    expect(lines).toHaveLength(2);
+    expect(gains[2]?.[0]).toEqual(['set', 0, 3.5]);
+    expect(gains[2]?.some(([call]) => call === 'cancel')).toBe(false);
+  });
+
   it('refuses a theme with a voice of no kind it sounds', () => {
     expect(() => readTheme({ ...waltz(120), voices: { tune: { kind: 'organ', volume: 1 } } })).toThrow(/no kind/);
   });
@@ -135,6 +163,31 @@ describe('the music (D192)', () => {
     expect(frequency(81)).toBe(880);
   });
 });
+
+/** An audio context that takes the calls a pad's line makes and sounds nothing, with
+ * what every gain it made was told, in the order it made them. */
+function toldContext(): { ctx: AudioContext; gains: [call: string, ...values: number[]][][] } {
+  const gains: [call: string, ...values: number[]][][] = [];
+  const param = () => ({ setValueAtTime: () => undefined, setTargetAtTime: () => undefined });
+  const node = () => ({ connect: (target: unknown) => target });
+  const ctx = {
+    createGain: () => {
+      const told: [call: string, ...values: number[]][] = [];
+      gains.push(told);
+      return {
+        ...node(),
+        gain: {
+          setValueAtTime: (value: number, at: number) => told.push(['set', value, at]),
+          setTargetAtTime: (value: number, at: number) => told.push(['target', value, at]),
+          cancelScheduledValues: (at: number) => told.push(['cancel', at]),
+        },
+      };
+    },
+    createBiquadFilter: () => ({ ...node(), type: '', frequency: param() }),
+    createOscillator: () => ({ ...node(), type: '', frequency: param(), detune: param(), start: () => undefined }),
+  } as unknown as AudioContext;
+  return { ctx, gains };
+}
 
 /** An audio context that only takes the calls a struck note makes, and sounds nothing. */
 function fakeContext(): AudioContext {

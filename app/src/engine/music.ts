@@ -280,8 +280,9 @@ const FALL = 0.4;
 
 /** One note of a bowed pad, from `at` for `seconds`, on one of the voice's lines: the
  * line whose note ends as this one starts slides to its pitch and sounds on, with no
- * breath between the two; a line dies away only where no note follows its own. */
-function bowed(ctx: AudioContext, lines: Line[], pitch: number, at: number, seconds: number, loudness: number, out: AudioNode): void {
+ * breath between the two; a line dies away only where no note follows its own. A note
+ * that finds no line free starts one of its own, from silence. */
+export function bowed(ctx: AudioContext, lines: Line[], pitch: number, at: number, seconds: number, loudness: number, out: AudioNode): void {
   const hertz = frequency(pitch);
   let line = lines[lineFor(lines, at, pitch)];
   const follows = line !== undefined && at - line.until < JOIN;
@@ -302,9 +303,11 @@ function bowed(ctx: AudioContext, lines: Line[], pitch: number, at: number, seco
     });
     line = { saws, filter, gain, until: 0, pitch };
     lines.push(line);
+  } else {
+    // The dying away set at the end of the note before is taken back: this note follows.
+    // A line just made has nothing to take back, and keeps the silence it starts from.
+    line.gain.gain.cancelScheduledValues(at - JOIN);
   }
-  // The dying away set at the end of the note before is taken back: this note follows.
-  line.gain.gain.cancelScheduledValues(at - JOIN);
   const cutoff = Math.min(4000, hertz * 5);
   if (follows) {
     for (const saw of line.saws) saw.frequency.setTargetAtTime(hertz, at, SLIDE);

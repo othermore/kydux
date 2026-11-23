@@ -130,8 +130,9 @@ def test_the_forgotten_room_s_side_door_rests_shut_and_opens_in_two_pieces():
     """D289: the story's door rests closed, its closed state draws nothing; open, its leaf
     stands on the landing beside the wall, as high as the shut door, on row 3, and its
     doorway lies on the floor, covering the whole of the shut door; the block at the
-    doorway's foot is drawn over whoever crosses it, drawn on the doorway's middle and
-    lower; on the landing, a figure is drawn with its feet below the leaf's foot."""
+    doorway's foot is drawn over whoever crosses it, drawn on the doorway's middle with
+    its feet on the middle of the cell below; on the landing, a figure is drawn with its
+    feet below the leaf's foot."""
     passage = CONTENT / "art" / "scenes" / "the-tower-passage"
     art = json.loads((passage / "art.json").read_text(encoding="utf-8"))
     door = art["things"]["room_door"]
@@ -167,7 +168,8 @@ def test_the_forgotten_room_s_side_door_rests_shut_and_opens_in_two_pieces():
     assert {"cells": [[5, 3], [5, 3]], "by": 0.25} in [
         {k: v for k, v in part.items() if k in ("cells", "by")} for part in art["nudged"]
     ]
-    assert any(part["cells"] == [[5, 3], [5, 3]] and part["by"] == 0.4 for part in art["lowered"])
+    crossing = next(part for part in art["lowered"] if part["cells"] == [[5, 3], [5, 3]])
+    assert 4.4 <= 3 + 0.8 + crossing["by"] <= 4.6
     landing = next(part for part in art["lowered"] if part["cells"] == [[2, 3], [4, 3]])
     assert 3 + 0.8 + landing["by"] > leaf[3]
     assert not any("leaf" in part for part in art["nudged"] + art["lowered"])

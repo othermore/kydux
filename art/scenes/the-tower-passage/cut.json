@@ -136,9 +136,9 @@
   ],
   "lowered": [
     {
-      "about": "The forgotten room's side doorway (D289): a figure crossing it is drawn lower, its feet behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`).",
+      "about": "The forgotten room's side doorway (D289): a figure crossing it is drawn lower, its feet on the middle of the cell below, behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`) and hides it up to the chest.",
       "cells": [[5, 3], [5, 3]],
-      "by": 0.4
+      "by": 0.65
     },
     {
       "about": "The landing of the back stairs, before the side door (D289): a figure on it is drawn lower, its feet below the open leaf's foot, as one passing before the leaf.",

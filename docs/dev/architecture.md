@@ -60,12 +60,15 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (D235, D242), a flown step in a third of a walked one's time, and
                 through a ring's hole, on the side of the ring it flew to
                 (flight.ts, D185, D232), the tester's view of the cells,
-                the low and the high ones, the rings' order and the masks
+                the low and the high ones, the small ones only a familiar
+                walks (D270), the rings' order and the masks
                 (debug.ts, opened with ?debug), and the sound effects, made as
                 the game plays on the page's one sound context, which sleeps
                 while nothing sounds (sfx.ts, D231), with the flight's wind,
                 a gust for each flown command (sound.ts, D185, D243), and the
-                chapters' music, played from its notes (music.ts, D192)
+                chapters' music, played from its notes (music.ts, D192), and a
+                familiar's trial drawn in light from its sheet, frame by frame
+                (trial.ts, D263)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
                 under the line's own indentation (D223)
   src/fonts/    the code's letter, Inconsolata (D238), and the hand the
@@ -104,7 +107,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 and its pages (lessons.ts), a story and its steps as the scene's
                 events (stories.ts), the guide's words (guide.ts), and the
                 course (course.ts): its chapters, what comes next, a stop's
-                state, what the child knows in a level (D40); every address
+                state, what the child knows in a level (D40); the first year's
+                familiars, the draft and the familiar written into a level, and
+                what a text says of them (familiar.ts, D260, D265, D266); every address
                 of a file under content/, with the world's stamp, is made by
                 address.ts (D230)
   src/progress/ the player's progress, a document per game (store.ts), the
@@ -116,7 +121,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 into world.zip, copy the content into content/ with the course in
                 content/course.json (its items' titles in every language among
                 it), each level and story on a scene with its world built in, and
-                write the world's table as api.json
+                write the world's table as api.json and the first year's
+                familiars as familiars.json (D260)
   e2e/          the browser tests (Playwright), beside the node_modules they need;
                 the loop's screenshots in e2e/shots/ (D39), and a chapter played whole
                 for the owner (walkthrough.spec.ts, by `npm run walkthrough`)
@@ -124,6 +130,8 @@ world/          kydux_world, the model of the levels, and its tests: level.py re
                 a level; world.py holds the wizard and the ticks; things.py the
                 read-only base and the things; actors.py the teacher and the sight
                 rule, the ghost, the cat, the friend and the racer (D189);
+                familiars.py the first year's familiars, `Familiar` and the
+                reading of a class the child writes (D260, D261);
                 goals.py the goals; api.py
                 the names a level may teach;
                 explain.py errors in the child's words; run.py runs the child's code;
@@ -290,15 +298,29 @@ teacher.distance_to(other), ghost.distance_to(other), cat.distance_to(other)
 hole.open                    # whether a step onto it, taken now, would find it open (D53, D167)
 hole.closed                  # whether a step onto it, taken now, lands on the floor; hole.open's
                              # opposite, so `while hole.open:` is `while not hole.closed:`
+
+wizard.cast("minka", creature)  # a tick: an object of a class with (Familiar) into the
+                             # circle as a trial (D262), or the living familiar back to the
+                             # wizard, which hands over everything it carries
+familiar.name, familiar.color   # the creature's two attributes, the child's to write (D260)
+familiar.position            # where it stands; None before minka calls it
+familiar.move_right(steps=1) # and move_left, move_up, move_down, inherited from Familiar:
+                             # a tick per step of the familiar's; picks up a piece of
+                             # thread where a move ends (D270)
+familiar.go_to(x, y)         # a method of the child's own class, allowed from Orla's
+                             # orders on, and the one Orla's orders use (D267)
 ```
 
 The map's characters: `#` a wall, `.` floor, `=` a shelf (D46), `~` a low
-cell, which a flight crosses and a walk does not (D186), `S` the wizard's
+cell, which a flight crosses and a walk does not (D186), `,` a small cell,
+which a familiar enters and the wizard does not (D270), `S` the wizard's
 start, any other letter a floor tile named by it (a marker). A scene's map
 names its own terrains in its scene.json, each with its `kind` and whether
 it is walked on (`walk`), seen across (`sight`) and flown over (`fly`): a
 low terrain, water or a hedge, is flown over and not walked on; a high one,
-a tree or a wall, neither (D186).
+a tree or a wall, neither (D186); a terrain whose `walk` is `"small"`, a
+familiars' passage, is walked on by a familiar alone, and the wizard bumps
+there with the terrain's kind (D270).
 
 The child's code holds `wizard` and every thing and actor of the level by
 its id. Everything it holds is read-only to it (D20). Its errors are
@@ -315,10 +337,10 @@ tiles are `[x, y]`.
 | kind | actor | data | the scene |
 |---|---|---|---|
 | `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243); flown moves of a figure's that follow one another are one glide at an even speed, read ahead from the ticks, with no rest at the cells it passes (D259), and `data-flyers-at` says where each flying figure is as each frame is drawn |
-| `bump` | wizard | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
+| `bump` | wizard, or a familiar | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `familiar` (with `id`), and for a familiar's bump `wizard`, `actor` or `familiar` (with `id`, D270); a familiars' passage, a small cell, is a `wall` to the wizard, with the cell's `kind` (D270); `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
-| `pick_up` | wizard | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); `data-carried` |
+| `pick_up` | wizard, or a familiar | `id`, `at` | the wizard bends; a thing on the floor rises and vanishes, one a spell brought to the hands fades there (D127); a familiar's thing rises a little and vanishes where its move ends (D270); `data-carried` |
 | `open` | wizard, by `door.open()`; or the door, in the wizard's tick, opened by a spell or a word | `id`, `at`, `by`: `hand`, `spell` or `word` | the door's frame turns open; `data-doors` |
 | `shoved` | the door, in the tick it opens | `id`, the figure; `from`, `to`; `by`, the door | the figure on the open leaf's cells walks aside along the row (D125); `data-shoved` |
 | `cast` | wizard | `spell`, `at` | the wand is pointed and a point of light flies from it, to the thing the spell takes or a tile ahead, and bursts in a ring |
@@ -330,7 +352,7 @@ tiles are `[x, y]`.
 | `sleep` | wizard, or in a story an actor | `id`, the bed; `at`, the cell under the bed's pillow (`pillow_side`) the figure goes to bed from, which the world walks the wizard to first, a `move` a tick; `bed`, its tile; `facing`, toward the bed (the wizard's) | the figure, facing the bed, hops in an arc from its cell into the bed and settles lying there, its head on the pillow, under the quilt, in the tick (D130); for the wizard no celebration after, but the night falling and the morning coming before the card (D124); `data-sleeping` for the wizard, `data-asleep` for all (D84, D91) |
 | `wake` | in a story, the wizard or an actor | `at` | the figure gets up and stands on its tile, the floor under the bed's pillow (D91, D130) |
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
-| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned |
+| `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved before its minka), and the first year's warnings, `by` `orla` or `book`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, told as Orla's or the book's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
 | `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
 | `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
@@ -343,6 +365,19 @@ tiles are `[x, y]`.
 | `wrong_way` | the ring, in the wizard's move | `id`, `at`, `way`, the cell flown from | the ring shakes, with the bump's sound, and half a second after it the wizard thinks the way it is flown (D237), over its head or beside it (D245); the ring counts as missed (D219) |
 | `read` | wizard, before the first action of a race | `at`, `count`, `lines` | the band at the scene's foot says Ilda reading the two programs and the ticks to each take-off, the line read lit in the editor; `data-race-band` (D189) |
 | `judged` | wizard, a tick after a race is flown out | `at`; `lines`, `flight`, `missed`, `penalty` and `tick`, Ilda's count of the wizard, `flight` and `tick` null when it has not crossed; `racer`, `racer_lines`, `racer_tick`; `winner`, `wizard`, the racer's id, or null for a tie | the band says Ilda's verdict: the ticks each one took, the wizard's penalty when it has one, the winner or the tie; `data-race-verdict` (D234) |
+| `trial` | the trial, in the wizard's tick of minka | `id` (`familiar_<n>`), `kind`, `name`, `color`, `at`, `pale` and its `reason` (`colour`, `grey`, `none` or null), `dissolved`, the trial whose cell it takes | the creature drawn in light from its sheet (D263), fading in with a burst and the `trial` sound: whole and washed towards white with an edge of light, or, pale, its lines alone in white light, trembling; the trial it replaces dissolves; `data-creatures`, `data-trials` |
+| `spark` | the trial, in the wizard's tick of minka | `id`, `kind`, `at` | a shapeless spark of light where the trial would stand, for three ticks (D261) |
+| `told` | the actor who speaks, or `book`, in the tick going on | `who`, `key`; `kind`, `name`, `color`, `line` for its words | the level's or the chapter's words in a bubble over who says them, from a spot of the scene for a voice painted into it, or in the book's band; the playback holds until they are read (D264); `data-told` |
+| `book` | `book`, in the tick of minka or after the program | `line`, `ok`, `ink`; or `kind` and `colors`, a kind's colours | the band under the scene: the line noted in pencil or in ink, the book's words when the class cannot make the familiar, or the kind's colours as the strings to write (D267); `data-book-band` |
+| `order` | `orla`, after the program | `line`, the line the world runs; `to` | the band shows the line, and the familiar's steps follow as its own (D267) |
+| `held` | the trial, in the birth level's run that does not pass | `at`, `to`, `facing` | the trial nudges at the circle's edge with the bump's sound, and a footprint of light on the cell it would reach (D268) |
+| `footprint` | the trial, after a step held | `from`, `at`, `facing` | a footprint of light on the cell the step would reach (D268); `data-footprints` |
+| `born` | the familiar, in the step that leaves the circle, or another's after the program | `id`, `at` | the trial takes its living sheet, with a burst (D268) |
+| `learned` | `familiar`, before the first tick | `id`, `kind`, `methods` | nothing: the living familiar's class took the child's methods (D269) |
+| `puzzled` | the familiar | `id`, `at` | the creature tilts its head (D269) |
+| `copied` | the room-mate | `id`, `kind`, `color` | her trial drawn again as her copy of the child's (D268) |
+| `hand_over` | the familiar, in its last step's tick after minka | `id`, `things`, `at` | the things are the wizard's, with the pick-up's sound (D262) |
+| `lit` | the plate, in the familiar's move | `id`, `at` | the plate turns to its `lit` state (D270); `data-lit` |
 
 A run's status is `won`, `incomplete`, `error`, `too_many_ticks`,
 `interrupted` or `caught`; its goals say for each whether it was met or
@@ -3988,3 +4023,263 @@ one overturns stays, marked as superseded.
   its last step is shown, so that at every speed the broom flies its way once and the rings,
   the gusts and the count stay with it. Rules out a move per cell shorter than its tick, a
   move per cell that eases in and out, and a flight made slower to hide the rests.
+- **D260 — A class of the child's is a kind of familiar.** Decided 2026-11-17 from the
+  owner's design (*un familiar no se elige, se describe*). A level whose `level.json` has a
+  `familiar` block puts a real Python class, `Familiar`, among the program's names. A class
+  the child writes with `(Familiar)` is a kind of familiar and its name is the kind (`Fox`);
+  an object of it is one creature. `Familiar` is made for each world
+  (`world/kydux_world/familiars.py`), needs no `super()` and no `__init__` of the child's:
+  its `__new__` takes any data and keeps the world's own state under `_k_` names, so that a
+  class with no `__init__` called with data gives Python's own error. Its `__setattr__`
+  takes `name` and `color` and nothing else; `position` is read (D153) and is `None` before
+  the creature is called. The class is looked at when Python makes it (`__init_subclass__`):
+  a method other than `__init__`, and than `go_to` where the level's block allows it, or any
+  other name in its body, stops the program at that line (D261). The limits hold only for
+  classes that inherit from the world's `Familiar`: a lesson's own `class Crow:` or `class
+  Familiar:` is plain Python. The one table of the first year is in `familiars.py`: the six
+  kinds with their colours (`Fox`: `red`, `white`, `black`; `Crow`: `black`, `white`; `Bat`:
+  `black`, `white`; `Hare`: `brown`, `white`; `Mouse`: `brown`, `white`; `Frog`: `green`,
+  `red`), the colour kept for the friend (`Hare`, `grey`), the friends' familiars' names
+  (Tolu and Kesi, and Rumo and Nabi when the child takes one of those), the reserved names,
+  and the default description (`Fox`, `Pimu`, `red`). `app/scripts/pack-world.mjs` writes it
+  as `familiars.json` and the page reads the same table (`app/src/content/familiar.ts`); the
+  rules the two sides share (a name's check, the room-mate's colour, the alternate names)
+  are checked on both from one file of cases, `world/tests/familiar_cases.json`. The level's
+  block:
+
+  ```json
+  "familiar": {
+    "stage": "trial",
+    "circle": [8, 6, 11, 8],
+    "trials": [[10, 7]],
+    "methods": ["__init__"],
+    "book": false,
+    "then": null,
+    "draft": {"kind": "Fox", "name": "Pimu", "color": "red"}
+  }
+  ```
+
+  `stage` is `trial` (a level where the description is tried), `birth` (the level where it
+  leaves the circle) or `living` (a level played with the familiar there); `circle` is the
+  rectangle of cells inside the ring; `trials` the cells where a trial appears, in order;
+  `methods` what a class may define; `book` whether the book tries to note the trial (D267);
+  `then` what follows a won run (D268); `draft` and, in a `living` level, `living` (`kind`,
+  `name`, `color`, `source`, `at`, `facing`) are the level's own defaults, so that any level
+  plays alone (D49), the tests run it and `#level/<id>` opens it under `?debug`; the page
+  writes the game's own over them before a run (D265). Rules out a `wizard.describe(...)`
+  action, a menu of creatures and a class the game writes for the child.
+- **D261 — The first year's limits are stumbles of the story.** Decided 2026-11-17 by the
+  owner (*ninguno es un error rojo de Python: es un tropiezo de la historia, con palabras de
+  Orla*). Two kinds. A **warning** stops the program at its line as a refusal does:
+  `World.warn(reason, by, **detail)` beside `refuse` gives a tick, a `blocked` event with
+  the reason and who says it, `self.error = reason` and raises `Refused`. Its reasons:
+  `other_attribute` (anything but `name` and `color`, with the name written), `other_method`
+  and `other_name` (in the class's body), `go_to_not_yet` (a `go_to` before the level that
+  teaches it), `not_a_familiar` (`minka` on an object of a class without `(Familiar)`:
+  *`minka` solo llama a familiares, y tu clase no dice que lo sea*), `class_changed` (D269),
+  by Orla; and `name_letters`, `name_long`, `name_taken`, by the book. A **flawed trial**
+  does not stop anything: a kind that is not of the first year gives a shapeless spark of
+  light where the trial would stand, and Orla's words (`spark`); a colour that is not the
+  kind's own gives the trial with no colour (`pale: true`, reason `colour`), Orla's words
+  and the book showing the kind's colours as the strings to write; `Hare` with `grey` gives
+  the same pale hare with Orla's own words for it (reason `grey`: *`{wizard}`, tú no eres
+  tan {bueno|buena} como `{friend}`, y lo de la liebre gris no te va a salir bien*) and the
+  book shows `"brown"` and `"white"`; no colour at all gives the pale trial with no words
+  (reason `none`), and no name a trial with no name. A name is checked at every `minka`: a
+  string of letters only (`str.isalpha()`), twelve at most, whose lower-case form is not a
+  Python keyword, a builtin's name nor a name of the game's (`familiars.RESERVED`: `wizard`,
+  `familiar`, `orla`, `bimo`, `rinlo`, `friend`, `mate`, `moon`, `sun`, `star`, and every id
+  a chapter 5 level gives a thing or an actor, kept whole by a test). Rules out a Python
+  exception of the game's for any of these, and a silent correction of what the child wrote.
+- **D262 — `minka` takes an object.** Decided 2026-11-17 from the design. `minka` is in
+  `KNOWN_SPELLS` and `SPELLS`, and the notebook's aimed spells; `wizard.cast("minka", pimu)`
+  costs the wizard's tick as any cast. With no object, or with a thing of the world, it is
+  refused as an aimed spell with nothing to aim at is. In a `trial` or `birth` level it
+  brings the object's trial into the circle: each object takes the next free cell of
+  `trials`; with every cell taken, the oldest trial dissolves and the new one takes its
+  cell; an object already in the circle is not called twice (`blocked`, `already_here`, not
+  a stop). The event is `trial` (the object's id `familiar_<n>`, its kind, name, colour,
+  cell, `pale` and its reason, the cell's earlier trial dissolved) or `spark`. On a
+  **living** familiar `minka` brings it back: after the cast's tick the familiar runs by the
+  shortest way over the cells a familiar enters (D270) to the free cell beside the wizard
+  that is nearest by that way (ties by y, then x), a cell a tick, and hands the wizard
+  everything it carries in its last step's tick (the event `hand_over` with the things'
+  ids); beside the wizard already, it hands over with no step; with no way, `blocked`,
+  `no_way`. A new object called with a familiar living is refused, `already_living`, and
+  Orla says `halt`. Rules out a familiar that appears beside the wizard without walking.
+- **D263 — A trial is the figure in light; a trial with no colour is its drawing,
+  trembling.** Decided 2026-11-17 by the designer from the owner's words (*hay que pensar
+  bien cómo distinguir a los pálidos de los blancos, y que sea obvio*), on the design's
+  picture of the trials, samples 2 to 8, which waits for the owner's eye. A trial with its
+  colour, white included, is the creature's whole figure, half transparent, with an edge of
+  light, and it stands still. A trial with no colour is only the figure's lines, drawn in
+  white light with the floor seen through, and its light trembles. Both are drawn by the
+  page from the creature's sheet, frame by frame (`app/src/engine/trial.ts`, with the
+  samples' numbers scaled to the sheet's cell): no trial is painted. A pale trial of a kind
+  is drawn from the kind's first sheet. The spark and the footprints of light (D268) are
+  drawn by the page as well. Rules out a pale trial as the figure washed to grey (sample 1,
+  mistaken for a white creature) and a sheet of trials from Gemini.
+- **D264 — Someone's words in a run, and the playback waits for them.** Decided 2026-11-17
+  by the designer. The event `told`: someone of the scene says something while a program
+  runs. It is a note in the tick going on (it costs no tick): the actor's id, a `key` and
+  the values its words take (`kind`, `name`, `color`, `line`). The words are the level's own
+  (`text.<lang>.json`, a `told` map) or, without one, the chapter's (`told.<key>` in
+  `i18n/<lang>.json`), through `personal()`; a kind's and a colour's words come from
+  `familiars.<Kind>` and `familiars.colors.<color>` (in Spanish with the kind's gender: *un
+  zorro rojo*, *una liebre blanca*). They are shown as a bubble over the actor for their
+  reading time (D175), and the playback holds until they are read: ten seconds at most,
+  divided by the speed; step by step, until the next step; a run shown at once (Stop, a
+  replayed end) shows the last words only. They are built on `Speech`, as the race's verdict
+  is (D234). The words said at a win are named in the level's `level.json`, `"told": {"won":
+  [["orla", "won"], ["bimo", "bimo"]]}`, and said in that order after the goals. Someone
+  painted into a scene speaks from a spot the scene names (`scene.json`, `"voices": {"bimo":
+  [9, 3]}`); a story's `who` with no actor of that id speaks from the same spot. A warning
+  (D261) is told the same way, by Orla or in the book's band (D267). Rules out words of the
+  story in the outcome card only, and a run that goes on under an unread bubble.
+- **D265 — The draft and the familiar are kept with the game, and written into the level.**
+  Decided 2026-11-17 from the design. `Progress` has `familiar?: {draft?: {kind, name?,
+  color?}, living?: {kind, name, color, source, learned?}}`, validated by `readProgress` (a
+  kind and a colour of the table, a name that passes the check, the sources strings). The
+  world's result has `familiar: {trial: {kind, name, color} | null, born: boolean, source:
+  string | null, learned: string | null}`: the first good trial standing at the end, whether
+  the familiar left the circle, and the child's class as written, taken from the program
+  with `ast.get_source_segment`. The page saves on a win: levels 3, 5 and 7 keep the trial
+  as the draft while no familiar lives; level 10 keeps it as `living` with its `source`, for
+  good; level 12 keeps `learned`, the class with `go_to`. Before a run, and for the starting
+  code, the page writes the game's `draft` and `living` into the level's `familiar` block,
+  as it does `api` and `spells` (`main.ts`, `showLevel`); a `living` level takes `source` or
+  `learned` as its block's `from` says, `learned ?? source` for `learned`. With a familiar
+  living, a `trial` level is practice: the page says so on entering (`familiar.practice`),
+  fills the starting code from the living one and saves nothing of it. The starting code is
+  filled when a level is first opened and by *Start over* (D266). Rules out a familiar kept
+  in the saved program of a level, and a second familiar.
+- **D266 — The familiar in the texts.** Decided 2026-11-17 by the designer. `personal()` and
+  the tests' `for_wizard` fill, from the game's familiar or draft and, without one, from the
+  level's defaults: `{familiar}` (its name, *Pimu*), `{familiar_var}` (`pimu`),
+  `{familiar_class}` (`Fox`), `{familiar_color}` (the Python string, `red`),
+  `{familiar_kind}` and `{familiar_a_kind}` (*zorro*, *un zorro*), `{familiar_color_word}`
+  (*rojo*, agreeing with the kind), `{familiar_source}` (the class as kept, its lines),
+  `{mate_familiar}`, `{mate_var}`, `{mate_color}` (the room-mate's: the child's kind in the
+  table's first colour that is not the child's, named Kesi) and `{friend_familiar}` (Tolu).
+  A choice by the kind's gender is written `{familiar:el|la}`. After the birth a text names
+  the creature by `{familiar}` or as *tu familiar*, never by its kind, so that no text needs
+  the kind's gender but those that fill it. Rules out a text for each kind.
+- **D267 — The world uses the child's class after the program.** Decided 2026-11-17 from the
+  design (*el libro lo anota en una línea*; *ahora lo mandaré yo*). Where the level's block
+  says `book`, when the program has ended with a good trial (a first-year kind, a name, its
+  colour), the world calls the child's class itself as `Class(name, color)` with the trial's
+  own name and colour, inside the sandbox and its limits, what it prints dropped, and looks
+  at the object it gets: the same name and colour, or the book cannot note it. The event
+  `book` carries the line (`Fox("Pimu", "red")`), `ok`, and `ink` (true in the `birth`
+  level's passing run only); the page shows it in a band under the scene, written in pencil
+  or in ink, and failing with the book's words (*tu clase no sabe hacer un familiar con un
+  nombre y un color*). In level 12, when the program has ended with the familiar on the
+  sun's plate, the world gives Orla's two orders, which the level's block names (`"orders":
+  {"on": "sun", "steps": [{"to": [13, 10], "key": "order_star"}, {"to": [11, 10], "key":
+  "order_wizard"}]}`): for each, an `order` event with the line the world runs
+  (`pimu.go_to(13, 10)`, then `pimu.go_to(11, 10)`) shown in the band, her words (`told`),
+  and the call of the child's `go_to`, its steps ticks as any (D270) with the child's lines
+  inside `go_to` lit. An error inside is explained as the child's own and the goal stays
+  unmet. Rules out a check of the program's text for `__init__` or `go_to`.
+- **D268 — The fourth level's program is rehearsed, and a familiar is born once.** Decided
+  2026-11-17 by the owner (*si has llegado hasta ahí y tienes el programa bien, Orla lo
+  dice, pero no lo pregunta*; a wrong way shown in footprints). In a `birth` level
+  `run_code` runs the program twice, each in a new world. The first run is silent, a
+  rehearsal in which the trial crosses the circle's edge freely. The verdict is `passes`
+  when the rehearsal is won and no familiar lives in the game. The second run is the one
+  shown, played by the verdict. *Passing*: at the `minka` Orla speaks (`go`) and the book
+  notes the line in ink; the step that leaves the circle gives the event `born`; after the
+  program, the level's `then` (the room-mate's trial steps out of the circle and lives, a
+  tick of the world's). *Not passing*: the trial walks inside the circle; the step that
+  would leave it is `held` (a tick, the line lit, the trial at the edge), and every step
+  ordered after it is a `footprint` at the cell it would reach, a tick each, with `bump`
+  where it would bump, the way going on as the rehearsal's did; at the end, when a step was
+  held, Orla speaks (`not_yet`). With a familiar living, the shown run is played as not
+  passing with Orla's `halt` (*¡alto! ya tienes un familiar*), and its status and goals are
+  the rehearsal's: the practice may be won and nothing is saved. When the trial called
+  differs in kind or colour from the room-mate's copy, the room-mate's trial is drawn again
+  from it and the room-mate speaks (`copy`). `check_consistency` holds for both runs. Rules
+  out a question to the child before the birth, and a familiar born by a program that then
+  fails.
+- **D269 — A living familiar is in the programs, and describing it again only adds.**
+  Decided 2026-11-17 from the design. In a `living` level the world makes the familiar
+  before the program: it runs the kept class (`living.source`) under the file name `<book>`
+  with `Familiar` in reach, makes the object with the name and the colour, stands it on
+  `living.at` and gives it to the program under its name in lower case (`pimu`). No line of
+  the program makes it. When the program defines a class of the same name with `(Familiar)`,
+  its `__init__` is compared with the kept one (`ast.dump` of the two functions): the same,
+  and the object becomes of the new class (`object.__setattr__(familiar, "__class__", New)`)
+  with the event `learned`; another kind's name beside it or a changed `__init__`, and Orla
+  warns (`class_changed`). A method the familiar's class lacks is explained with its name
+  (*Pimu no sabe hacer `go_to`*) and the creature tilts its head (the event `puzzled`).
+  `check_called` and the API's check take a method of the child's class as the familiar's
+  own. Rules out a second object for the same creature and a familiar that forgets what it
+  is.
+- **D270 — A familiar's steps are ticks; some cells only a familiar enters; it picks up
+  where it stops; what it sees, the wizard finds.** Decided 2026-11-17 from the design.
+  `World.act` takes an `actor` (`"wizard"` by default): a familiar's `move_up`, `move_down`,
+  `move_left` and `move_right` are the wizard's `_move` with the familiar as the one that
+  walks, a cell a tick, a bump on what blocks and on the wizard, on an actor and on another
+  trial; a count of zero walks nothing and costs nothing. `check_consistency` asks one
+  acting event for each tick (the wizard's, a familiar's, or the world's own after the
+  program) and that each one's steps follow on. A trial moves only in the `birth` level;
+  before its `minka` a move is `blocked`, `not_here`. The role `familiar` in `api.py`:
+  `familiar.name`, `familiar.color`, `familiar.position` (`x`, `y`), `familiar.move_up`,
+  `familiar.move_down`, `familiar.move_left`, `familiar.move_right`. A scene's terrain with
+  `"walk": "small"` is entered by a familiar and not by the wizard, who bumps there with the
+  terrain's kind and a thought of its own. A thing kind `thread` is in `THING_KINDS` and
+  `CARRIED_KINDS`; a familiar picks up every carried kind of thing on the cell where a move
+  of one step or more ends (the familiar's `pick_up` event, in that step's tick) and carries
+  it; the wizard has it only when `minka` brings the familiar back (D262). A zone's things
+  are found from within it (D196) by the wizard **or by its living familiar**, and
+  `find_all` orders them as ever, nearest to the wizard first. A thing kind `trail` is a
+  thread's end on the floor: not carried, walked over, found by no one. A thing kind `plate`
+  lies in the floor, is walked over, and is lit when a familiar ends a move on it (the event
+  `lit`, the plate's state `lit`); the three plates' ids are `moon`, `sun` and `star`. Rules
+  out a familiar that moves without ticks and a wizard that sees through walls without it.
+- **D271 — The goals and the explanations of the chapter.** Decided 2026-11-17 by the
+  designer. Goals (`goals.py`, each with its `params` for the page): `trial` (at the
+  program's end the circle holds `count` trials of a first-year kind, each `named` and
+  `coloured` when the goal asks it; with `count` 2 their names differ); `noted` (the book
+  can note the trial, D267); `born` (the familiar has left the circle); `familiar_at` (the
+  familiar ends the program on a cell, or `on` a plate); `orders` (Orla's two orders obeyed:
+  after each the familiar stands where she sent it); `no_bumps` with `"of": "familiar"`;
+  `collect` with `"all": true` (the wizard ends with every thing of the kind). Explanations
+  (`explain.py`): `missing_self` (a `TypeError` of one datum too many on a method of the
+  child's class whose first name is not `self`: *cuando nace un objeto, Python se lo pasa a
+  `__init__` el primero de todos; a este `__init__` le falta un sitio para él: `self`*);
+  `no_attribute` (an object without the attribute: *este objeto no tiene nada que se llame
+  `name`*); `object_arguments` (too few or too many data to make an object, with the
+  numbers); `no_such_method` (D269). Rules out a goal that reads the program's text.
+- **D272 — A lesson's block may end in an error meant to be seen; the five ideas of the
+  chapter.** Decided 2026-11-17 from the design. `lesson.json` may say `"try": "error"` with
+  the kind expected (`"error": "no_attribute"`): the lesson runner shows the error's
+  explanation as the block's result, and the test of D142 asks that the block ends in
+  exactly that error. The course's concepts include `class`, `attributes`, `init`, `inherit`
+  and `methods`, found in a program by `concepts_used()` (an `ast.ClassDef`; an attribute of
+  a name given a value; an `__init__` in a class; a class with a parent; a function in a
+  class that is not `__init__`) and shown in the notebook's Python tab as seven entries:
+  `class` and `object` (with the concept `class`), `attribute`, `__init__` and `self` (with
+  `init`), `inherit` and `method`. The lessons of the chapter are Orla's. Not taught, and in
+  no text: `super()`, attributes of a class, `__str__`, properties. Rules out a lesson whose
+  example hides its error.
+- **D273 — What the two scenes and the figures hold.** Decided 2026-11-17 by the designer.
+  The scenes are `the-tower-hall` and `the-tower-passage`. The hall's three brass plates are
+  things of the settings' kind `plate`, each with a state `lit` made as a door's state is
+  (D148): one edit of the base with the three lit, the masks by difference. The great book
+  lies open on the lectern in the base painting, and Bimo sleeps on the lectern beside it in
+  every picture: he is part of the scene, speaks from his spot (D264) and never leaves. The
+  hall has a second light, `sunset`, as the dormitory has `morning`. The forgotten room's
+  door has no open state. A familiar's sheet is
+  `content/art/figures/familiar-<kind>-<color>.webp`, fourteen in all, laid out as a
+  wizard's walking sheet (three steps down, left, right and up) with each figure half a
+  wizard's height, standing in the lower half of its frame, so that it is cut and drawn as
+  any figure and comes out at 0.57 of a cell; its row to the right is the row to the left
+  mirrored by the tool; a kind's other colours are edits of its first sheet. Others'
+  creatures in a level or a story are actors of the kind `familiar` (`creature`, `color`,
+  `trial`, `spark`, or `"of": "mate"` for the room-mate's copy of the child's; a `creature`
+  given as a list is the first kind that is not the child's); the child's own is `{"id":
+  "familiar", "kind": "familiar"}` in a story. Orla has a walking sheet (`orla`, an adult)
+  and Rinlo a sitting row. The thread's piece and the trail's end are sprites (D182). A
+  level's plan is its scene's picture in ink (D143, D151). Rules out illustrations for the
+  stories (D74), and a picture of Bimo awake, of the tin box, of the slate and of the spark.

@@ -486,6 +486,31 @@ with the door's name (`leaf`), and the content test holds them.
 
 A door of chapters 1 and 2 is painted shut and open (D116): `doorways` and `swung`.
 
+## A passage narrower than a cell
+
+The familiars' passages (D270, D273) are a trench in a wall, narrower than a cell, which
+a familiar walks and the wizard does not fit in: a terrain with `"walk": "small"`, `,` in
+a level's map. Gemini paints a trench a whole cell wide whatever it is asked, so the
+tower's passage is made in steps by `tools/art/narrow.py`, from an enlargement of the
+wall with the trench painted along the middles of its cells:
+
+1. `squeeze` takes the enlargement's painted grid out and squeezes the trench onto the
+   middles of its cells, the masonry beside it stretched to fill, and makes the two
+   flaps, the passage's mouths, smaller. Gemini repairs the picture without moving
+   anything.
+2. `green` lays a flat green over the rubble Gemini mirrored beside the trench, and
+   Gemini paints new rubble there.
+3. `scene` lays the result back into the whole scene, its colours brought back to the
+   scene's.
+4. `guide` writes `art/raw/game-check/narrow-<scene>.png`: the trench's cells framed in
+   green and every cell beside them in red, so that one sees that the trench lies in its
+   own cells and in no other.
+
+The numbers of each step are the scene's `art/scenes/<scene>/narrow.json`. The trench is
+about half a cell wide. Where the passage goes into a wall the figures walk behind, the
+wall is a row drawn over it (`over`), so that the familiar is hidden there as it walks;
+the sweep stands a familiar on every small cell (`small-<scene>.png`).
+
 ## Where the cells are
 
 The cells are where the figures walk (D149).
@@ -695,6 +720,24 @@ the back (`figure-zarek-fly.md`, with the young wizard's flying views as the pos
 reference). Each view takes its row at the height the row has (`--drawn-fly-view`), the
 magenta round it cleared as the wizard's flying rows' is.
 
+### Familiars
+
+A familiar's sheet (D273) is laid out as a wizard's walking sheet, four rows of three,
+each figure about half a child's height and standing on its frame's foot line, so that
+the page cuts and draws it as any figure, at 0.57 of a cell
+(`familiar_height_cells` in `figures.json`, which lists the fourteen under
+`familiars`). There is one sheet for each kind and colour a first-year may describe,
+`familiar-<kind>-<colour>.webp`, and the grey hare, the friend's. The first colour of each
+kind is drawn by Gemini on flat magenta from its picture of the six animals in their
+colours; each other colour is Gemini's edit of that first drawing, checked against it
+frame by frame by how much of their outlines they share. `tools/art/figures.py
+--familiar` cuts them: the magenta's shades round each figure cleared, the row facing
+right the row facing left mirrored. A trial, the spark and the footprints of light are
+drawn by the page from these sheets (D263); no picture is painted for them.
+
+Orla, a grown-up, is drawn whole standing in the four views, and Rinlo has four sitting
+rows after his walking ones (`--drawn-sit`), both made as the figures drawn whole are.
+
 ### Portraits
 
 Every character has a portrait (D194), a bust in three-quarter view looking a little to
@@ -757,9 +800,11 @@ A sprite is cut from a box of a picture by `tools/art/sprites.py sprite`:
 - `art/scenes/<scene>/`: each painted scene's settings, `cut.json`, with
   its manifest: the field, the entrance hall, the dormitory, the library,
   chapter 3's seven: the tunnel, the crossing, the two doors, the three
-  doors, the long round, the storeroom and the way down, and chapter 4's
+  doors, the long round, the storeroom and the way down, chapter 4's
   four: the broom shed, the lake's edge, the ring field and the race
-  course.
+  course, and chapter 5's two: the tower's hall and the tower's passage,
+  whose `narrow.json` holds the numbers of its passage (see *A passage
+  narrower than a cell*).
 - `content/art/things/`: the sprites of things (D182), with `things.json`.
 - `content/art/chapters/<chapter>/card.webp`: each chapter's card for the map, a band
   of its first level's scene cut small by `tools/art/chapter_cards.py` (D193).

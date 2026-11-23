@@ -724,7 +724,14 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     born once (D268), a living familiar in the programs (D269), its steps, the cells
     only it enters and what it sees (D270), the chapter's goals and explanations
     (D271), a lesson's block that ends in an error meant to be seen (D272), and the
-    two scenes and the fourteen familiars' sheets (D273).
+    two scenes and the fourteen familiars' sheets (D273); long words said in pieces
+    (D274) and a figure that speaks while its step's actions play (D275); and, in
+    `sprint-54.md`, a trial that holds only with a name and a colour (D276), a familiar
+    at twice a child's pace (D277), its `pick_up` (D278), a story's figure that stands,
+    sits and brings a thing into sight (D279), time that passes as the scene gone dark
+    and back (D280), the corridor's second tiny entrance (D281), the familiar on the
+    trench's middle, behind its near rim (D282), a friend's portrait in the colours it
+    wears (D283), and words told in the circle's levels off the circle (D284).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

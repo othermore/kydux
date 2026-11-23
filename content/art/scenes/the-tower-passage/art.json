@@ -51,7 +51,7 @@
       "cells": [
         [
           10,
-          8
+          9
         ],
         [
           10,
@@ -61,7 +61,21 @@
       "by": 0.025
     },
     {
-      "about": "The stretch up column 13, measured the same way, off by as much.",
+      "about": "The turn from column 10 into row 8, taken tight: a familiar facing along row 8 has its feet on row 8's side behind the trench's near rim and its others on column 10's floor, clear of the column's left rim, and its nose inside the corner (D282).",
+      "cells": [
+        [
+          10,
+          8
+        ],
+        [
+          10,
+          8
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "about": "The stretch up column 13, measured as column 10's, off by as much.",
       "cells": [
         [
           13,
@@ -69,10 +83,24 @@
         ],
         [
           13,
-          8
+          7
         ]
       ],
       "by": 0.025
+    },
+    {
+      "about": "The turn from row 8 into column 13, taken tight as the other: a familiar facing along row 8 has its nose inside the column's right rim.",
+      "cells": [
+        [
+          13,
+          8
+        ],
+        [
+          13,
+          8
+        ]
+      ],
+      "by": -0.1
     }
   ],
   "source": "SOURCE.md"

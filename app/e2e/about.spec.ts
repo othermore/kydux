@@ -82,7 +82,7 @@ test.describe('the look', () => {
     await seedWizard(page, MARTA);
     await page.goto('/#map');
     const cards = page.locator('.map-chapter .chapter-card');
-    await expect(cards).toHaveCount(4);
+    await expect(cards).toHaveCount(5);
     await expect(cards.first()).toHaveCSS('background-image', /chapters\/01-arrival\/card\.webp/);
     await expect(page.locator('.map-chapter').first()).not.toHaveAttribute('data-locked', 'true');
     await expect(page.locator('.map-chapter').nth(3)).toHaveAttribute('data-locked', 'true');

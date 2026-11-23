@@ -3517,7 +3517,8 @@ one overturns stays, marked as superseded.
   folding.
   The shape is taken once in a level's visit: a start over, the window's size and the
   language keep it. A hidden thing, and what the scene's picture holds of its own (a wall,
-  a bed, a statue), do not count. Rules out a box folded as a level opens, a box left open
+  a bed, a statue), do not count; a plate in the floor counts by its cell, though the
+  painting draws it while it is unlit (D270). Rules out a box folded as a level opens, a box left open
   over the wizard or a thing of the level, and a box that changes its shape while the
   child plays.
 - **D228 — The start card lies over the whole window.** Decided 2026-11-14 by the owner

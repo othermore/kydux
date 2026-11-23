@@ -224,6 +224,19 @@ test.describe('the birth (D268)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));
 
+  test("the goals box leaves the moon's plate in sight, a thing of the level though painted (D227)", async ({ page }) => {
+    await open(page, 'out-of-the-circle');
+    // The strip, or the list folded three seconds after it is seen, never a list left open.
+    await expect
+      .poll(async () => {
+        const goals = page.locator('.goals');
+        const shape = await goals.getAttribute('data-shape');
+        return shape === 'strip' || (await goals.getAttribute('data-folded')) === 'true';
+      }, { timeout: ciTimes(15_000) })
+      .toBe(true);
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}out-of-the-circle-goals.png` });
+  });
+
   test('a wrong program is held at the edge in footprints; the solution is born, once', async ({ page }) => {
     await open(page, 'out-of-the-circle');
     expect(await run(page, wrong('out-of-the-circle', 'a_cell_short'))).not.toMatch(/^¡Lo has conseguido/);

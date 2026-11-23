@@ -1248,11 +1248,18 @@ class LevelScene extends Phaser.Scene {
   /** What of the level is drawn on the page now (SceneHandle, D227): the wizard, every
    * figure seen, every thing of the level seen, and the end's mark. */
   levelBoxes(): { left: number; top: number; right: number; bottom: number }[] {
-    const drawn: { getBounds(): Phaser.Geom.Rectangle }[] = [this.wizard];
+    const drawn: ({ getBounds(): Phaser.Geom.Rectangle } | Phaser.Geom.Rectangle)[] = [this.wizard];
     for (const actor of this.actors.values()) if (actor.sprite.visible) drawn.push(actor.sprite);
     for (const image of this.things.values()) if (image.visible && image.alpha > 0) drawn.push(image);
     for (const { mark } of this.marks) if (mark.visible) drawn.push(mark);
-    return drawn.map((object) => this.onPage(object.getBounds()));
+    // A plate unlit is the painting's own, but a thing of the level that a goal sends the
+    // familiar to (D270): its cell counts.
+    for (const thing of this.map.things) {
+      if (thing.kind !== 'plate') continue;
+      const [x, y] = thing.tile;
+      drawn.push(new Phaser.Geom.Rectangle(x * TILE, y * TILE, TILE, TILE));
+    }
+    return drawn.map((object) => this.onPage(object instanceof Phaser.Geom.Rectangle ? object : object.getBounds()));
   }
 
   /** A rectangle of the scene's world as a box in the page's pixels. */

@@ -2,11 +2,11 @@
 // sheet, frame by frame, so that no trial is painted. A trial with its colour, a white
 // creature's too, is the whole figure washed a little towards white, half transparent,
 // with an edge of light round it, and it stands still. A trial with no colour is only
-// the figure's lines, its own dark lines and its outer edge, drawn in white light with
-// the floor seen through a breath of light inside, over a soft shade and a glow that
-// lift the lines off a pale floor; the scene makes its light tremble. The numbers are
-// those of the trials the owner chose, drawn at 200 pixels a cell
-// (drafts/chapter-5/prueba_luz.py and prueba_palida.py), scaled to the sheet's cell.
+// the figure's lines, its own dark lines and its outer edge, drawn thin in white light
+// with the floor seen through, over a soft shade that lifts the lines off a pale floor,
+// and with no edge of light: beside a white creature's trial, full and glowing, it is a
+// hollow drawing, at the game's size as well. The scene makes its light tremble. The
+// numbers are given at 200 pixels a cell and scaled to the sheet's cell.
 // Pure pixels, with no Phaser: the scene turns them into textures.
 
 /** An image's pixels, RGBA, straight alpha, row by row. */
@@ -31,19 +31,17 @@ export const GOOD = {
   ],
 };
 
-/** A trial with no colour: its outer edge `edge` pixels wide, its dark lines where the
- * figure is darker than `dark` (fully at `dark - fade`), a veil of light inside, its
- * lines white, and under them a soft shade and a warm glow. */
+/** A trial with no colour: its outer edge `edge` pixels wide, two pixels of the sheet,
+ * its dark lines where the figure is darker than `dark` (fully at `dark - fade`), no
+ * veil of light inside, its lines white, and under them a soft shade alone: a glow
+ * would fill so small a figure and make it a white creature's trial. */
 export const PALE = {
-  edge: 13,
-  dark: 0.42,
-  fade: 0.2,
-  veil: 0.16,
+  edge: 9,
+  dark: 0.3,
+  fade: 0.15,
+  veil: 0,
   line: [255, 255, 255] as const,
-  halos: [
-    { size: 19, blur: 7, colour: [70, 45, 20] as const, strength: 0.5 },
-    { size: 9, blur: 3, colour: [255, 244, 190] as const, strength: 0.7 },
-  ],
+  halos: [{ size: 13, blur: 4, colour: [60, 40, 30] as const, strength: 0.55 }],
 };
 
 /** How a pale trial trembles (D263): a pixel of its sheet to each side, about eight

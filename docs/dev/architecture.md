@@ -4113,13 +4113,17 @@ one overturns stays, marked as superseded.
   bien cómo distinguir a los pálidos de los blancos, y que sea obvio*), on the design's
   picture of the trials, samples 2 to 8, which waits for the owner's eye. A trial with its
   colour, white included, is the creature's whole figure, half transparent, with an edge of
-  light, and it stands still. A trial with no colour is only the figure's lines, drawn in
-  white light with the floor seen through, and its light trembles. Both are drawn by the
-  page from the creature's sheet, frame by frame (`app/src/engine/trial.ts`, with the
-  samples' numbers scaled to the sheet's cell): no trial is painted. A pale trial of a kind
+  light, and it stands still. A trial with no colour is only the figure's lines, drawn thin
+  in white light with the floor seen through, over a soft shade and with no edge of light,
+  and its light trembles: at the game's size a white creature's trial is a full, glowing
+  figure and a trial with no colour a hollow drawing. Both are drawn by the page from the
+  creature's sheet, frame by frame (`app/src/engine/trial.ts`, its numbers scaled to the
+  sheet's cell): no trial is painted. A pale trial of a kind
   is drawn from the kind's first sheet. The spark and the footprints of light (D268) are
   drawn by the page as well. Rules out a pale trial as the figure washed to grey (sample 1,
-  mistaken for a white creature) and a sheet of trials from Gemini.
+  mistaken for a white creature), one with a veil and a glow of light, which fill a figure
+  half a cell high and make it a white creature's, one in a light of a colour, which a child
+  who asked for that colour takes for it, and a sheet of trials from Gemini.
 - **D264 — Someone's words in a run, and the playback waits for them.** Decided 2026-11-17
   by the designer. The event `told`: someone of the scene says something while a program
   runs. It is a note in the tick going on (it costs no tick): the actor's id, a `key` and

@@ -28,13 +28,15 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the words the scene shows (words.ts, why an action failed);
                 the looks a wizard may have (looks.ts) and the placeholders for a
                 scene without art (placeholders.ts); the camera on the scene, its
-                zoom, its drag, a story's window and the place a story step or
-                a level frames (camera.ts, D69, D74, D199, D201), the
+                zoom, its drag, a story's window, the place a story step or
+                a level frames and the travel between two framings of a part
+                (camera.ts, D69, D74, D199, D201, D321), the
                 words said in bubbles and the wizard's thoughts (speech.ts), the
                 playback of a run's events (playback.ts, its long ticks for
                 what the wizard's hands do), a painted scene drawn from its
-                art with its figures sorted by their feet (scene.ts, painted.ts,
-                D76), a painted thing drawn on the tile its level lays it on,
+                art with its figures sorted by their feet, and what of it the
+                view may show (scene.ts, painted.ts, D76, D323), a painted thing
+                drawn on the tile its level lays it on,
                 in its middle (shift.ts, D85, D109), a figure drawn on its
                 scene's painted strip (depth.ts, D105, D149), a speaker's bubble
                 clear of the other figures and of the goals box as far as its
@@ -67,7 +69,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 the game plays on the page's one sound context, which sleeps
                 while nothing sounds (sfx.ts, D231), with the flight's wind,
                 a gust for each flown command (sound.ts, D185, D243), and the
-                chapters' music, played from its notes (music.ts, D192), and a
+                chapters' music, played from its notes, and how long it takes to
+                turn to a movement asked for (music.ts, D192, D320), and a
                 familiar's trial drawn in light from its sheet, frame by frame
                 (trial.ts, D263)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
@@ -77,8 +80,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 each with its SOURCE.md and licence
   src/ui/       the screens: start with the saved games (start.ts), the
                 wizard's creator (wizard.ts), the map, also over a level (map.ts),
-                a lesson with its teacher (lesson.ts), a story told on its scene
-                (story.ts, D74), the settings (settings.ts), and the level
+                a lesson with its teacher (lesson.ts), a story told on its scene,
+                and the one that goes on from it in place (story.ts, D74, D320),
+                the settings (settings.ts), and the level
                 screen, a view of the run controller (controller.ts), with its
                 goals panel, outcome card, start and win cards (cards.ts), the zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
@@ -110,8 +114,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 opens, before the first screen loads (D214, D221, D246)
   src/content/  loading a level's level.json and its text.<lang>.json, a lesson
                 and its pages (lessons.ts), a story and its steps as the scene's
-                events, and the theme, or the movement of one, in force at a step
-                (stories.ts, D314, D316), the
+                events, who leaves and who comes in by a way out or in with them,
+                and the theme, or the movement of one, in force at a step
+                (stories.ts, D314, D316, D319, D322), the
                 guide's words (guide.ts), and the course (course.ts): its
                 chapters, what comes next, a stop's state, what the child knows
                 in a level (D40), the theme a screen opens to (D192, D314); the first year's
@@ -153,7 +158,8 @@ content/        the levels, each with level.json, its words in text.<lang>.json,
                 sheets, the wizard's in every look and the two friends' (art/,
                 D76, D77); the lessons, each with lesson.json and
                 <lang>.md; the stories (stories/), each with story.json, its
-                staging and maybe the music it is told to (D314), and
+                staging, maybe the music it is told to (D314) and the story it
+                goes on from in place (`continues`, D320), and
                 text.<lang>.json, D74; the chapters, each with
                 chapter.json and text.<lang>.json; the screen's guide's words
                 (guide/, D68); the music's themes, each its notes (music/, D192);
@@ -331,7 +337,10 @@ a tree or a wall, neither (D186); a terrain whose `walk` is `"small"`, a
 familiars' passage, is walked on by a familiar alone, and the wizard bumps
 there with the terrain's kind (D270); a terrain whose `walk` is `"story"`
 is floor the painting shows where no level goes: a wall to a level, or a
-shelf where it is seen across, and floor to a story's figures (D288).
+shelf where it is seen across, and floor to a story's figures (D288); one
+of these may say `"out": true`, a way out of the scene behind a cover that
+hides a figure whole, which a story's figure leaves by and comes in by
+(D319, D322).
 
 The child's code holds `wizard` and every thing and actor of the level by
 its id. Everything it holds is read-only to it (D20). Its errors are
@@ -347,7 +356,7 @@ tiles are `[x, y]`.
 
 | kind | actor | data | the scene |
 |---|---|---|---|
-| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225), and where a familiar walks, two, as a person's step in a story's step where a familiar walks (D277) | walks it one tile, facing that way, over the ticks it takes as they are played (D277), with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132), a familiar's a light tap at most every 120 ms (D277); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243); flown moves of a figure's that follow one another are one glide at an even speed, read ahead from the ticks, with no rest at the cells it passes (D259), and `data-flyers-at` says where each flying figure is as each frame is drawn |
+| `move` | wizard, or an actor | `from`, `to`, `facing`, cells off the map for a story's figure that leaves or comes in by the scene's edge, past it (D319, D322); `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225), and where a familiar walks, two, as a person's step in a story's step where a familiar walks (D277) | walks it one tile, facing that way, over the ticks it takes as they are played (D277), with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132), a familiar's a light tap at most every 120 ms (D277); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243); flown moves of a figure's that follow one another are one glide at an even speed, read ahead from the ticks, with no rest at the cells it passes (D259), and `data-flyers-at` says where each flying figure is as each frame is drawn; a cell off the map is placed as any cell, its depth and its tint under the scene's `dark` columns with it, and nothing asked of its terrain |
 | `bump` | wizard, or a familiar | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `familiar` (with `id`), and for a familiar's bump `wizard`, `actor` or `familiar` (with `id`, D270); a familiars' passage, a small cell, is a `wall` to the wizard, with the cell's `kind` (D270); `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
@@ -368,8 +377,10 @@ tiles are `[x, y]`.
 | `reveal` | wizard | `id`, `at` | the thing's whole outline beats over whatever covers it, until it is picked up or given; `data-revealed` (D85) |
 | `blocked` | wizard | `at`; `by`: a door's id, or `wizard`; `reason`: `locked`, `far`, `open`, `nothing`, `sealed`, `password`, `no_wand`, `unknown_spell` (with `spell`), `no_map` (orvim, with `spell`), `nothing_near` (osto, with `spell`), `out_of_reach` (fendra, `by` the thing, with `spell`), `too_high` (`by` the thing up on a shelf), `not_carried`, `nobody`, `no_bed`, `bed_taken`, `not_here`, or the reason of a tile the wizard may not step on, `not_my_dormitory` (with `facing`, which the wizard turns to, D84), or `door_leaf`, `by` the door whose open leaf lies there (with `facing`, D125), or `no_walk`, a walk into a low cell (with `facing` and the cell's `kind`, D186); `too_far`, `by` a broom untied from off its cell, and `no_knot`, `by` a broom with no knot, after which the run ends in an error (D183); `no_broom`, drevo with no broom carried (D185); `no_landing`, drevo cast in the air over a cell no one walks on (with the cell's `kind` and `spell`), and `ring_rim`, `by` the ring, a turn to the side inside a ring (with `facing`, D226), after each of which the run ends in an error, the wizard in the air (D215); `tried`: whether the wizard got to try | the wizard thinks why, in a grey cloud over its head or, with no room there, beside it (D245); when `tried`, the door, the ring or the wizard shakes (D28); `no_landing` and `ring_rim` sound as a bump does, the thought half a second after it (D237), and `ring_rim` nudges the wizard the way it turned; in a level with a familiar (D261, D262): `already_here`, `already_living` (`halt`), `no_way`, `not_here` (a trial moved or told to pick up before its minka), `nothing`, `by` the familiar, its `pick_up` where nothing lies, which shakes it (D278), and the first year's warnings, `by` `orla`, `other_attribute`, `other_method`, `other_name`, `go_to_not_yet`, `not_a_familiar`, `class_changed`, `name_letters`, `name_long`, `name_taken`, `one_familiar`, `two_familiars`, `one_class` (D297), `too_soon` (D301), `kind_kept` (D305), told as Orla's words (D264) and ending the run in a refusal |
 | `turn` | an actor | `facing` | the actor faces the other way |
-| `vanish` | in a story, an actor, or the wizard at the story's very end | | the figure fades out of sight (D74) |
-| `appear` | in a story, an actor | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
+| `vanish` | in a story, a ghost or a familiar (D322) | | the figure fades out of sight (D74) |
+| `appear` | in a story, a ghost or a familiar, or any actor stepping out from behind a thing (D322) | `at`; `from`, a cell beside it, when it steps out from behind a thing there | the figure comes into sight on its cell: walking out from `from`, behind what stands there, over the tick (D128), or fading in (D74) |
+| `leave` | in a story, an actor, or the wizard at a part's end (D310) | | the tick after a walk that leaves ends, two cells past the scene's edge or on a way-out cell behind its cover: the figure is hidden at once, its sway and its shadow with it, with nothing of it in sight to fade (D319) |
+| `enter` | in a story, an actor | `at`, two cells past the scene's edge, a cell further for each figure before it by the same way in, or a way-out cell; `facing`, in, by the edge | the figure is set there whole and solid, on its feet or in the air, past the edge where the frame hides it or behind a cover, and walks or flies in, a `move` a tick (D322) |
 | `seen` | an actor | `by`, `at` | the scene shakes and the actor's cone turns red; the run ends `caught` |
 | `found` | `world`, in the tick of `find_all` or `find_nearest`, or in a story as a figure shows a thing staged hidden (D279) | `ids`, the hidden things found; `at`, their cells | each comes into sight from the straw and is drawn from now on; one found before the first tick is shown with it; `data-found` (D184) |
 | `untie` | wizard | `id`, `at` | the wizard bends over the broom, a long tick, and its thread is gone; `data-untied` (D183) |
@@ -1300,8 +1311,9 @@ one overturns stays, marked as superseded.
   drawn wide, no editor and no goals; a sequence of steps, each a line said
   by a character in a bubble over them or by the voice in a band under the
   scene, with its actions before it (D103: a walk through a tile or a list
-  of them, each leg straight, ending out of sight when it says so, a turn,
-  an appearing, a vanishing once the words are said, lying down in a bed
+  of them, each leg straight, ending out of the scene by a way out when it
+  says so, D319, a turn, a coming in by a way in, D322, a ghost's or a
+  familiar's appearing and vanishing once the words are said, lying down in a bed
   and getting up, D91, a door opened or closed), each done by its own
   `by`, the step's `by`, or the speaker, so that the voice can tell what
   others do; different figures' actions play at once.
@@ -1762,7 +1774,7 @@ one overturns stays, marked as superseded.
   order; different figures' play at once, tick by tick, in the order they
   are first named, so that two friends walk together. A `walk` is a tile
   or a list of tiles, each reached in a straight line; a walk may end in
-  `vanish`, for a figure walking out of sight; a seated figure stands and sits, and a
+  `leave`, for a figure walking out of the scene by a way out (D319); a seated figure stands and sits, and a
   figure brings a staged thing into sight (D279). `open` and `close` name a
   door of the story beside the figure, which changes state as a level's
   door does. The camera keeps with the step's `by`, or its speaker: the
@@ -4934,7 +4946,7 @@ one overturns stays, marked as superseded.
 - **D310 — The wizard may leave a part out of sight.** Decided 2026-11-22 by the owner, of
   *The tower* (*adentrándose igual en la oscuridad*), and of its dormitory (*desaparecer
   por la izquierda del escenario*). In the last step of a part, before a `scene`, the
-  wizard may walk out of sight as in a story's last step, and so may the one who speaks
+  wizard may walk out of the scene by a way out (D319) as in a story's last step, and so may the one who speaks
   under `meanwhile` (D275), as its last action; its bubble stays where it was last seen
   until the step ends.
 - **D311 — The first year is the three friends.** Decided 2026-11-22 by the owner (*Solo

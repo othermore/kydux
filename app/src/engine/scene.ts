@@ -69,9 +69,11 @@
 // glow (D79); a scene without art, by placeholders.ts.
 //
 // A story is played on the scene the same way (D74): its steps come as events,
-// an actor appears, walks, turns, says its words in a bubble and vanishes; the
-// camera keeps whoever each step is about, with their words, in view; a bubble
-// stays until the next step.
+// an actor comes in by a way in (D322), walks, turns, says its words in a bubble and
+// leaves by a way out (D319), a ghost or a familiar fading in and out; the camera keeps
+// whoever each step is about, with their words, in view, or travels between two
+// framings of a part, a bubble waiting for it to arrive (D321); a bubble stays until
+// the next step.
 
 import Phaser from 'phaser';
 import type { LevelJson, WorldEvent, WorldResult } from '../runtime/protocol';

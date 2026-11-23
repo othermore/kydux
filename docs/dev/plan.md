@@ -766,8 +766,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     that comes out of the dark framed (D318), nobody fading out of a scene, who leaves
     walking out by a way out (D319), a story that goes on from the one before with
     nothing between (D320), the camera travelling between two framings of a part
-    (D321), and nobody fading into a scene, who comes in walking in by a way in
-    (D322).
+    (D321), nobody fading into a scene, who comes in walking in by a way in (D322),
+    and the view that ends inside a painting, the band over the entrance's wall
+    unseen (D323).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

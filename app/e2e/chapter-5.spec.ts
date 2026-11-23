@@ -479,6 +479,13 @@ test.describe('the living familiar (D267, D269, D270)', () => {
     // The class kept with go_to, in a game whose familiar lives: Nabi's test above.
   });
 
+  test("a class of another kind is stopped by Orla, who names the kind kept (D305)", async ({ page }) => {
+    await open(page, 'orlas-orders');
+    const crow = solution('orlas-orders').replaceAll('class Fox(', 'class Crow(');
+    expect(await run(page, crow)).toContain('Ya has conjurado y sacado del círculo a un zorro');
+    await expect(scene(page)).toHaveAttribute('data-told', /orla:kind_kept/);
+  });
+
   test('a go_to straight to the room walks the corridor and bumps', async ({ page }) => {
     await open(page, 'the-small-passage');
     expect(await run(page, wrong('the-small-passage', 'straight_to_the_room'))).not.toMatch(/^¡Lo has conseguido/);

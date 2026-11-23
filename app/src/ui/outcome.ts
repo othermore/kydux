@@ -84,6 +84,7 @@ export function explanationText(explanation: Explanation, own: Record<string, st
       case 'go_to_not_yet':
       case 'not_a_familiar':
       case 'class_changed':
+      case 'kind_kept':
       case 'name_letters':
       case 'name_long':
       case 'name_taken':

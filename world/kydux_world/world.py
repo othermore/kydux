@@ -312,13 +312,15 @@ class World:
 
     def _k_takes_over(self, klass: type, node: ast.ClassDef | None) -> None:
         """The program's class of the living familiar's kind, its `__init__` the kept one's,
-        takes the familiar over, adding what it knows (D269); another kind, or another
-        `__init__`, is a description changed, which Orla does not allow."""
+        takes the familiar over, adding what it knows (D269); a class of another kind is
+        stopped by Orla, who names the kind kept (D305), and another `__init__` is a
+        description changed, which she does not allow."""
         living = self.living
         assert living is not None
         old = type(living)
+        # The familiar is the kind conjured and taken out of the circle, for good (D305).
         if klass.__name__ != old.__name__:
-            self.warn("class_changed", "orla", name=klass.__name__)
+            self.warn("kind_kept", "orla", name=klass.__name__, kind=old.__name__)
         kept = familiars.class_node(self.familiar_block.kept_class() or "", old, None)
         if familiars.init_of(node) != familiars.init_of(kept):
             self.warn("class_changed", "orla", name=klass.__name__)

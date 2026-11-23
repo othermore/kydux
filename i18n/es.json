@@ -803,6 +803,7 @@
     "go_to_not_yet": "Es pronto para enseñar `go_to` a tu familiar.\n\nIr a un sitio se le enseña a un familiar cuando ya ha salido del círculo, no antes.",
     "not_a_familiar": "`minka` solo llama a familiares, y tu clase no dice que lo sea.",
     "class_changed": "La descripción de un familiar vivo ya no se cambia: solo se le añade lo que aprende.",
+    "kind_kept": "Ya has conjurado y sacado del círculo a {familiar_a_kind}: debes seguir con tu familiar, no puedes cambiarlo por otro.",
     "name_letters": "No puedo escribir «{name}» como nombre en el libro…\n\n…el nombre de un familiar es una sola palabra, y solo de letras.",
     "name_long": "No puedo escribir «{name}» como nombre en el libro: es demasiado largo. Doce letras, como mucho.",
     "name_taken": "No puedo escribir «{name}» como nombre en el libro: ese nombre ya lo usan Python o el colegio. Elige otro.",

@@ -235,6 +235,20 @@ function speakOfTheFamiliar(): void {
   speakOfFamiliar(table && kept ? familiarWords(kept, table, kindWords, colourWord) : null);
 }
 
+/** A story part's built world with the game's kept familiar in it, the one it lives with
+ * or, before, its draft (D265), so that the scene draws it as the story's familiar
+ * (D305); with none, the world as it is and the table's default. */
+function withGamesFamiliar(world: LevelJson): LevelJson {
+  const table = familiarTable();
+  const kept = table ? checkedFamiliar(progress.familiar(), table) : null;
+  const described = kept?.living ?? kept?.draft;
+  // Only a part with a familiar of its own is given one: the block sets nothing else.
+  const actors = Array.isArray(world.actors) ? (world.actors as { kind?: unknown }[]) : [];
+  if (!described || !actors.some((actor) => actor.kind === 'familiar')) return world;
+  const { kind, name, color } = described;
+  return { ...world, familiar: { draft: { kind, ...(name ? { name } : {}), ...(color ? { color } : {}) } } };
+}
+
 /** The table loaded and the familiar's words set, before a screen's texts are read. */
 async function familiarKnown(): Promise<void> {
   await loadFamiliars();
@@ -297,7 +311,9 @@ async function showStory(content: HTMLElement, id: string, key: string): Promise
           ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
           : {}),
         label: itemLabel(course, `story:${id}`),
-        startScene: (...args) => sceneCode.then(({ startScene }) => startScene(...args)),
+        // Every part's figure of the familiar is the game's own (D305).
+        startScene: (parent, world, ...rest) =>
+          sceneCode.then(({ startScene }) => startScene(parent, withGamesFamiliar(world), ...rest)),
         // The opening is read over the welcome's painting of the castle until its scene
         // is there (D61, D214), its first step with the letter before it (D257).
         // A story that names the castle as its still tells the steps that say so over it

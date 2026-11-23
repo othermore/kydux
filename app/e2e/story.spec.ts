@@ -481,3 +481,22 @@ test("the hall goes dark while the children tell Orla, and comes back in the eve
   await expect(scene).toHaveAttribute('data-state', 'done', { timeout: ciTimes(30_000) });
   await expect(scene).not.toHaveAttribute('data-hour', 'sunset');
 });
+
+test("a story draws the game's own familiar, a white crow, and the mate's copy of it (D305)", async ({ page }) => {
+  const crow = 'class Crow(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n';
+  const game = {
+    version: 1,
+    wizard: { name: 'Marta', gender: 'girl', look: 'teal' },
+    familiar: { living: { kind: 'Crow', name: 'Nabi', color: 'white', source: crow } },
+  };
+  await page.addInitScript((kept) => {
+    if (!localStorage.getItem('kydux.games')) localStorage.setItem('kydux.progress', kept);
+    localStorage.setItem('kydux.tips-off', '1');
+  }, JSON.stringify(game));
+  await page.goto('/#story/the-trail');
+  const scene = page.locator('#scene');
+  await expect(scene).toHaveAttribute('data-creatures', /(^|;)familiar:[^:;]*:Crow:white:/, { timeout: ciTimes(90_000) });
+  await expect(scene).not.toHaveAttribute('data-creatures', /(^|;)familiar:[^:;]*:Fox:/);
+  // The room-mate's copy is the child's kind in another of its colours (D268).
+  await expect(scene).toHaveAttribute('data-creatures', /(^|;)mate_familiar:[^:;]*:Crow:black:/);
+});

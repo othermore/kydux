@@ -966,7 +966,17 @@
           "code": "class Crow(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n    def go_to(self, x, y):\n        if x < self.position.x:\n            self.move_left(self.position.x - x)\n        else:\n            self.move_right(x - self.position.x)\n        if y < self.position.y:\n            self.move_up(self.position.y - y)\n        else:\n            self.move_down(y - self.position.y)\n\npimu.go_to(13, 4)\n",
           "expect": {
             "status": "error",
-            "explanation": "class_changed"
+            "explanation": "kind_kept",
+            "line": 1,
+            "told": [
+              [
+                "orla",
+                "kind_kept"
+              ]
+            ],
+            "params": {
+              "kind": "Fox"
+            }
           }
         }
       ]

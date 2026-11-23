@@ -439,3 +439,66 @@ def test_the_result_says_what_the_page_keeps():
         "source": "class Fox(Familiar):\n    pass",
         "learned": None,
     }
+
+
+def test_where_a_familiar_walks_a_wizard_s_step_takes_two_ticks():
+    """A person's step takes two ticks where a familiar can walk, a familiar's one (D277);
+    the four levels of trials keep every level's pace, and the flight its own (D225)."""
+    paces = {
+        level_id: level_of(level_id).walk_ticks
+        for level_id in (
+            "the-circle",
+            "the-name-and-the-colour",
+            "one-line-in-the-book",
+            "the-slate",
+            "out-of-the-circle",
+            "orlas-orders",
+            "the-small-passage",
+            "the-forgotten-room",
+        )
+    }
+    assert paces == {
+        "the-circle": 1,
+        "the-name-and-the-colour": 1,
+        "one-line-in-the-book": 1,
+        "the-slate": 1,
+        "out-of-the-circle": 2,
+        "orlas-orders": 2,
+        "the-small-passage": 2,
+        "the-forgotten-room": 2,
+    }
+    living = {
+        "stage": "living",
+        "methods": ["__init__"],
+        "living": {"kind": "Fox", "name": "Pimu", "color": "red", "source": CLASS, "at": [10, 9]},
+    }
+    level = Level.from_dict(hall("a-walk", actors=[ORLA], familiar=living))
+    result = run_code(level, "wizard.move_left(1)\npimu.move_down(1)\n")
+    moves = _events(result, "move")
+    assert [(e.actor, e.tick, e.data.get("ticks")) for e in moves] == [
+        ("wizard", 1, 2),
+        ("familiar", 3, None),
+    ]
+    assert result.ticks == 3
+
+
+def test_a_level_has_drevo_or_a_familiar_that_walks_not_both(tmp_path):
+    """The course gives no level both (D277); the page gives a level of chapter 5 every
+    spell known, drevo among them (D80), and the level keeps its familiar's pace."""
+    living = {
+        "stage": "living",
+        "methods": ["__init__"],
+        "living": {"kind": "Fox", "name": "Pimu", "color": "red", "source": CLASS, "at": [10, 9]},
+    }
+    data = hall("both", actors=[ORLA], familiar=living, spells=["minka", "drevo"])
+    assert Level.from_dict(data).walk_ticks == 2
+    (tmp_path / "both").mkdir()
+    (tmp_path / "both" / "level.json").write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(LevelError, match="drevo or a familiar that walks"):
+        Level.from_directory(tmp_path / "both")
+    trials = hall(
+        "trials",
+        actors=[ORLA],
+        familiar={"stage": "trial", "circle": [8, 6, 11, 8], "trials": [[10, 7]]},
+    )
+    assert Level.from_dict({**trials, "spells": ["minka", "drevo"]}).walk_ticks == 1

@@ -1,5 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FLOWN, HELD, LONG, lengthOf, Playback, type PlaybackEvent, type PlaybackState, ticksTo, TOLD_MOST } from './playback';
+import {
+  FAMILIAR_PACE,
+  FLOWN,
+  HELD,
+  LONG,
+  lengthOf,
+  Playback,
+  type PlaybackEvent,
+  type PlaybackState,
+  ticksTo,
+  TOLD_MOST,
+} from './playback';
 
 function events(n: number): PlaybackEvent[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -370,5 +381,62 @@ describe('words said in a run (D264)', () => {
     expect(shown).toEqual([0, 1]);
     vi.advanceTimersByTime(1);
     expect(shown).toEqual([0, 1, 2]);
+  });
+});
+
+describe('where a familiar walks (D277)', () => {
+  const step = (tick: number, actor: string, data: Record<string, unknown> = {}): PlaybackEvent => ({
+    tick,
+    actor,
+    kind: 'move',
+    data: { from: [0, 0], to: [1, 0], facing: 'right', ...data },
+    line: 1,
+  });
+
+  it("plays every tick in half the time, a person's step of two ticks as long as anywhere", () => {
+    // The wizard's step of two ticks, then the familiar's two steps of one.
+    const run = [step(1, 'wizard', { ticks: 2 }), step(3, 'familiar'), step(4, 'familiar')];
+    const playback = new Playback({ tickMs: 400, pace: FAMILIAR_PACE });
+    const shown: number[] = [];
+    const spans: number[] = [];
+    playback.onTick((tick, events) => {
+      shown.push(tick);
+      const move = events.find((event) => event.kind === 'move');
+      if (move) spans.push(playback.span(typeof move.data.ticks === 'number' ? move.data.ticks : 1));
+    });
+    playback.load(run);
+    playback.play();
+    vi.advanceTimersByTime(399);
+    expect(playback.tick).toBe(2);
+    vi.advanceTimersByTime(1);
+    expect(playback.tick).toBe(3);
+    vi.advanceTimersByTime(200);
+    expect(playback.tick).toBe(4);
+    // The wizard's step is seen as long as a tick, a familiar's half of it.
+    expect(spans).toEqual([1, FAMILIAR_PACE, FAMILIAR_PACE]);
+    expect(lengthOf([run[1] as PlaybackEvent], FAMILIAR_PACE)).toBe(FAMILIAR_PACE);
+    // A cast's tick is LONG, as anywhere.
+    expect(lengthOf([{ tick: 1, actor: 'wizard', kind: 'cast', data: {}, line: 1 }], FAMILIAR_PACE)).toBe(LONG);
+  });
+
+  it("plays the ticks a story gives a length of in that time, the others as they are", () => {
+    const run = [step(1, 'mate', { ticks: 2 }), step(1, 'familiar'), step(2, 'familiar'), step(3, 'mate')];
+    const playback = new Playback({ tickMs: 400 });
+    const spans: number[] = [];
+    playback.onTick((_, events) => {
+      const move = events.find((event) => event.actor === 'mate');
+      if (move) spans.push(playback.span(typeof move.data.ticks === 'number' ? move.data.ticks : 1));
+    });
+    playback.load(run, new Map([[1, 0.5], [2, 0.5]]));
+    const ticks = [run.slice(0, 2), run.slice(2, 3), run.slice(3)];
+    expect(ticksTo(ticks, 0, (event) => event.actor === 'mate' && event.tick === 3, 1, new Map([[1, 0.5], [2, 0.5]]))).toBe(1);
+    playback.play();
+    vi.advanceTimersByTime(199);
+    expect(playback.tick).toBe(1);
+    vi.advanceTimersByTime(1);
+    expect(playback.tick).toBe(2);
+    vi.advanceTimersByTime(200);
+    expect(playback.tick).toBe(3);
+    expect(spans).toEqual([1, 1]);
   });
 });

@@ -330,6 +330,45 @@ test.describe('the trials that hold and those that fade (D276)', () => {
   });
 });
 
+test.describe("a familiar at twice a child's pace (D277)", () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  /** The middle time between a figure's cells as the scene says them, at the normal speed:
+   * the wizard's (data-wizard), or an actor's (data-actors). */
+  async function cellTime(page: Page, id: string, code: string): Promise<number> {
+    await scene(page).evaluate((node, who) => {
+      const seen: [number, string][] = [];
+      (window as unknown as { cells: [number, string][] }).cells = seen;
+      const cell = () =>
+        who === 'wizard'
+          ? (node.getAttribute('data-wizard') ?? '')
+          : ((node.getAttribute('data-actors') ?? '').split(';').find((one) => one.startsWith(`${who}:`)) ?? '').split(',').slice(0, 2).join(',');
+      new MutationObserver(() => {
+        const now = cell();
+        if (seen[seen.length - 1]?.[1] !== now) seen.push([performance.now(), now]);
+      }).observe(node, { attributes: true, attributeFilter: ['data-wizard', 'data-actors'] });
+    }, id);
+    await run(page, code);
+    const cells = await page.evaluate(() => (window as unknown as { cells: [number, string][] }).cells);
+    const gaps = cells.slice(1).map(([at], index) => at - (cells[index] as [number, string])[0]).filter((gap) => gap > 20);
+    gaps.sort((a, b) => a - b);
+    return gaps[Math.floor(gaps.length / 2)] ?? 0;
+  }
+
+  test("the fox crosses a cell in half the time a child takes in another level", async ({ page }) => {
+    test.setTimeout(ciTimes(240_000));
+    await open(page, 'the-long-corridor', '1');
+    const child = await cellTime(page, 'wizard', 'wizard.move_right(8)\n');
+    await open(page, 'orlas-orders', '1');
+    const fox = await cellTime(page, 'familiar', solution('orlas-orders'));
+    // A tick is 400 ms at the normal speed: a child's cell takes one, a fox's half of one.
+    expect(child).toBeGreaterThan(300);
+    expect(fox / child).toBeGreaterThan(0.35);
+    expect(fox / child).toBeLessThan(0.7);
+  });
+});
+
 test.describe('the birth (D268)', () => {
   test.use({ locale: 'es-ES' });
   test.beforeEach(({ page }) => seedWizard(page, MARTA));

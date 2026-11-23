@@ -1145,7 +1145,7 @@ class Wizard(Child):
             self._set(position=ahead, ring=entered)
             step = {"from": list(here), "to": list(ahead), "facing": direction.value}
             # A walked step where the wizard can fly takes three ticks, a flown one one
-            # (D225).
+            # (D225); where a familiar walks, two (D277).
             ticks = 1 if flying else world.level.walk_ticks
             if flying:
                 # Which step of its command a flown one is, and of how many, for the page

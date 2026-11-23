@@ -456,7 +456,7 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     if (!scene) return;
     const part = partsOf()[index];
     const end = partsOf()[index + 1]?.step ?? story.steps.length;
-    const { events, spans } = storyEvents({
+    const { events, spans, lengths } = storyEvents({
       steps: story.steps.slice(part?.step ?? 0, end),
       world: part?.world ?? story.world,
       flying: part?.flying ?? [],
@@ -467,7 +467,10 @@ export function storyScreen(parts: StoryScreenParts): Screen {
     // last step of this part to frame one framed is held (D199).
     scene.follow();
     scene.place(framingAt(story.steps, part?.step ?? 0, step));
-    scene.playback.load(events.filter((event) => event.tick <= span.last));
+    scene.playback.load(
+      events.filter((event) => event.tick <= span.last),
+      lengths,
+    );
     scene.playback.seek(span.first - 1);
     scene.playback.play();
   };

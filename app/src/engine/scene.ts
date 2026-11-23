@@ -148,7 +148,7 @@ import { Speech } from './speech';
 import { Sway } from './sway';
 import { shadeAt, tintOf } from './shade';
 import { heldOutline, MarkSilhouette, Silhouette } from './silhouette';
-import { HELD, LONG, Playback, TOLD_MOST } from './playback';
+import { FAMILIAR_PACE, HELD, LONG, Playback, TOLD_MOST } from './playback';
 import { HOP_RISE, HOP_TICKS, hopAt, hopTop } from './hop';
 import { lightTimes, LIGHT_RING, pullTimes } from './spell';
 import { clearOf, sightTiles, type Tile } from './sight';
@@ -252,6 +252,10 @@ const FAMILIAR_EVENTS = new Set([
 /** The placeholder a familiar is drawn with on a scene with no sheet for it. */
 const CREATURE_KEY = 'creature-placeholder';
 const SPARK_KEY = 'spark';
+/** The least time between two of a familiar's taps, in milliseconds (D277): its quick
+ * steps at speed 1 are each heard, at twice the speed one in two, at four times one in
+ * three. */
+const PAW_GAP = 120;
 /** How long a trial that does not hold is seen before it fades, and how long it takes to
  * fade, in milliseconds at speed 1, by the page's clock and not by ticks (D276). */
 export const TRIAL_SEEN_MS = 4000;
@@ -309,6 +313,12 @@ function centre([x, y]: Tile): [number, number] {
 
 function isFacing(value: unknown): value is Facing {
   return typeof value === 'string' && (FACINGS as readonly string[]).includes(value);
+}
+
+/** How many ticks a move takes: a walked step of the wizard's says it where it is more
+ * than one (D225, D277), and so does a person's step in a story where a familiar walks. */
+function stepTicks(event: WorldEvent): number {
+  return typeof event.data.ticks === 'number' && event.data.ticks > 1 ? event.data.ticks : 1;
 }
 
 function tileOf(value: unknown): Tile | null {
@@ -467,6 +477,8 @@ class LevelScene extends Phaser.Scene {
    * a voice painted into the scene speaks from (D264). */
   private readonly creatures = new Map<string, CreatureLook>();
   private readonly called = new Set<string>();
+  /** When each familiar's last step was heard, on the scene's clock (D277). */
+  private readonly lastPaw = new Map<string, number>();
   /** The trials seen that do not hold (D276), by id: how long each has still to be seen
    * and to fade, in milliseconds at speed 1, the alpha it fades from, the tick it came in
    * (0 for one staged), and whether it is staged, whose seconds start once the start
@@ -680,7 +692,7 @@ class LevelScene extends Phaser.Scene {
   }
 
   /** How long a tick of this scene lasts at speed 1: a third of TICK_MS where the wizard
-   * can fly (D225). */
+   * can fly (D225), a half where a familiar walks (D277). */
   private get tickMs(): number {
     return TICK_MS * this.playback.pace;
   }
@@ -1947,8 +1959,13 @@ class LevelScene extends Phaser.Scene {
   /** A figure's step (D132): the wizard's, a grown-up's (figures.json's `adults`) or
    * a child's, every other one a little lower. */
   private step(id: string): void {
-    // A familiar's steps are lighter than anyone's (D273).
+    // A familiar's steps are lighter than anyone's (D273), and quick (D277): a tap at most
+    // every PAW_GAP of the page's clock, so that a run of them is heard as steps and not
+    // as a noise.
     if (this.creatures.has(id)) {
+      const now = this.time.now;
+      if (now - (this.lastPaw.get(id) ?? Number.NEGATIVE_INFINITY) < PAW_GAP) return;
+      this.lastPaw.set(id, now);
       this.playSound('step_child', 1.6);
       return;
     }
@@ -2485,8 +2502,10 @@ class LevelScene extends Phaser.Scene {
         this.placeWizard(from, facing ?? 'down');
         this.wizardTile = to;
         const [x, y] = this.figureAt(to);
-        this.walk(this.wizard, facing ?? 'down', x, y, duration);
-        this.enchantedStep(this.wizard, from, to, duration, false);
+        // A walked step lasts the ticks it takes, as they are played (D225, D277).
+        const walked = duration * this.playback.span(stepTicks(event));
+        this.walk(this.wizard, facing ?? 'down', x, y, walked);
+        this.enchantedStep(this.wizard, from, to, walked, false);
         this.step('wizard');
         break;
       }
@@ -3220,7 +3239,9 @@ class LevelScene extends Phaser.Scene {
         }
         actor.sprite.setPosition(...this.figureAt(from));
         const [x, y] = this.figureAt(to);
-        const length = this.playback.tickDuration * 0.9;
+        // A step lasts the ticks it takes, as they are played: a familiar's half a person's
+        // where it walks (D277).
+        const length = this.playback.tickDuration * 0.9 * this.playback.span(stepTicks(event));
         this.walk(actor.sprite, facing, x, y, length);
         this.enchantedStep(actor.sprite, from, to, length, false);
         this.step(event.actor);
@@ -3551,9 +3572,14 @@ export async function startScene(
   options: SceneOptions = {},
 ): Promise<SceneHandle> {
   const map = layout(level);
-  // Where the wizard can fly, every tick plays in a third of the time (D225).
+  // Where the wizard can fly, every tick plays in a third of the time (D225); where a
+  // familiar walks, in half of it, and a level with a familiar keeps its own pace though
+  // it knows drevo (D80, D277).
   const flies = Array.isArray(level.spells) && level.spells.includes('drevo');
-  const playback = new Playback({ tickMs: TICK_MS, pace: flies ? FLOWN : 1 });
+  const familiar = level.familiar as { stage?: unknown } | undefined;
+  const walks = familiar?.stage === 'birth' || familiar?.stage === 'living';
+  const pace = familiar ? (walks ? FAMILIAR_PACE : 1) : flies ? FLOWN : 1;
+  const playback = new Playback({ tickMs: TICK_MS, pace });
   // A painted scene's art, when it has some (D76); a scene without is drawn with placeholders.
   const art = await loadArt(level).catch(() => null);
 

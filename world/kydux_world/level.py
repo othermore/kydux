@@ -105,6 +105,9 @@ RING_COLOURS = ("red", "blue", "yellow", "purple")
 #: The ticks a walked step takes in a level where the wizard can fly, its spells
 #: holding drevo; a flown step takes one, and a step elsewhere one (D225).
 WALK_TICKS_FLYING = 3
+#: The ticks a walked step of the wizard's takes in a level whose familiar can walk, its
+#: block of stage birth or living; a familiar's step takes one (D277).
+WALK_TICKS_FAMILIAR = 2
 #: The spells the world knows how to cast; a level names those it has (D42).
 #: Each has its effect in kydux_world.world.SPELLS.
 KNOWN_SPELLS = ("zelim", "fendra", "kirra", "osto", "orvim", "drevo", "minka")
@@ -577,7 +580,12 @@ class Level:
             raise LevelError(f"{directory.name}: goals.py and own_goals in level.json go together")
         if goals.is_file():
             data["goals_source"] = goals.read_text(encoding="utf-8")
-        return cls.from_dict(data)
+        level = cls.from_dict(data)
+        # A flight's pace and a familiar's are each a level's own (D225, D277): the course
+        # gives no level both, though the page gives a level every spell known (D80).
+        if "drevo" in level.spells and level.familiar_can_walk:
+            raise LevelError(f"{level.id}: a level has drevo or a familiar that walks, not both")
+        return level
 
     def inside(self, position: Position) -> bool:
         return 0 <= position.x < self.width and 0 <= position.y < self.height
@@ -601,9 +609,20 @@ class Level:
         return self.free(position) or position in self.low
 
     @property
+    def familiar_can_walk(self) -> bool:
+        """Whether the level's familiar can walk: its block of stage birth or living
+        (D277)."""
+        return self.familiar is not None and self.familiar.stage in ("birth", "living")
+
+    @property
     def walk_ticks(self) -> int:
-        """The ticks a walked step takes: three where the wizard can fly, its spells
-        holding drevo, so that a flight is three times as fast; one elsewhere (D225)."""
+        """The ticks a walked step of the wizard's takes: two where its familiar can walk,
+        so that a familiar goes at twice a child's pace, and one in the levels of trials: a
+        level with a familiar keeps its own pace, though the page gives it drevo among the
+        spells known (D80, D277); three where the wizard can fly, its spells holding
+        drevo, so that a flight is three times as fast (D225); one elsewhere."""
+        if self.familiar is not None:
+            return WALK_TICKS_FAMILIAR if self.familiar_can_walk else 1
         return WALK_TICKS_FLYING if "drevo" in self.spells else 1
 
     def clear(self, position: Position) -> bool:
@@ -1963,8 +1982,10 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
         char = grid[tile.y][tile.x] if inside else WALL
         return char not in (WALL, SHELF) and (flying or char != LOW)
 
-    # Where each figure stands, or None while out of sight.
+    # Where each figure stands, or None while out of sight; the familiars, whose steps
+    # are quick (D277).
     where: dict[str, Position | None] = {"wizard": wizard}
+    familiar_ids = {actor.get("id") for actor in actors if actor.get("kind") == "familiar"}
     for actor in actors:
         actor_id = _identifier(story_id, actor.get("id"), "an actor's id")
         if actor_id in where:
@@ -2209,11 +2230,22 @@ def story_on_scene(data: dict[str, Any], scene: Scene) -> dict[str, Any]:
             else:
                 kind = "sleep" if "sleep" in action else "wake"
                 queue.append((kind, action.get("sleep")))
+        # In a step where a familiar walks, the figures play in half ticks: a familiar's
+        # step takes one, every other doing two, as the page plays it (D277).
+        quick = any(
+            doer in familiar_ids and any(kind == "move" for kind, _ in queue)
+            for doer, queue in queues.items()
+        )
+        busy: dict[str, int] = {}
+        now = 0
         while any(queues.values()):
+            now += 1
             for doer, queue in queues.items():
-                if not queue:
+                if not queue or busy.get(doer, 0) > now:
                     continue
                 kind, value = queue.pop(0)
+                if quick and not (doer in familiar_ids and kind == "move"):
+                    busy[doer] = now + 2
                 if kind == "lift":
                     aloft.add(doer)
                 elif kind == "land":

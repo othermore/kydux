@@ -193,3 +193,66 @@ describe('a story as the scene\'s events (D74)', () => {
   });
 });
 
+
+describe('a familiar in a story walks at twice the pace (D277)', () => {
+  const hall = {
+    map: ['########', '#S.....#', '#......#', '########'],
+    actors: [
+      { id: 'nuri', kind: 'friend', at: [6, 2] },
+      { id: 'familiar', kind: 'familiar', at: [6, 1] },
+    ],
+  };
+
+  it("plays a step where a familiar walks in half ticks, a person's cell taking two", () => {
+    const { events, spans, lengths } = storyEvents({
+      world: hall,
+      steps: steps({ who: 'voice', do: [{ walk: [4, 2], by: 'nuri' }, { walk: [2, 1], by: 'familiar' }] }),
+    });
+    const seen = events.map((e) => [e.tick, e.actor, e.kind, e.data.ticks ?? null]);
+    expect(seen).toEqual([
+      [1, 'nuri', 'move', 2],
+      [1, 'familiar', 'move', null],
+      [2, 'nuri', 'wait', null],
+      [2, 'familiar', 'move', null],
+      [3, 'nuri', 'move', 2],
+      [3, 'familiar', 'move', null],
+      [4, 'nuri', 'wait', null],
+      [4, 'familiar', 'move', null],
+    ]);
+    // The familiar's four cells end with the person's two: each at its own pace.
+    expect(spans[0]).toEqual({ first: 1, last: 4 });
+    expect([...lengths]).toEqual([
+      [1, 0.5],
+      [2, 0.5],
+      [3, 0.5],
+      [4, 0.5],
+    ]);
+  });
+
+  it('ends a step with a person still walking once its last cell is walked', () => {
+    const { events, lengths } = storyEvents({
+      world: hall,
+      steps: steps(
+        { who: 'voice', do: [{ walk: [4, 2], by: 'nuri' }, { walk: [5, 1], by: 'familiar' }] },
+        { who: 'nuri', do: null },
+      ),
+    });
+    const familiarLast = Math.max(...events.filter((e) => e.actor === 'familiar').map((e) => e.tick));
+    const nuriLast = Math.max(...events.filter((e) => e.actor === 'nuri' && e.kind !== 'say').map((e) => e.tick));
+    expect(familiarLast).toBe(1);
+    expect(nuriLast).toBe(4);
+    // The words of the next step come at a tick of the normal length.
+    const said = events.find((e) => e.kind === 'say');
+    expect(said?.tick).toBe(5);
+    expect(lengths.has(5)).toBe(false);
+  });
+
+  it('keeps a step with no familiar walking at the normal pace', () => {
+    const { events, lengths } = storyEvents({ world: hall, steps: steps({ who: 'voice', do: { walk: [4, 2], by: 'nuri' } }) });
+    expect(events.map((e) => [e.tick, e.kind, e.data.ticks ?? null])).toEqual([
+      [1, 'move', null],
+      [2, 'move', null],
+    ]);
+    expect(lengths.size).toBe(0);
+  });
+});

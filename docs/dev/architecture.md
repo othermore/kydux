@@ -336,7 +336,7 @@ tiles are `[x, y]`.
 
 | kind | actor | data | the scene |
 |---|---|---|---|
-| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225) | walks it one tile, facing that way, with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243); flown moves of a figure's that follow one another are one glide at an even speed, read ahead from the ticks, with no rest at the cells it passes (D259), and `data-flyers-at` says where each flying figure is as each frame is drawn |
+| `move` | wizard, or an actor | `from`, `to`, `facing`; `flying`; for a flown step of the wizard's, `step`, from 1, and `steps`, its place in its command and the command's count (D243); `ticks`, a walked step of the wizard's where it can fly, three (D225), and where a familiar walks, two, as a person's step in a story's step where a familiar walks (D277) | walks it one tile, facing that way, over the ticks it takes as they are played (D277), with a step's sound, a tap of filtered noise: the wizard's `step`, a child's `step_child` (the friends, Eldra), a grown-up's `step_adult` (figures.json's `adults`), every other one a little lower (D132), a familiar's a light tap at most every 120 ms (D277); a flown move has no tap: the wizard's command is one gust, started at its first step for the command's whole length, or at a later step where none sounds (D243); flown moves of a figure's that follow one another are one glide at an even speed, read ahead from the ticks, with no rest at the cells it passes (D259), and `data-flyers-at` says where each flying figure is as each frame is drawn |
 | `bump` | wizard, or a familiar | `at`, `facing`, `by`: `wall`, `door`, `hole`, `friend` (with `id`, D66), `familiar` (with `id`), and for a familiar's bump `wizard`, `actor` or `familiar` (with `id`, D270); a familiars' passage, a small cell, is a `wall` to the wizard, with the cell's `kind` (D270); `high` (flying, with the cell's `kind`, D186) or `ring` (walked or flown into from its side, with `id`, D187); `kind`, the cell's terrain where the scene names it | nudges the wizard against it, and in the air ends the gust at once (D243); the thought names a friend, a high cell's kind (*las copas de los árboles no se pasan*) and a ring's side, half a second after the bump (D237), over the head or, with no room there, beside it (D245) |
 | `say` | wizard | `text` | a bubble over the wizard for its reading time, three ticks at least (D175), under it when there is no room above or the goals box would cover it (D240) |
 | `wait` | wizard | `at` | nothing: the wizard stands still |
@@ -3480,8 +3480,9 @@ one overturns stays, marked as superseded.
   page plays every tick of such a level in a third of a tick (`Playback`'s `pace`,
   `FLOWN`), the hands' ticks as long as anywhere (LONG), so that a walked step is seen
   as long as anywhere else and a flown one a third of it. Everywhere else a walked step
-  takes one tick. Rules out a flight of three cells a tick, which would make a flight
-  of one or two cells cost a whole tick, and a walk as fast as a flight.
+  takes one tick, but where a familiar walks, two, and a level with a familiar is never
+  played at the flight's pace (D277). Rules out a flight of three cells a tick, which would
+  make a flight of one or two cells cost a whole tick, and a walk as fast as a flight.
 - **D226 — A turn inside a ring rubs its rim, and the program stops.** Decided
   2026-11-14 by the owner (*si se está dentro del aro y se intenta salir hacia un lado
   (no hacia arriba o hacia abajo), se choca con el borde del aro*; *un pensamiento/sonido
@@ -4232,7 +4233,8 @@ one overturns stays, marked as superseded.
   where it stops; what it sees, the wizard finds.** Decided 2026-11-17 from the design.
   `World.act` takes an `actor` (`"wizard"` by default): a familiar's `move_up`, `move_down`,
   `move_left` and `move_right` are the wizard's `_move` with the familiar as the one that
-  walks, a cell a tick, a bump on what blocks and on the wizard, on an actor and on another
+  walks, a cell a tick, at twice a person's pace (D277), a bump on what blocks and on the
+  wizard, on an actor and on another
   trial; a count of zero walks nothing and costs nothing. `check_consistency` asks one
   acting event for each tick (the wizard's, a familiar's, or the world's own after the
   program) and that each one's steps follow on. A trial moves only in the `birth` level;
@@ -4346,3 +4348,32 @@ one overturns stays, marked as superseded.
   the trials seen: one faded leaves it. Rules out a trial with no name or no colour that
   stands for the whole level, a fade counted in ticks, and a world that forgets a trial
   its goal still counts.
+- **D277 — Where a familiar walks, a person's step takes two ticks, and the page plays
+  the ticks in half the time.** Decided 2026-11-18 by the owner (*Creo que los animales
+  deben moverse a 2x. No tan rápido como las escobas, pero más rápido que los niños*;
+  *donde hay animales hay que hacer que el tiempo vaya al doble de rápido, para que los
+  niños tarden dos ticks por casilla pero los animales solo un tick por casilla*). In a
+  level whose familiar can walk (a `familiar` block of stage `birth` or `living`,
+  `Level.familiar_can_walk`) a walked step of the wizard's takes two ticks
+  (`Level.walk_ticks`, `WALK_TICKS_FAMILIAR`), told as D225 tells its three: its event
+  `move`, with `ticks`, in the first, and one with no event of the wizard's. A
+  familiar's step takes one tick (D270), and every other action one. The page plays
+  every tick of such a level in half a tick (`Playback`'s `pace`, `FAMILIAR_PACE`), the
+  wizard's hands' ticks as long as anywhere (LONG): a familiar crosses a cell in half the
+  time a child takes anywhere, a flight is still faster (a third), and a child's step is
+  seen as long as in any other level. A figure's step is drawn over the ticks it takes as
+  they are played (`Playback.span`). The familiar that `minka` brings back runs at that
+  pace. A level's `tick_limit` and a familiar's count of ticks are untouched. A level with
+  a familiar keeps its own pace, two ticks a person's step where its familiar walks and
+  one in the levels of trials, though the page gives it `drevo` among the spells known
+  (D80). No level of the course has both `drevo` and a familiar that walks, and the
+  level's check refuses one (`Level.from_directory`). In a story a familiar's walked cell
+  takes half the time of a person's, each figure at its own pace when both walk in one
+  step: a step where a familiar walks is played in half ticks
+  (`storyEvents`' `lengths`, given to `Playback.load`), a familiar's step taking one and
+  every other doing two, a person's step with its `ticks` and the second half a `wait`;
+  the story's check plays it so. A familiar's quick steps are heard as light taps at most
+  every 120 ms of the page's clock (`PAW_GAP`): each at the normal speed, one in two at
+  twice it, one in three at four times. Rules out a familiar of two cells a tick, which
+  would make a move of one cell cost a whole tick and skip the cell between, and a slower
+  child with the animal's time unchanged.

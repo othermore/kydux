@@ -154,14 +154,25 @@ function waypoints(walk: Tile | Tile[]): Tile[] {
  * one before `first`). Every tick has an event, so that tick n is the
  * playback's n-th. A step's actions are each figure's in turn, and the figures
  * play at once (D103): at each tick, each figure with an event left plays its
- * next, in the order the figures are first named. An event of a figure other
+ * next, in the order the figures are first named. In a step where a familiar walks,
+ * its ticks are played in half the time, given in `lengths` by their numbers: a
+ * familiar's step takes one, and every other doing two, a person's step saying its
+ * `ticks` and the second a `wait` (D277). An event of a figure other
  * than the step's `by`, or its speaker, says `aside`, for the camera to keep
  * with the one the step is about. A figure's words come after its step's actions,
  * or, in a step that says `meanwhile`, in the tick of the first of them (D275). */
 export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
   events: WorldEvent[];
   spans: { first: number; last: number }[];
+  lengths: Map<number, number>;
 } {
+  // The familiars of the story, whose steps are quick (D277).
+  const familiars = new Set(
+    ((story.world.actors as { id: string; kind?: string }[] | undefined) ?? [])
+      .filter((actor) => actor.kind === 'familiar')
+      .map((actor) => actor.id),
+  );
+  const lengths = new Map<number, number>();
   const where = new Map<string, Tile>();
   // Who is in the air, the staging's at first (D185).
   const aloft = new Set<string>(story.flying ?? []);
@@ -305,20 +316,42 @@ export function storyEvents(story: Pick<Story, 'steps' | 'world' | 'flying'>): {
     // Words said as the step begins, in the tick of its first actions (D275).
     const under = step.meanwhile === true && step.who !== 'voice' && [...queues.values()].some((queue) => queue.length > 0);
     if (under) events.push({ tick, actor: step.who, kind: 'say', data: { text: step.text }, line: null });
+    // Where a familiar walks, the step is played in half ticks (D277).
+    const quick = [...queues].some(
+      ([actor, queue]) => familiars.has(actor) && queue.some((next) => next.kind === 'move' && next.data.flying !== true),
+    );
+    const busy = new Map<string, number>();
     while ([...queues.values()].some((queue) => queue.length > 0)) {
       for (const [actor, queue] of queues) {
+        if ((busy.get(actor) ?? 0) > tick) {
+          // A person's second half of a doing, in a step where a familiar walks.
+          events.push({ tick, actor, kind: 'wait', data: { ...(actor !== about ? { aside: true } : {}) }, line: null });
+          continue;
+        }
         const next = queue.shift();
         if (!next) continue;
+        const slow = quick && !(familiars.has(actor) && next.kind === 'move');
+        if (slow) busy.set(actor, tick + 2);
+        const data = slow && next.kind === 'move' ? { ...next.data, ticks: 2 } : next.data;
         // The wizard's broom lifts and lands as the world's own events do, noted by
         // the broom, so that the scene plays them as a flight and not as a step (D185).
         const broom = actor === 'wizard' && (next.kind === 'fly' || next.kind === 'land');
-        events.push({ tick, actor: broom ? 'broom' : actor, kind: next.kind, data: next.data, line: null });
-        played(actor, next.kind, next.data);
+        events.push({ tick, actor: broom ? 'broom' : actor, kind: next.kind, data, line: null });
+        played(actor, next.kind, data);
       }
+      if (quick) lengths.set(tick, 0.5);
+      tick += 1;
+    }
+    // The last doings' second halves.
+    while (quick && [...busy.values()].some((until) => until > tick)) {
+      for (const [actor, until] of busy) {
+        if (until > tick) events.push({ tick, actor, kind: 'wait', data: { ...(actor !== about ? { aside: true } : {}) }, line: null });
+      }
+      lengths.set(tick, 0.5);
       tick += 1;
     }
     if (step.who !== 'voice' && !under) add(step.who, 'say', { text: step.text });
     spans.push({ first, last: tick - 1 });
   }
-  return { events, spans };
+  return { events, spans, lengths };
 }

@@ -50,8 +50,8 @@
     },
     "star": {
       "row": 10,
-      "left": 1181,
-      "top": 898,
+      "left": 1152,
+      "top": 864,
       "states": {
         "lit": "star-lit.webp"
       },

@@ -1700,6 +1700,79 @@ def test_a_mask_is_whole_inside_its_thing_s_outline(tmp_path, monkeypatch):
     assert small[rows, round(0.32 * cell) : round(0.58 * cell)].min() == 255
 
 
+def a_glow_on(base: np.ndarray) -> np.ndarray:
+    """The base with a round light on it, dying away to nothing 70 pixels from its middle,
+    and a loose dot of light beside it."""
+    ys, xs = np.mgrid[0 : base.shape[0], 0 : base.shape[1]]
+    glow = np.clip(60 * (1 - np.hypot(xs - 100, ys - 100) / 70), 0, None)
+    shown = np.clip(base + glow[..., None], 0, 255).astype(np.uint8)
+    shown[20:23, 20:23] = 170
+    return shown
+
+
+def test_a_feathered_light_rises_inward_from_its_outline_and_the_box_cuts_it_sharp(
+    tmp_path, monkeypatch
+):
+    """D287: a lying thing's state with a feather has alpha 0 outside its difference's
+    outline, rising over the feather's width to 1 inside it; a dot narrower than the
+    feather comes out at next to nothing; the difference is read beyond the box, so the
+    edge the box cuts is sharp on the page."""
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    shown = a_glow_on(base)
+    diff = {"threshold": 10, "soft": 6, "speck": 1, "scraps": 0, "feather": 0.1}
+    picture = {"picture": "lit.png", "diff": diff}
+    plate = {"box": [0, 0, 1, 0.6], "row": 0, "solid": False, "lying": True}
+    scene = scene_of_pictures(
+        tmp_path,
+        monkeypatch,
+        {"base.png": base, "lit.png": shown},
+        {"plate": {**plate, "states": {"lit": picture}}},
+    )
+    box = (0, 0, 200, 120)
+    pixels, alpha = export_scene.state_alpha(
+        scene, scene.things["plate"], picture, base, base, box, None
+    )
+    outline = export_scene.difference_mask(shown, base, (0, 0, 200, 200), diff)
+    assert not alpha[~outline].any(), "nothing outside the difference's outline"
+    # Along the light's middle row, outward from its middle: whole, then dying away
+    # over the feather's twenty pixels, with no step.
+    edge = int(np.nonzero(outline[100])[0].max())
+    along = alpha[100, 100 : edge + 1]
+    assert along[0] == 1 and (np.diff(along) <= 0).all()
+    assert 0 < alpha[100, edge] < 0.1
+    assert 0.4 < alpha[100, edge - 10] < 0.6
+    assert alpha[100, edge - 21] == 1
+    assert alpha[18:25, 18:25].max() < 0.2, "a dot of light is next to nothing"
+    # The box cuts the light below its middle: its last row there is whole.
+    assert alpha[119, 100] == 1
+    sprite = np.array(
+        export_scene.state_sprite(pixels, alpha, scene.grid, 1, 1, (0, 0, 96, 58), 0, 0.0, None)
+    )
+    assert sprite.shape[0] == 58 and sprite[57, 48, 3] == 255
+    assert sprite[0, :, 3].max() == 0 and sprite[:, 0, 3].max() == 0
+
+
+def test_a_feather_on_a_thing_that_does_not_lie_in_the_floor_is_refused(tmp_path, monkeypatch):
+    """D287, D155: a figure walks behind a standing thing, whose mask stays 0 or 1."""
+    base = np.full((200, 200, 3), 120, dtype=np.uint8)
+    picture = {"picture": "lit.png", "diff": {"feather": 0.1}}
+    standing = {"box": [0, 0, 1, 1], "row": 0, "solid": False, "states": {"lit": picture}}
+    scene = scene_of_pictures(
+        tmp_path, monkeypatch, {"base.png": base, "lit.png": a_glow_on(base)}, {"lamp": standing}
+    )
+    with pytest.raises(ValueError, match="lamp's lit is feathered, and lamp does not lie"):
+        scene.refuse_loose_feathers()
+    monkeypatch.setattr(scene_settings.Settings, "marks", lambda self: ["."])
+    with pytest.raises(ValueError, match="lamp's lit is feathered"):
+        scene_settings.settings("door")
+    static = {"box": [0, 0, 1, 1], "row": 0, "mask": "difference", "diff": {"feather": 0.1}}
+    with pytest.raises(ValueError, match="statue feathers its own mask"):
+        scene_settings.Settings("door", {"things": {"statue": static}}).refuse_loose_feathers()
+    scene_settings.Settings(
+        "door", {"things": {"plate": {**standing, "lying": True}}}
+    ).refuse_loose_feathers()
+
+
 def test_a_line_the_edit_moved_apart_from_the_thing_closes_nothing_in():
     """D155: what the thing's outline closes in is the thing's; a frame of lines the
     edit moved, apart from it, takes nothing into its mask."""

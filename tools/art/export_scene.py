@@ -135,7 +135,9 @@ def changed(a: np.ndarray, b: np.ndarray, threshold: float = 60) -> np.ndarray:
 #: lines a model's edit moved a little, which are not the thing; the holes of no more
 #: than `holes` pixels, which are of the thing; and how far gaps in it are closed. A
 #: static thing that Gemini painted flat magenta is cut with a high threshold, and takes
-#: the outline beside it (`rim`).
+#: the outline beside it (`rim`). A state of a thing lying in the floor may say how wide,
+#: in cells, its edge dies away inside its outline (`feather`, D287); no other mask is
+#: anything but 0 or 1 (D155).
 DIFFERENCE = {"threshold": 26, "soft": 13, "speck": 8, "holes": 3000, "close": 0}
 #: How far each of the two distances is smoothed, in the painting's pixels.
 DIFFERENCE_BLUR = (1.2, 5.0)
@@ -178,6 +180,30 @@ def difference_mask(
     out = np.zeros(base.shape[:2], dtype=bool)
     out[crop] = mask
     return out
+
+
+def feathered(
+    shown: np.ndarray,
+    base: np.ndarray,
+    box: tuple[int, int, int, int],
+    own: dict,
+    width: float,
+) -> np.ndarray:
+    """A light lying in the floor, its mask by difference softened inward (D287): the mask
+    made as difference_mask makes it, 0 or 1, read `width` pixels beyond the box; then its
+    alpha at a pixel is that pixel's depth inside the mask's outline over `width`, 1 from
+    there inward, so that the light dies away with no line and no loose dot at its rim. The
+    box cuts the picture after, and an edge it makes on a wall stays sharp."""
+    grow = int(np.ceil(width))
+    wide = (box[0] - grow, box[1] - grow, box[2] + grow, box[3] + grow)
+    mask = difference_mask(shown, base, wide, own)
+    height, picture_width = base.shape[:2]
+    x0, y0 = max(0, wide[0]), max(0, wide[1])
+    x1, y1 = min(picture_width, wide[2]), min(height, wide[3])
+    alpha = np.zeros(base.shape[:2], dtype=np.float32)
+    depth = image_first.depth_inside(mask[y0:y1, x0:x1], width)
+    alpha[y0:y1, x0:x1] = np.minimum(1, depth / width)
+    return alpha
 
 
 def closed_in(mask: np.ndarray, differs: np.ndarray, holes: int, speck: int) -> np.ndarray:
@@ -393,6 +419,10 @@ def state_alpha(
             # A state cut by the difference against the scene's base (D148), its box
             # its own where the state lies in a part of the thing's.
             within = native_box(grid, picture["box"]) if "box" in picture else native
+            feather = picture["diff"].get("feather")
+            if feather:
+                width = feather * spacing
+                return shown, feathered(shown, painting, within, picture["diff"], width)
             mask = difference_mask(shown, painting, within, picture["diff"])
             return shown, mask.astype(np.float32)
         traced = picture.get("leaf", picture.get("traced"))

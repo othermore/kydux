@@ -269,6 +269,31 @@ def eroded(mask: np.ndarray, r: int) -> np.ndarray:
     return ~dilated(~mask, r)
 
 
+def depth_inside(mask: np.ndarray, most: float) -> np.ndarray:
+    """How far each pixel of a mask lies inside its outline, in pixels, up to `most`: the
+    distance from it to the nearest pixel outside the mask, 0 outside it; past the
+    picture's edge the mask goes on as its edge pixels do. Each offset nearer than `most`
+    is tried, from the farthest to the nearest, so that the nearest pixel outside is the
+    last written: numpy alone, for the few cells of a thing's box."""
+    reach = int(np.ceil(most))
+    height, width = mask.shape
+    outside = np.pad(~mask, reach, mode="edge")
+    depth = np.where(mask, np.float32(most), np.float32(0))
+    offsets = sorted(
+        (
+            (float(np.hypot(dx, dy)), dy, dx)
+            for dy in range(-reach, reach + 1)
+            for dx in range(-reach, reach + 1)
+            if 0 < np.hypot(dx, dy) < most
+        ),
+        reverse=True,
+    )
+    for distance, dy, dx in offsets:
+        near = outside[reach + dy : reach + dy + height, reach + dx : reach + dx + width]
+        depth[near & mask] = distance
+    return depth
+
+
 def flooded(seeds: np.ndarray, passable: np.ndarray, steps: int) -> np.ndarray:
     """What `seeds` reach through `passable` pixels, a pixel a step to the four
     sides, in at most `steps` steps."""

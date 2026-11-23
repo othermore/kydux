@@ -365,7 +365,7 @@
   },
   "things": {
     "moon": {
-      "about": "The moon's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148).",
+      "about": "The moon's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148). Its light is whole: the box is as large as its glow, its foot reaching down to the box's bottom, and the mask dies away over a tenth of a cell inside its outline (`feather`, D287).",
       "box": [
         5.0,
         3.42,
@@ -373,6 +373,7 @@
         6.2
       ],
       "row": 4,
+      "reach": 1.2,
       "solid": false,
       "without": "tower-hall-base-4.png",
       "states": {
@@ -383,14 +384,15 @@
             "soft": 6,
             "speck": 8,
             "holes": 60000,
-            "scraps": 0.3
+            "scraps": 0.3,
+            "feather": 0.1
           }
         }
       },
       "lying": true
     },
     "sun": {
-      "about": "The sun's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148).",
+      "about": "The sun's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148). Its light is whole: the box is as large as its glow, its foot reaching down to the box's bottom, and the mask dies away over a tenth of a cell inside its outline (`feather`, D287).",
       "box": [
         12.05,
         3.42,
@@ -398,6 +400,7 @@
         6.2
       ],
       "row": 4,
+      "reach": 1.2,
       "solid": false,
       "without": "tower-hall-base-4.png",
       "states": {
@@ -408,18 +411,19 @@
             "soft": 6,
             "speck": 8,
             "holes": 60000,
-            "scraps": 0.3
+            "scraps": 0.3,
+            "feather": 0.1
           }
         }
       },
       "lying": true
     },
     "star": {
-      "about": "The star's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148).",
+      "about": "The star's plate, lying in the floor (D273): the base shows it as it is; lit, it is Gemini's edit of the base with the three plates lit (tools/art/prompts/tower-hall-lit.md), laid on the base by its outlines, cut by the difference within the plate's glow (D148). Its light is whole above and at its sides, its box as large as its glow; below, the box ends on the top edge of the hall's front wall, which ends the glow, and the mask dies away over a tenth of a cell inside its outline (`feather`, D287).",
       "box": [
-        12.3,
-        9.35,
-        14.9,
+        12.0,
+        9.0,
+        15.0,
         10.74
       ],
       "row": 10,
@@ -433,7 +437,8 @@
             "soft": 6,
             "speck": 8,
             "holes": 60000,
-            "scraps": 0.3
+            "scraps": 0.3,
+            "feather": 0.1
           }
         }
       },

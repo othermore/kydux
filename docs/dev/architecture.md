@@ -2378,12 +2378,13 @@ one overturns stays, marked as superseded.
   head lies in the wall, or whose feet lie in a statue's base.
 - **D155 — A cut-out's mask is opaque inside its outline.** Decided 2026-11-08 by the
   owner (the wizard seen through the statue's robe). A mask by difference (D148) is 0 or 1
-  at every pixel, its edge softened over one pixel by the page's resampling. Where a
-  thing's colour is nearly the floor's, its thin outline differs even where its inside
-  does not: the lines that differ and touch the mask close those parts in, each as large as
-  the thing's largest hole, with the outline beside them (`closed_in`); a line the edit
-  moved apart from the thing closes nothing in. Rules out a figure seen through a statue, a
-  leaf or a torch.
+  at every pixel, its edge softened over one pixel by the page's resampling; a light lying
+  in the floor, under every figure, is the one that dies away inside its outline (D287).
+  Where a thing's colour is nearly the floor's, its thin outline differs even where its
+  inside does not: the lines that differ and touch the mask close those parts in, each as
+  large as the thing's largest hole, with the outline beside them (`closed_in`); a line
+  the edit moved apart from the thing closes nothing in. Rules out a figure seen through a
+  statue, a leaf or a torch.
 - **D156 — A painted door shows its painted state at every tick, hung on the jamb it opens
   on.** Decided 2026-11-08 by the owner. A door with painted states is never drawn with the
   placeholder's frame: at the tick it opens, at the run's end and on the timeline, the page
@@ -4288,28 +4289,28 @@ one overturns stays, marked as superseded.
   example hides its error.
 - **D273 — What the two scenes and the figures hold.** Decided 2026-11-17 by the designer.
   The scenes are `the-tower-hall` and `the-tower-passage`, whose corridor has two tiny
-  entrances, the trench's mouth and a flap painted only (D281). The hall's three brass plates are
-  things of the settings' kind `plate`, each with a state `lit` made as a door's state is
-  (D148): one edit of the base with the three lit, the masks by difference. The great book
-  lies open on the lectern in the base painting, and Bimo sleeps on the lectern beside it in
-  every picture: he is part of the scene, speaks from his spot (D264) and never leaves. The
-  hall has a second light, `sunset`, as the dormitory has `morning`; it comes in *Lo que
-  trajo el familiar* while the children tell Orla, after the scene has gone dark (D280).
-  The forgotten room's
-  door has no open state. A familiar's sheet is
+  entrances, the trench's mouth and a flap painted only (D281). The hall's three brass
+  plates are things of the settings' kind `plate`, each with a state `lit` made as a
+  door's state is (D148): one edit of the base with the three lit, the masks by
+  difference, each light whole and dying away at its rim (D287). The great book lies open
+  on the lectern in the base painting, and Bimo sleeps on the lectern beside it in every
+  picture: he is part of the scene, speaks from his spot (D264) and never leaves. The hall
+  has a second light, `sunset`, as the dormitory has `morning`; it comes in *Lo que trajo
+  el familiar* while the children tell Orla, after the scene has gone dark (D280). The
+  forgotten room's door has no open state. A familiar's sheet is
   `content/art/figures/familiar-<kind>-<color>.webp`, fourteen in all, laid out as a
   wizard's walking sheet (three steps down, left, right and up) with each figure half a
   wizard's height, standing in the lower half of its frame, so that it is cut and drawn as
   any figure and comes out at 0.57 of a cell; its row to the right is the row to the left
   mirrored by the tool; a kind's other colours are edits of its first sheet. Others'
   creatures in a level or a story are actors of the kind `familiar` (`creature`, `color`,
-  `trial`, `spark`, or `"of": "mate"` for the room-mate's copy of the child's; a `creature`
-  given as a list is the first kind that is not the child's); the child's own is `{"id":
-  "familiar", "kind": "familiar"}` in a story. Orla has a walking sheet (`orla`, an adult)
-  and Rinlo a sitting row, in which a story seats him and stands him up (D279). The thread's piece and the trail's end are sprites (D182). A
-  level's plan is its scene's picture in ink (D143, D151). Rules out illustrations for the
-  stories (D74), and a picture of Bimo awake, of the friend's little box, of the slate and of
-  the spark.
+  `trial`, `spark`, or `"of": "mate"` for the room-mate's copy of the child's; a
+  `creature` given as a list is the first kind that is not the child's); the child's own
+  is `{"id": "familiar", "kind": "familiar"}` in a story. Orla has a walking sheet
+  (`orla`, an adult) and Rinlo a sitting row, in which a story seats him and stands him up
+  (D279). The thread's piece and the trail's end are sprites (D182). A level's plan is its
+  scene's picture in ink (D143, D151). Rules out illustrations for the stories (D74), and
+  a picture of Bimo awake, of the friend's little box, of the slate and of the spark.
 - **D274 — Long words are said in pieces.** Decided 2026-11-17 by the owner (*los diálogos
   que se hacen con burbujas no deben ser muy largos, pero se pueden partir en trozos
   incluso a mitad de frase con ... para hacerlos más cortos*). A bubble holds some 110
@@ -4550,3 +4551,17 @@ one overturns stays, marked as superseded.
   the circle, and the passage's two, whose wizard stands under the passage's mouth, say
   `"facing": "up"`. Rules out a wizard with its back to its own familiar's birth, and a
   turn asked of the child's program only to look the right way.
+- **D287 — A light lying in the floor is drawn whole and ends softly.** Decided 2026-11-19
+  by the owner (*El circulo de luz … sale cortado por abajo, en la linea de la casilla*;
+  *la máscara debería estar en el muro, no en el círculo*). A plate's `lit` picture (D273)
+  holds the whole of its glow as Gemini painted it: its box is as large as the glow and
+  its `reach` takes the picture down to the box's bottom, past the bottom of the plate's
+  row. No edge of the picture cuts the glow on the floor; the one straight edge is where a
+  wall stands over it, the star's bottom on the top edge of the hall's front wall. A state
+  of a thing lying in the floor may give its difference a `feather`, in cells: the mask's
+  alpha rises from 0 on the difference's outline to 1 at that distance inside it, so that
+  the glow dies away with no line and no loose dot at its rim. The feather is measured on
+  the difference before the box cuts it, so that an edge the box makes on a wall stays
+  sharp. It is the one mask by difference that is not 0 or 1 (D155): a thing lying in the
+  floor is under every figure, and nothing is seen through it. Rules out a glow cut on a
+  cell's line or on its box's, and a soft mask on anything a figure walks behind.

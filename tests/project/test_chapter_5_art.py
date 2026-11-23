@@ -1,7 +1,7 @@
 """Chapter 5's figures and sprites hold what the page reads of them (D273): the fourteen
 familiars' walking sheets, half a child's height, each figure of the right-facing row
 the left-facing one turned over; Orla's sheet and Rinlo's sitting rows; the thread's and
-the trail's sprites, lying."""
+the trail's sprites, lying; and the hall's plates' light whole (D287)."""
 
 import json
 import sys
@@ -99,3 +99,28 @@ def test_the_thread_and_the_trail_are_sprites_lying_on_the_floor():
 
 def test_the_familiars_size_is_the_tool_s():
     assert figures.FAMILIAR_HEIGHT_CELLS == ABOUT["familiar_height_cells"]
+
+
+def test_each_plate_s_light_is_whole_in_both_lights():
+    """D287: a lit plate's picture is as tall as its box, and no edge of it cuts the glow
+    on the floor: its top, left and right columns are at alpha 0, and the moon's and the
+    sun's bottom rows; the star's bottom is the hall's front wall, which ends its glow."""
+    hall = CONTENT / "art" / "scenes" / "the-tower-hall"
+    art = json.loads((hall / "art.json").read_text(encoding="utf-8"))
+    settings = json.loads((REPO / "art" / "scenes" / "the-tower-hall" / "cut.json").read_text())
+    cell = 96
+    for plate in ("moon", "sun", "star"):
+        box = settings["things"][plate]["box"]
+        thing = art["things"][plate]
+        assert (thing["left"], thing["top"]) == (round(box[0] * cell), round(box[1] * cell))
+        for name in (thing["states"]["lit"], thing["hours"]["sunset"]["lit"]):
+            alpha = np.array(Image.open(hall / name).convert("RGBA"))[..., 3]
+            assert alpha.shape == (
+                round(box[3] * cell) - round(box[1] * cell),
+                round(box[2] * cell) - round(box[0] * cell),
+            ), name
+            assert alpha[0].max() == alpha[:, 0].max() == alpha[:, -1].max() == 0, name
+            if plate == "star":
+                assert alpha[-1].max() == 255, "the wall ends the star's glow"
+            else:
+                assert alpha[-1].max() == 0, name

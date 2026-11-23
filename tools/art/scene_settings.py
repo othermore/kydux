@@ -130,6 +130,21 @@ class Settings:
                     f"{self.id}: {name} opens and closes but names no kind, door or hole"
                 )
 
+    def refuse_loose_feathers(self) -> None:
+        """Only a state of a thing lying in the floor softens its mask's edge (`feather`,
+        D287): it lies under every figure, and nothing is seen through it; whatever a
+        figure walks behind keeps a mask of 0 or 1 (D155)."""
+        for name, thing in self.things.items():
+            if "feather" in (thing.get("diff") or {}):
+                raise ValueError(f"{self.id}: {name} feathers its own mask, and only a state may")
+            for state, picture in (thing.get("states") or {}).items():
+                feathers = isinstance(picture, dict) and "feather" in (picture.get("diff") or {})
+                if feathers and not thing.get("lying"):
+                    raise ValueError(
+                        f"{self.id}: {name}'s {state} is feathered, and {name} does not lie "
+                        "in the floor"
+                    )
+
     def refuse_long_nudges(self) -> None:
         """A figure walks its own column; only the cells round a door or an arch are
         nudged, never a whole column or row (D149); and a thing the game draws is shifted
@@ -149,6 +164,7 @@ def settings(scene_id: str) -> Settings:
     found = Settings(scene_id, json.loads(path.read_text(encoding="utf-8")))
     found.refuse_long_nudges()
     found.refuse_unkinded()
+    found.refuse_loose_feathers()
     return found
 
 

@@ -77,8 +77,8 @@ exactly these keys and no others.
   browser and the game counts how it is played; the button takes the yes back and
   deletes the cookies, and the saved games stay where they are.
 - `cookies.settings_refused`: on the settings page, beside the button *Aceptar las
-  cookies* (*Accept the cookies*), two sentences: the cookies are refused in this
-  browser; in a day or two the game asks again.
+  cookies* (*Accept the cookies*), one sentence: the cookies are refused in this
+  browser. It does not say that the notice comes back.
 
 ## Rules
 

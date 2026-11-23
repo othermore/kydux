@@ -844,7 +844,7 @@
     "refuse_sure": "Sí, rechazarlas",
     "settings_title": "Cookies",
     "settings_accepted": "Las cookies están aceptadas en este navegador y el juego cuenta cómo se juega. Este botón retira el permiso y borra las cookies; tus partidas guardadas se quedan donde están.",
-    "settings_refused": "Las cookies están rechazadas en este navegador. Dentro de un día o dos, el juego volverá a preguntar.",
+    "settings_refused": "Las cookies están rechazadas en este navegador.",
     "withdraw": "Retirar el permiso"
   }
 }

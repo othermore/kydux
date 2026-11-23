@@ -5350,7 +5350,9 @@ one overturns stays, marked as superseded.
   whatever the answer, with the two presses of a refusal as events. The notice and the
   settings speak of the cookies alone: no text of the game names GoatCounter or says
   what is counted without cookies (*no digas lo que cuenta el juego sin cookies, eso no
-  hay que aclararlo en ningún sitio*). The notice's words are Gemini's from
+  hay que aclararlo en ningún sitio*), and none says that a no is asked about again
+  (*no pongas en los ajustes lo de que el juego volverá a preguntar. Eso lo sabemos
+  nosotros*). The notice's words are Gemini's from
   `tools/write/briefs/the-cookies-notice.md`, its one line and its question the owner's.
   Rules out a game that does not open without the cookies, a refusal in one press, a
   long text before the game, Google's tag loaded before a yes, and any counting on a

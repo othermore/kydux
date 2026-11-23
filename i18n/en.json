@@ -844,7 +844,7 @@
     "refuse_sure": "Yes, refuse them",
     "settings_title": "Cookies",
     "settings_accepted": "The cookies are accepted in this browser, and the game counts how it is played. This button takes the yes back and deletes the cookies; your saved games stay where they are.",
-    "settings_refused": "The cookies are refused in this browser. In a day or two, the game will ask again.",
+    "settings_refused": "The cookies are refused in this browser.",
     "withdraw": "Withdraw the permission"
   }
 }

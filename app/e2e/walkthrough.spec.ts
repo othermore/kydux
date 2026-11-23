@@ -147,7 +147,7 @@ async function level(page: Page, id: string): Promise<void> {
   // with ways is opened so, with the tester's panel and buttons kept out of the pictures.
   await page.goto(ways.length > 0 ? `/?debug#level/${id}` : `/#level/${id}`);
   if (ways.length > 0) {
-    await page.addStyleTag({ content: '.debug-box, .debug-legend, #debug-solution, .way { display: none !important; }' });
+    await page.addStyleTag({ content: '.debug-box, .debug-legend, .debug-numbers, #debug-solution, .way { display: none !important; }' });
   }
   await page.locator('#start').waitFor({ timeout: ciTimes(90_000) });
   await page.waitForTimeout(ciTimes(400));

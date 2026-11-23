@@ -1,0 +1,139 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 1,
+      "image": "row-1-static-under.webp",
+      "top": 0,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 7,
+      "image": "row-7-static.webp",
+      "top": 494,
+      "static": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static-over.webp",
+      "top": 787,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 11,
+      "image": "row-11-static.webp",
+      "top": 922,
+      "static": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-under.webp",
+      "top": 1200,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {},
+  "nudged": [
+    {
+      "about": "Round the top arch, whose opening lies between the two columns (D149).",
+      "cells": [
+        [
+          8,
+          1
+        ],
+        [
+          8,
+          2
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          9,
+          1
+        ],
+        [
+          9,
+          2
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch below the crossing.",
+      "cells": [
+        [
+          8,
+          9
+        ],
+        [
+          8,
+          12
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          12
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch at the foot of the wide corridor.",
+      "cells": [
+        [
+          14,
+          12
+        ],
+        [
+          14,
+          14
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          15,
+          12
+        ],
+        [
+          15,
+          14
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "dark": [
+    {
+      "columns": [
+        14,
+        15
+      ],
+      "from": 12.8,
+      "to": 13.8,
+      "most": 0.6
+    }
+  ],
+  "source": "SOURCE.md"
+}

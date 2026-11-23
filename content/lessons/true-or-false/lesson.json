@@ -1,0 +1,10 @@
+{
+  "id": "true-or-false",
+  "speaker": "friend",
+  "teaches": [
+    "teacher.facing",
+    "wizard.facing",
+    "concept:equal",
+    "concept:not"
+  ]
+}

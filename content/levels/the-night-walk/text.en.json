@@ -1,0 +1,21 @@
+{
+  "title": "The night walk",
+  "goals": [
+    "Pick up the key.",
+    "Open the door.",
+    "Hold the hole shut with *osto*.",
+    "Reach the mark in the arch below.",
+    "Do not let Dask see you.",
+    "Without bumping into anything."
+  ],
+  "starting_code": "# Walk down to the key.\n\n# Pick it up.\n\n# Walk down to the door.\n\n# Open it, it is called `door`.\n\n# Walk down to the hole's edge.\n\n# Hold the hole shut with osto.\n\n# Walk down across it to the cell before Dask's corridor.\n\n# Wait while he looks right.\n\n# Walk down to the arch.\n",
+  "hints": [
+    "Remember, the key is 1 step away. After opening the door, there are 2 steps to the hole's edge.",
+    "This hole never closes on its own, so a `while` loop would wait for ever! Instead, use `wizard.cast(\"osto\")` from the cell right before the hole to hold it shut, and then `while` with `dask.facing` for Dask.",
+    "After casting *osto*, walk down 3 to the cell before Dask's corridor. Once Dask turns, walk down 4 to the arch!"
+  ],
+  "intro": "This is the way home! We must use everything together: pick up the key from the floor, open the door, hold that hole shut with *osto* since it never closes on its own, and wait for Dask to turn around in the last corridor. His lantern shines very far! It is a long walk, but I know we can do it.",
+  "outro": "We made it! We are almost back in our beds.",
+  "changes": "Dask starts in a different place each time.",
+  "changed": "This time, Dask starts in another place."
+}

@@ -1,0 +1,7 @@
+{
+  "id": "what-a-program-is",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.move_right"
+  ]
+}

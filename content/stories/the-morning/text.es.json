@@ -1,0 +1,11 @@
+{
+  "title": "La mañana",
+  "steps": [
+    "La brillante luz de la mañana entra por la ventana. Has dormido muy bien en tu cama nueva.",
+    "¡Buenos días! Hoy vamos a la biblioteca: en su banco de varitas prestan una de la escuela hasta que compremos la nuestra. ¡Y yo todavía no tengo ninguna!",
+    "¡Yo también necesito una! La varita que llevo es solo la de repuesto de {friend}, que me prestó en la verja, y quiero devolvérsela cuanto antes.",
+    "¡Entonces podemos ir {juntos|juntas}! Conozco el camino a la biblioteca.",
+    "Salís {juntos|juntas} del dormitorio y cruzáis la sala común hacia la puerta, con {mate} muy cerca de ti.",
+    "Abres la puerta y sales a los largos pasillos del castillo con {mate}, de camino a la biblioteca."
+  ]
+}

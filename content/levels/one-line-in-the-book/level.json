@@ -1,0 +1,242 @@
+{
+  "id": "one-line-in-the-book",
+  "kind": "practice",
+  "speaker": "orla",
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "minka"
+  ],
+  "camera": {
+    "fit": [
+      [
+        4,
+        2
+      ],
+      [
+        15,
+        11
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "facing": "up",
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "orla",
+      "at": [
+        11,
+        4
+      ],
+      "facing": "down",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        6,
+        7
+      ],
+      "facing": "right"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        13,
+        7
+      ],
+      "facing": "left"
+    },
+    {
+      "kind": "familiar",
+      "id": "friend_familiar",
+      "creature": "Hare",
+      "color": "grey",
+      "trial": true,
+      "at": [
+        8,
+        7
+      ],
+      "drill": [
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          8,
+          7
+        ]
+      ]
+    },
+    {
+      "kind": "familiar",
+      "id": "mate_familiar",
+      "at": [
+        11,
+        7
+      ],
+      "tries": true
+    }
+  ],
+  "familiar": {
+    "stage": "trial",
+    "circle": [
+      8,
+      6,
+      11,
+      8
+    ],
+    "trials": [
+      [
+        10,
+        7
+      ]
+    ],
+    "methods": [
+      "__init__"
+    ],
+    "book": true,
+    "then": {
+      "born": "friend_familiar",
+      "to": [
+        7,
+        7
+      ],
+      "way": [
+        [
+          7,
+          4
+        ],
+        [
+          6,
+          4
+        ]
+      ]
+    },
+    "draft": {
+      "kind": "Fox",
+      "name": "Pimu",
+      "color": "red"
+    }
+  },
+  "api": [
+    "wizard.cast",
+    "familiar.name",
+    "familiar.color"
+  ],
+  "goals": [
+    {
+      "kind": "trial",
+      "count": 1,
+      "named": true,
+      "coloured": true
+    },
+    {
+      "kind": "noted"
+    }
+  ],
+  "map": [
+    "####################",
+    "####################",
+    "####################",
+    "#########==#########",
+    "####=....==....=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=.....S....=####",
+    "#########..#########",
+    "#########==#########",
+    "########===#########",
+    "########===#########"
+  ],
+  "terrain": [
+    "####################",
+    "##############l#####",
+    "##############l#####",
+    "#########uu###l#####",
+    "####u....uu....u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "#########..#########",
+    "#########ss#########",
+    "########sss#########",
+    "########sss#########"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "u": "furniture",
+    "s": "stair",
+    "l": "wall"
+  },
+  "walked": [
+    "."
+  ],
+  "things": [
+    {
+      "kind": "plate",
+      "id": "moon",
+      "at": [
+        6,
+        4
+      ]
+    },
+    {
+      "kind": "plate",
+      "id": "sun",
+      "at": [
+        13,
+        4
+      ]
+    },
+    {
+      "kind": "plate",
+      "id": "star",
+      "at": [
+        13,
+        10
+      ]
+    }
+  ],
+  "fixed": [
+    "moon",
+    "sun",
+    "star"
+  ],
+  "voices": {
+    "bimo": [
+      9,
+      3
+    ]
+  },
+  "art": "the-tower-hall"
+}

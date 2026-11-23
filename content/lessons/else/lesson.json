@@ -1,0 +1,7 @@
+{
+  "id": "else",
+  "speaker": "friend",
+  "teaches": [
+    "concept:else"
+  ]
+}

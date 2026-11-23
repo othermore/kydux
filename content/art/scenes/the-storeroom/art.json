@@ -1,0 +1,160 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 7,
+      "image": "row-7-static-under.webp",
+      "top": 432,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static-over.webp",
+      "top": 768,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static.webp",
+      "top": 958,
+      "static": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-under.webp",
+      "top": 1200,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {
+    "store_door": {
+      "row": 12,
+      "left": 797,
+      "top": 960,
+      "states": {
+        "closed": "store_door-closed.webp",
+        "open": "store_door-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rows": {
+        "open": 13
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        10
+      ]
+    },
+    "key": {
+      "row": 7,
+      "left": 912,
+      "top": 677,
+      "states": {
+        "lying": "key-lying.webp"
+      },
+      "at": [
+        10,
+        7
+      ]
+    },
+    "hole": {
+      "row": 7,
+      "left": 269,
+      "top": 670,
+      "states": {
+        "open": "hole-open.webp"
+      },
+      "kind": "hole",
+      "at": [
+        3,
+        7
+      ]
+    }
+  },
+  "lowered": [
+    {
+      "about": "Touched by store_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          8,
+          14
+        ],
+        [
+          8,
+          14
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "store_door"
+    },
+    {
+      "about": "Touched by store_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          9,
+          14
+        ],
+        [
+          9,
+          14
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "store_door"
+    },
+    {
+      "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
+      "cells": [
+        [
+          0,
+          8
+        ],
+        [
+          5,
+          8
+        ]
+      ],
+      "by": -0.3
+    }
+  ],
+  "nudged": [
+    {
+      "about": "Round the door (D149).",
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          13
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          13
+        ]
+      ],
+      "by": -0.1,
+      "about": "Column 10 a little toward the door's middle, clear of its open leaf."
+    }
+  ],
+  "source": "SOURCE.md"
+}

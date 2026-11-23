@@ -1,0 +1,36 @@
+{
+  "title": "Lo que trajo el familiar",
+  "steps": [
+    "Tienes un puñado de trozos de hilo negro en la mano. Arriba se oye un cerrojo, y pasos en la escalera de atrás.",
+    "Rinlo aparece por el arco del fondo del pasillo, muy pálido.",
+    "Volar me aterra. Antes de cada clase me paso días sin dormir.",
+    "Esa voz me encontró, creo que sintió mi miedo.",
+    "Lleva todo el año hablándome, desde los muros del castillo, cada vez que estoy solo en una habitación.",
+    "Me prometió que se acabarían las clases de vuelo, dijo que nadie se haría daño…",
+    "…me dio los hilos y me enseñó a anudarlos… y luego siguió pidiendo más y más cosas…",
+    "…pero hoy le he dicho que no haría nada más. Lo que me pedía, podría hacerte mucho daño.",
+    "Pues no me parece nada del otro mundo, Rinlo… A mí tampoco me gustan las escobas.",
+    "Rinlo casi se ríe.",
+    "Subís los cuatro a la torre. Orla está sola con el libro. Dejas los hilos sobre el atril.",
+    "Son hilos para trucar escobas. Tenemos algo que contarte…",
+    "Debo agradeceros por vuestra sinceridad.",
+    "Y por vuestra valentía, algo digno de mención en unos niños de primer curso.",
+    "Veréis, jóvenes, estos hilos hacen mucho más que trucar escobas. Son los desechos del alma de un mago.",
+    "Un mago al que debieron matar con un hechizo oscuro. Son la esencia del mal, hecha cosa por esa muerte.",
+    "Causan males que no se pueden contar. Atraen la muerte y el dolor. Destruyen la amistad, y el alma.",
+    "«Los he tenido meses en una caja», dice {friend}, sin voz.",
+    "Sueltos, duermen. Es el nudo lo que los despierta.",
+    "Habéis hecho bien en desatarlos, y mejor en traérmelos.",
+    "Orla los cubre con un paño y los guarda bajo llave.",
+    "Ese nudo no se enseña en Arvelia desde hace muchos años.",
+    "Debéis saber que os creo y que confío en vosotros.",
+    "Y a ti, Rinlo, te diré: le has dicho que no, has vencido a tus miedos.",
+    "Eso era lo más difícil, y lo has conseguido.",
+    "Atesora las amistades que te hacen ser mejor…",
+    "…pues solo con grandes amigos podemos las personas llegar allí donde estamos llamados a llegar.",
+    "Hay algo que debéis saber, y tú más que nadie, {wizard}."
+  ],
+  "later": {
+    "13": "Tardáis un buen rato en contar la historia completa."
+  }
+}

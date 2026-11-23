@@ -1,0 +1,206 @@
+{
+  "id": "the-dark-room",
+  "kind": "practice",
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "spells": [
+    "kirra"
+  ],
+  "dark": true,
+  "things": [
+    {
+      "kind": "door",
+      "id": "store_door",
+      "at": [
+        10,
+        10
+      ],
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "covers": {
+        "open": [
+          [
+            9,
+            11
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            9,
+            13
+          ]
+        ]
+      },
+      "locked": true
+    },
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [
+        9,
+        7
+      ],
+      "opens": "store_door"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        6,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        6,
+        5
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.cast",
+    "wizard.find_nearest",
+    "wizard.pick_up",
+    "door.open",
+    "door.locked",
+    "thing.position",
+    "position.x",
+    "position.y",
+    "wizard.position"
+  ],
+  "goals": [
+    {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
+      "kind": "open",
+      "id": "store_door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "x",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "same_row",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            9,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lower",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "farther",
+      "things": [
+        {
+          "id": "key",
+          "at": [
+            10,
+            8
+          ]
+        }
+      ]
+    }
+  ],
+  "map": [
+    "####################",
+    "####################",
+    "####################",
+    "####################",
+    "######===..===######",
+    "######.==..===######",
+    "#####..==.....######",
+    ".....S...........###",
+    "...###==....==######",
+    "######==..E.==######",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########...########",
+    "########....########"
+  ],
+  "terrain": [
+    "####################",
+    "####################",
+    "####################",
+    "####################",
+    "######uuu..uuu######",
+    "######.uu..uuu######",
+    "#####..uu.....######",
+    ".................###",
+    "...###uu....uu######",
+    "######uu....uu######",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########...########",
+    "########....########"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "u": "furniture"
+  },
+  "walked": [
+    "."
+  ],
+  "fixed": [
+    "store_door"
+  ],
+  "dark_area": [
+    [
+      5,
+      2,
+      13,
+      9
+    ]
+  ],
+  "art": "the-storeroom"
+}

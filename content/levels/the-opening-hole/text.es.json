@@ -1,0 +1,18 @@
+{
+  "title": "El agujero que se abre",
+  "goals": [
+    "Llega a la marca.",
+    "Comprueba `closed`."
+  ],
+  "starting_code": "# Camina hasta el borde del agujero con `move_right`.\n\n# Espera mientras el agujero esté abierto, con `while` y `wait`.\n\n# Crúzalo.\n",
+  "hints": [
+    "Camina 2 a la derecha para detenerte en el borde. ¡No pises el agujero!",
+    "Usa `while not` con `hole.closed`, y una espera debajo, para esperar mientras no esté cerrado. También puedes usar `while` con `hole.open`, que es lo mismo.",
+    "Cuando acabe el bucle `while`, el agujero estará cerrado, ¡así que camina 3 a la derecha hasta el arco!"
+  ],
+  "intro": "¡Cuidado dónde pisas! A tres casillas hay uno de esos agujeros que se abren en el suelo. La marca está al otro lado, en el arco del almacén. ¡Esperaremos mientras esté abierto, y luego cruzaremos!",
+  "outro": "¡A salvo al otro lado! Estamos en la puerta de un almacén oscuro.",
+  "learned": "Ahora sabes que `while not` espera a algo que aún no es verdad, y que `hole.closed` dice cuándo lo es; `hole.open` dice lo contrario.",
+  "changes": "El agujero no siempre tarda lo mismo en abrirse y cerrarse.",
+  "changed": "Esta vez, el agujero no tarda lo mismo en abrirse y cerrarse."
+}

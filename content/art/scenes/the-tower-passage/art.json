@@ -1,0 +1,208 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 4,
+      "image": "row-4-static.webp",
+      "top": 392,
+      "static": true
+    },
+    {
+      "row": 5,
+      "image": "row-5-static-over.webp",
+      "top": 427,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static-over.webp",
+      "top": 831,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static.webp",
+      "top": 905,
+      "static": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static-over.webp",
+      "top": 996,
+      "static": true,
+      "over": true
+    }
+  ],
+  "things": {
+    "room_door": {
+      "row": 3,
+      "left": 418,
+      "top": 204,
+      "states": {
+        "closed": "room_door-closed.webp",
+        "open": "room_door-open.webp"
+      },
+      "kind": "door",
+      "floors": {
+        "open": "room_door-open-floor.webp"
+      },
+      "rest": "closed",
+      "at": [
+        5,
+        3
+      ]
+    }
+  },
+  "lowered": [
+    {
+      "about": "The forgotten room's side doorway and the landing of the back stairs (D289, D307): a figure crossing the doorway is drawn lower, its feet on the middle of the cell below, behind the stone block at the doorway's near end, which is drawn over it (`room_door_jamb`) and hides it up to the chest; on the landing it stays as low, its feet below the open leaf's foot, going down once and staying down.",
+      "cells": [
+        [
+          2,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "by": 0.65
+    },
+    {
+      "about": "The room's floor before its side doorway (D307): a figure drawn lower, between the stool and the candle's box.",
+      "cells": [
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ]
+      ],
+      "by": 0.4
+    },
+    {
+      "about": "The last stairs behind the corridor's arch (D307): a figure drawn lower, so that its legs show in the arch's opening as it comes down.",
+      "cells": [
+        [
+          2,
+          10
+        ],
+        [
+          2,
+          10
+        ]
+      ],
+      "by": 0.6
+    },
+    {
+      "about": "The last stair behind the corridor's arch (D307): a figure drawn lower, its feet on the top step under the opening.",
+      "cells": [
+        [
+          2,
+          11
+        ],
+        [
+          2,
+          11
+        ]
+      ],
+      "by": 0.3
+    },
+    {
+      "about": "Under the room's front wall's lit top: a familiar drawn lower, so that it is wholly under the wall until it steps into the room.",
+      "cells": [
+        [
+          13,
+          4
+        ],
+        [
+          13,
+          4
+        ]
+      ],
+      "by": 0.25
+    }
+  ],
+  "nudged": [
+    {
+      "about": "The forgotten room's side doorway, open (D289): a figure crossing it is drawn on the middle of the floor at the doorway's foot, between its two sides measured on the door-open picture at 5.545 and 5.96.",
+      "cells": [
+        [
+          5,
+          3
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "by": 0.25
+    },
+    {
+      "about": "The trench's stretch up column 10: its painted floor's middle is 0.02 of a cell right of the cells', and a familiar's figure 0.005 left of its frame's, measured on the game's ground (D282).",
+      "cells": [
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          12
+        ]
+      ],
+      "by": 0.025
+    },
+    {
+      "about": "The turn from column 10 into row 8, taken tight: a familiar facing along row 8 has its feet on row 8's side behind the trench's near rim and its others on column 10's floor, clear of the column's left rim, and its nose inside the corner (D282).",
+      "cells": [
+        [
+          10,
+          8
+        ],
+        [
+          10,
+          8
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "about": "The stretch up column 13, measured as column 10's, off by as much.",
+      "cells": [
+        [
+          13,
+          4
+        ],
+        [
+          13,
+          7
+        ]
+      ],
+      "by": 0.025
+    },
+    {
+      "about": "The turn from row 8 into column 13, taken tight as the other: a familiar facing along row 8 has its nose inside the column's right rim.",
+      "cells": [
+        [
+          13,
+          8
+        ],
+        [
+          13,
+          8
+        ]
+      ],
+      "by": -0.1
+    }
+  ],
+  "source": "SOURCE.md"
+}

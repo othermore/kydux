@@ -1,0 +1,36 @@
+{
+  "title": "What the familiar brought",
+  "steps": [
+    "You have a handful of pieces of black thread in your hand. Above, a bolt is heard, and steps on the back stair.",
+    "Rinlo comes out of the arch at the end of the corridor, very pale.",
+    "Flying terrifies me. Before every lesson I spend days without sleeping.",
+    "That voice found me. I think it felt my fear.",
+    "It has been talking to me all year, from the castle's walls, whenever I am alone in a room.",
+    "It promised me the flying lessons would stop, it said nobody would get hurt…",
+    "…it gave me the threads and taught me to knot them… and then it kept wanting more and more…",
+    "…but today I told it I would do nothing more. What it wanted from me could have done you great harm.",
+    "Well, that doesn't seem so strange to me, Rinlo… I don't like brooms either.",
+    "Rinlo nearly laughs.",
+    "The four of you go up to the tower. Orla is alone with the book. You lay the threads on the lectern.",
+    "They're threads for tampering with brooms. We have something to tell you…",
+    "I must thank you for your honesty.",
+    "And for your courage, which is worthy of note in first-year children.",
+    "You see, young ones, these threads do far more than tamper with brooms. They are the leavings of a wizard's soul.",
+    "A wizard who must have been killed with a dark spell. They are evil itself, made a thing by that death.",
+    "They cause harm that cannot be told. They draw death and pain. They destroy friendship, and the soul.",
+    "\"I've had them in a box for months,\" says {friend}, with hardly any voice.",
+    "Loose, they sleep. It is the knot that wakes them.",
+    "You did well to untie them, and better to bring them to me.",
+    "Orla covers them with a cloth and locks them away.",
+    "That knot has not been taught in Arvelia for many years.",
+    "You should know that I believe you, and that I trust you.",
+    "And to you, Rinlo, I will say: you told it no, you have overcome your fears.",
+    "That was the hardest thing, and you have done it.",
+    "Treasure the friendships that make you better…",
+    "…for only with great friends can any of us reach the place we are called to reach.",
+    "There is something you must know, and you more than anyone, {wizard}."
+  ],
+  "later": {
+    "13": "It takes you a good while to tell the whole story."
+  }
+}

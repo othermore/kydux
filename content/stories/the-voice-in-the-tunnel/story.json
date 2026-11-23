@@ -1,0 +1,292 @@
+{
+  "id": "the-voice-in-the-tunnel",
+  "scene": "the-tower-passage",
+  "speaker": "friend",
+  "camera": [
+    10,
+    8
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "camera": {
+        "fit": [
+          [
+            0,
+            5
+          ],
+          [
+            19,
+            14
+          ]
+        ]
+      },
+      "do": null
+    },
+    {
+      "who": "cold_voice",
+      "camera": {
+        "fit": [
+          [
+            0,
+            0
+          ],
+          [
+            19,
+            9
+          ]
+        ]
+      },
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          13,
+          8
+        ]
+      },
+      "by": "familiar"
+    },
+    {
+      "who": "cold_voice",
+      "do": {
+        "by": "familiar",
+        "walk": [
+          10,
+          8
+        ]
+      },
+      "meanwhile": true
+    },
+    {
+      "who": "rinlo",
+      "do": {
+        "by": "familiar",
+        "walk": [
+          10,
+          13
+        ]
+      },
+      "meanwhile": true
+    },
+    {
+      "who": "rinlo",
+      "do": {
+        "stand": true
+      }
+    },
+    {
+      "who": "voice",
+      "by": "rinlo",
+      "do": [
+        {
+          "stamp": true
+        },
+        {
+          "stamp": true
+        },
+        {
+          "throw": [
+            "thread_1",
+            "thread_2",
+            "thread_3"
+          ]
+        },
+        {
+          "face": "right"
+        },
+        {
+          "sit": true
+        }
+      ]
+    },
+    {
+      "who": "friend",
+      "camera": {
+        "fit": [
+          [
+            0,
+            5
+          ],
+          [
+            19,
+            14
+          ]
+        ]
+      },
+      "do": {
+        "face": "right"
+      }
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "rinlo",
+      "camera": {
+        "fit": [
+          [
+            0,
+            0
+          ],
+          [
+            19,
+            9
+          ]
+        ]
+      },
+      "do": null
+    },
+    {
+      "who": "rinlo",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "camera": {
+        "fit": [
+          [
+            0,
+            5
+          ],
+          [
+            19,
+            14
+          ]
+        ]
+      },
+      "do": null
+    }
+  ],
+  "world": {
+    "things": [
+      {
+        "kind": "thread",
+        "id": "thread_1",
+        "at": [
+          9,
+          2
+        ],
+        "hidden": true
+      },
+      {
+        "kind": "thread",
+        "id": "thread_2",
+        "at": [
+          11,
+          3
+        ],
+        "hidden": true
+      },
+      {
+        "kind": "thread",
+        "id": "thread_3",
+        "at": [
+          12,
+          3
+        ],
+        "hidden": true
+      }
+    ],
+    "map": [
+      "####################",
+      "####################",
+      "######===...===#####",
+      "######==......=#####",
+      "#############,######",
+      "#############,######",
+      "#############,######",
+      "#############,######",
+      "##########,,,,######",
+      "##########,#########",
+      "##########,#########",
+      "##########,#########",
+      "##.#######,#########",
+      "#........S.........#",
+      "#..................#"
+    ],
+    "terrain": [
+      "####################",
+      "####################",
+      "######uuu...uuu#####",
+      "##llllvv......u#####",
+      "##l##########p######",
+      "##l##########p######",
+      "##l##########p######",
+      "##l##########p######",
+      "##l#######pppp######",
+      "##l#######p#########",
+      "##l#######p#########",
+      "##l#######p#########",
+      "##.#######p#########",
+      "#..................#",
+      "#..................#"
+    ],
+    "terrains": {
+      "#": "wall",
+      ".": "floor",
+      "=": "shelf",
+      "~": "low",
+      "u": "furniture",
+      "p": "passage",
+      "l": "wall",
+      "v": "furniture"
+    },
+    "walked": [
+      "."
+    ],
+    "voices": {
+      "cold_voice": [
+        8,
+        2
+      ]
+    },
+    "actors": [
+      {
+        "id": "friend",
+        "kind": "friend",
+        "at": [
+          8,
+          13
+        ],
+        "facing": "up",
+        "sight": 0
+      },
+      {
+        "id": "mate",
+        "kind": "friend",
+        "at": [
+          11,
+          14
+        ],
+        "facing": "up",
+        "sight": 0
+      },
+      {
+        "id": "familiar",
+        "kind": "familiar",
+        "at": [
+          13,
+          3
+        ],
+        "facing": "left",
+        "sight": 0
+      },
+      {
+        "id": "rinlo",
+        "kind": "friend",
+        "at": [
+          8,
+          3
+        ],
+        "facing": "right",
+        "sitting": true,
+        "sight": 0
+      }
+    ],
+    "art": "the-tower-passage"
+  }
+}

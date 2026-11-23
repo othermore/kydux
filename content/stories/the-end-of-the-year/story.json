@@ -1,0 +1,334 @@
+{
+  "id": "the-end-of-the-year",
+  "continues": "what-the-familiar-brought",
+  "scene": "the-tower-hall",
+  "music": "the-truth/name",
+  "light": "sunset",
+  "still": "castle",
+  "speaker": "orla",
+  "camera": [
+    10,
+    6
+  ],
+  "steps": [
+    {
+      "who": "orla",
+      "camera": {
+        "fit": [
+          [
+            4,
+            2
+          ],
+          [
+            15,
+            11
+          ]
+        ]
+      },
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "music": "the-truth/revelation",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "music": "the-truth/silence",
+      "do": null
+    },
+    {
+      "who": "mate",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "music": "the-truth/love",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "orla",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "music": "the-familiar",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    },
+    {
+      "who": "voice",
+      "do": null,
+      "still": true
+    }
+  ],
+  "world": {
+    "map": [
+      "####################",
+      "####################",
+      "####################",
+      "#########==#########",
+      "####=....==....=####",
+      "####=.....S....=####",
+      "####=..........=####",
+      "####=..........=####",
+      "####=..........=####",
+      "####=..........=####",
+      "####=..........=####",
+      "#########..#########",
+      "#########==#########",
+      "########===#########",
+      "########===#########"
+    ],
+    "terrain": [
+      "####################",
+      "##############l#####",
+      "##############l#####",
+      "#########uu###l#####",
+      "####u....uu....u####",
+      "####u..........u####",
+      "####u..........u####",
+      "####u..........u####",
+      "####u..........u####",
+      "####u..........u####",
+      "####u..........u####",
+      "#########..#########",
+      "#########ss#########",
+      "########sss#########",
+      "########sss#########"
+    ],
+    "terrains": {
+      "#": "wall",
+      ".": "floor",
+      "=": "shelf",
+      "~": "low",
+      "u": "furniture",
+      "s": "stair",
+      "l": "wall"
+    },
+    "walked": [
+      "."
+    ],
+    "things": [
+      {
+        "kind": "plate",
+        "id": "moon",
+        "at": [
+          6,
+          4
+        ]
+      },
+      {
+        "kind": "plate",
+        "id": "sun",
+        "at": [
+          13,
+          4
+        ]
+      },
+      {
+        "kind": "plate",
+        "id": "star",
+        "at": [
+          13,
+          10
+        ]
+      }
+    ],
+    "fixed": [
+      "moon",
+      "sun",
+      "star"
+    ],
+    "voices": {
+      "bimo": [
+        9,
+        3
+      ]
+    },
+    "facing": "up",
+    "actors": [
+      {
+        "id": "rinlo",
+        "kind": "friend",
+        "at": [
+          9,
+          5
+        ],
+        "facing": "up",
+        "sight": 0
+      },
+      {
+        "id": "friend",
+        "kind": "friend",
+        "at": [
+          8,
+          5
+        ],
+        "facing": "up",
+        "sight": 0
+      },
+      {
+        "id": "mate",
+        "kind": "friend",
+        "at": [
+          12,
+          5
+        ],
+        "facing": "up",
+        "sight": 0
+      },
+      {
+        "id": "familiar",
+        "kind": "familiar",
+        "at": [
+          10,
+          6
+        ],
+        "facing": "up",
+        "sight": 0
+      },
+      {
+        "id": "orla",
+        "kind": "teacher",
+        "at": [
+          11,
+          4
+        ],
+        "facing": "down",
+        "sight": 0
+      }
+    ],
+    "art": "the-tower-hall"
+  }
+}

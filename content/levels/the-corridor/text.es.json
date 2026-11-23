@@ -1,0 +1,15 @@
+{
+  "title": "El camino",
+  "goals": [
+    "Llega a la marca."
+  ],
+  "starting_code": "",
+  "hints": [
+    "Tienes que bajar por el camino y luego ir a la izquierda hacia la hierba.",
+    "Escribe una instrucción en cada línea por cada paso que quieras dar.",
+    "Necesitarás el método `move_down` y el método `move_left` para llegar a la marca."
+  ],
+  "intro": "¡La verja todavía no se abre! Mientras pensamos, echemos un vistazo por el prado. ¡Baja por el camino y luego ve hacia la hierba para llegar a esa marca!",
+  "outro": "¡Bien hecho! El cuaderno siempre está ahí si se te olvida algún método.",
+  "learned": "Ahora sabes qué son los objetos y los métodos, y los cuatro movimientos."
+}

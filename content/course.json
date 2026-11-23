@@ -1,0 +1,3121 @@
+{
+  "chapters": [
+    {
+      "id": "01-arrival",
+      "items": [
+        "story:the-letter",
+        "story:at-the-gate",
+        "lesson:what-a-program-is",
+        "level:the-gate",
+        "lesson:objects-and-actions",
+        "level:the-corridor",
+        "lesson:notes",
+        "level:the-dark-note",
+        "lesson:how-much",
+        "level:the-long-corridor",
+        "level:the-stairs",
+        "lesson:words",
+        "level:the-password",
+        "lesson:things-to-carry",
+        "level:the-wand",
+        "lesson:your-first-spell",
+        "level:the-sealed-door",
+        "level:the-way-in",
+        "story:up-to-the-castle"
+      ],
+      "music": "arrival"
+    },
+    {
+      "id": "02-the-library",
+      "items": [
+        "story:the-entrance",
+        "story:the-first-night",
+        "lesson:the-right-place",
+        "level:your-bed",
+        "story:the-morning",
+        "story:at-the-library",
+        "lesson:what-things-know",
+        "level:the-lost-book",
+        "lesson:giving-things",
+        "level:the-book-returned",
+        "lesson:keys-and-doors",
+        "level:the-hidden-key",
+        "lesson:the-distance",
+        "level:the-moving-key",
+        "lesson:counting-with-names",
+        "level:eldras-door",
+        "lesson:fendra",
+        "level:eldras-room",
+        "story:the-wand-bank"
+      ],
+      "music": "the-library"
+    },
+    {
+      "id": "03-passages",
+      "items": [
+        "story:after-dark",
+        "lesson:the-cells",
+        "level:the-doors-corridor",
+        "lesson:where-i-am",
+        "level:the-dark-tunnel",
+        "lesson:waiting",
+        "level:the-tunnel-exit",
+        "lesson:true-or-false",
+        "lesson:if",
+        "level:by-the-statues",
+        "lesson:else",
+        "level:left-or-right",
+        "level:the-wrong-door",
+        "lesson:repeat",
+        "level:the-three-doors",
+        "story:beyond-the-doors",
+        "lesson:while",
+        "level:past-the-teacher",
+        "lesson:kirra-and-osto",
+        "level:the-opening-hole",
+        "lesson:the-two-coordinates",
+        "level:the-dark-room",
+        "story:the-voices",
+        "lesson:the-portal",
+        "level:the-night-walk",
+        "story:caught"
+      ],
+      "music": "the-passages"
+    },
+    {
+      "id": "04-the-broom",
+      "items": [
+        "story:the-morning-after",
+        "lesson:the-broom",
+        "level:the-broom-at-your-feet",
+        "lesson:lists",
+        "level:the-shed",
+        "lesson:for-each",
+        "level:the-brooms-on-the-wall",
+        "lesson:checking-each",
+        "level:the-check",
+        "lesson:less-or-greater",
+        "level:the-nearest-broom",
+        "level:the-brooms-in-the-straw",
+        "story:the-flying-lesson",
+        "lesson:drevo",
+        "level:the-first-flight",
+        "lesson:an-action-of-your-own",
+        "level:the-rings",
+        "lesson:arguments-of-your-own",
+        "level:the-race",
+        "level:the-rematch",
+        "story:the-finish"
+      ],
+      "music": "the-broom"
+    },
+    {
+      "id": "05-the-familiar",
+      "items": [
+        "story:the-tower",
+        "lesson:a-kind-of-thing",
+        "level:the-circle",
+        "lesson:what-it-knows",
+        "level:the-name-and-the-colour",
+        "lesson:born-complete",
+        "level:one-line-in-the-book",
+        "level:the-slate",
+        "lesson:what-it-inherits",
+        "level:out-of-the-circle",
+        "lesson:what-it-does",
+        "level:orlas-orders",
+        "story:the-trail",
+        "level:the-small-passage",
+        "story:the-voice-in-the-tunnel",
+        "level:the-forgotten-room",
+        "story:what-the-familiar-brought",
+        "story:the-end-of-the-year"
+      ],
+      "music": "the-familiar"
+    }
+  ],
+  "themes": [
+    "arrival",
+    "the-broom",
+    "the-familiar",
+    "the-library",
+    "the-passages",
+    "the-truth"
+  ],
+  "known": {
+    "the-gate": [
+      "wizard.move_right"
+    ],
+    "the-corridor": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down"
+    ],
+    "the-dark-note": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down"
+    ],
+    "the-long-corridor": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down"
+    ],
+    "the-stairs": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down"
+    ],
+    "the-password": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say"
+    ],
+    "the-wand": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up"
+    ],
+    "the-sealed-door": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast"
+    ],
+    "the-way-in": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast"
+    ],
+    "your-bed": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep"
+    ],
+    "the-lost-book": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal"
+    ],
+    "the-book-returned": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give"
+    ],
+    "the-hidden-key": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open"
+    ],
+    "the-moving-key": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to"
+    ],
+    "eldras-door": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to"
+    ],
+    "eldras-room": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to"
+    ],
+    "the-doors-corridor": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to"
+    ],
+    "the-dark-tunnel": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position"
+    ],
+    "the-tunnel-exit": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait"
+    ],
+    "by-the-statues": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing"
+    ],
+    "left-or-right": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing"
+    ],
+    "the-wrong-door": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing"
+    ],
+    "the-three-doors": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing"
+    ],
+    "past-the-teacher": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing"
+    ],
+    "the-opening-hole": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed"
+    ],
+    "the-dark-room": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y"
+    ],
+    "the-night-walk": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y"
+    ],
+    "the-broom-at-your-feet": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie"
+    ],
+    "the-shed": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all"
+    ],
+    "the-brooms-on-the-wall": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all"
+    ],
+    "the-check": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-nearest-broom": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-brooms-in-the-straw": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-first-flight": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-rings": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-race": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-rematch": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-circle": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted"
+    ],
+    "the-name-and-the-colour": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color"
+    ],
+    "one-line-in-the-book": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color"
+    ],
+    "the-slate": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color"
+    ],
+    "out-of-the-circle": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color",
+      "familiar.move_up",
+      "familiar.move_down",
+      "familiar.move_left",
+      "familiar.move_right",
+      "familiar.pick_up",
+      "plate.position"
+    ],
+    "orlas-orders": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color",
+      "familiar.move_up",
+      "familiar.move_down",
+      "familiar.move_left",
+      "familiar.move_right",
+      "familiar.pick_up",
+      "plate.position",
+      "familiar.position"
+    ],
+    "the-small-passage": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color",
+      "familiar.move_up",
+      "familiar.move_down",
+      "familiar.move_left",
+      "familiar.move_right",
+      "familiar.pick_up",
+      "plate.position",
+      "familiar.position",
+      "familiar.go_to"
+    ],
+    "the-forgotten-room": [
+      "wizard.move_right",
+      "wizard.move_left",
+      "wizard.move_up",
+      "wizard.move_down",
+      "wizard.say",
+      "wizard.pick_up",
+      "wizard.cast",
+      "wizard.sleep",
+      "wizard.items",
+      "door.locked",
+      "wizard.find_nearest",
+      "thing.reveal",
+      "wizard.find_item",
+      "wizard.give",
+      "door.open",
+      "thing.distance_to",
+      "wizard.position",
+      "thing.position",
+      "wizard.wait",
+      "teacher.facing",
+      "wizard.facing",
+      "hole.open",
+      "hole.closed",
+      "position.x",
+      "position.y",
+      "broom.untie",
+      "wizard.find_all",
+      "broom.knotted",
+      "familiar.name",
+      "familiar.color",
+      "familiar.move_up",
+      "familiar.move_down",
+      "familiar.move_left",
+      "familiar.move_right",
+      "familiar.pick_up",
+      "plate.position",
+      "familiar.position",
+      "familiar.go_to"
+    ]
+  },
+  "spells_known": {
+    "the-gate": [],
+    "the-corridor": [],
+    "the-dark-note": [],
+    "the-long-corridor": [],
+    "the-stairs": [],
+    "the-password": [],
+    "the-wand": [],
+    "the-sealed-door": [
+      "zelim"
+    ],
+    "the-way-in": [
+      "zelim"
+    ],
+    "your-bed": [
+      "zelim"
+    ],
+    "the-lost-book": [
+      "zelim"
+    ],
+    "the-book-returned": [
+      "zelim"
+    ],
+    "the-hidden-key": [
+      "zelim"
+    ],
+    "the-moving-key": [
+      "zelim"
+    ],
+    "eldras-door": [
+      "zelim"
+    ],
+    "eldras-room": [
+      "zelim",
+      "fendra"
+    ],
+    "the-doors-corridor": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "the-dark-tunnel": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "the-tunnel-exit": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "by-the-statues": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "left-or-right": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "the-wrong-door": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "the-three-doors": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "past-the-teacher": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "the-opening-hole": [
+      "zelim",
+      "fendra",
+      "orvim"
+    ],
+    "the-dark-room": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra"
+    ],
+    "the-night-walk": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-broom-at-your-feet": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-shed": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-brooms-on-the-wall": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-check": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-nearest-broom": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-brooms-in-the-straw": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto"
+    ],
+    "the-first-flight": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo"
+    ],
+    "the-rings": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo"
+    ],
+    "the-race": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo"
+    ],
+    "the-rematch": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo"
+    ],
+    "the-circle": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "the-name-and-the-colour": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "one-line-in-the-book": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "the-slate": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "out-of-the-circle": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "orlas-orders": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "the-small-passage": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ],
+    "the-forgotten-room": [
+      "zelim",
+      "fendra",
+      "orvim",
+      "kirra",
+      "osto",
+      "drevo",
+      "minka"
+    ]
+  },
+  "words_known": {
+    "the-gate": [],
+    "the-corridor": [],
+    "the-dark-note": [],
+    "the-long-corridor": [],
+    "the-stairs": [],
+    "the-password": [
+      "ambrel"
+    ],
+    "the-wand": [
+      "ambrel"
+    ],
+    "the-sealed-door": [
+      "ambrel"
+    ],
+    "the-way-in": [
+      "ambrel"
+    ],
+    "your-bed": [
+      "ambrel"
+    ],
+    "the-lost-book": [
+      "ambrel"
+    ],
+    "the-book-returned": [
+      "ambrel"
+    ],
+    "the-hidden-key": [
+      "ambrel"
+    ],
+    "the-moving-key": [
+      "ambrel"
+    ],
+    "eldras-door": [
+      "ambrel"
+    ],
+    "eldras-room": [
+      "ambrel"
+    ],
+    "the-doors-corridor": [
+      "ambrel"
+    ],
+    "the-dark-tunnel": [
+      "ambrel"
+    ],
+    "the-tunnel-exit": [
+      "ambrel"
+    ],
+    "by-the-statues": [
+      "ambrel"
+    ],
+    "left-or-right": [
+      "ambrel"
+    ],
+    "the-wrong-door": [
+      "ambrel"
+    ],
+    "the-three-doors": [
+      "ambrel"
+    ],
+    "past-the-teacher": [
+      "ambrel"
+    ],
+    "the-opening-hole": [
+      "ambrel"
+    ],
+    "the-dark-room": [
+      "ambrel"
+    ],
+    "the-night-walk": [
+      "ambrel"
+    ],
+    "the-broom-at-your-feet": [
+      "ambrel"
+    ],
+    "the-shed": [
+      "ambrel"
+    ],
+    "the-brooms-on-the-wall": [
+      "ambrel"
+    ],
+    "the-check": [
+      "ambrel"
+    ],
+    "the-nearest-broom": [
+      "ambrel"
+    ],
+    "the-brooms-in-the-straw": [
+      "ambrel"
+    ],
+    "the-first-flight": [
+      "ambrel"
+    ],
+    "the-rings": [
+      "ambrel"
+    ],
+    "the-race": [
+      "ambrel"
+    ],
+    "the-rematch": [
+      "ambrel"
+    ],
+    "the-circle": [
+      "ambrel"
+    ],
+    "the-name-and-the-colour": [
+      "ambrel"
+    ],
+    "one-line-in-the-book": [
+      "ambrel"
+    ],
+    "the-slate": [
+      "ambrel"
+    ],
+    "out-of-the-circle": [
+      "ambrel"
+    ],
+    "orlas-orders": [
+      "ambrel"
+    ],
+    "the-small-passage": [
+      "ambrel"
+    ],
+    "the-forgotten-room": [
+      "ambrel"
+    ]
+  },
+  "concepts": {
+    "the-gate": [],
+    "the-corridor": [],
+    "the-dark-note": [
+      "comments"
+    ],
+    "the-long-corridor": [
+      "comments",
+      "arguments"
+    ],
+    "the-stairs": [
+      "comments",
+      "arguments"
+    ],
+    "the-password": [
+      "comments",
+      "arguments",
+      "strings"
+    ],
+    "the-wand": [
+      "comments",
+      "arguments",
+      "strings"
+    ],
+    "the-sealed-door": [
+      "comments",
+      "arguments",
+      "strings"
+    ],
+    "the-way-in": [
+      "comments",
+      "arguments",
+      "strings"
+    ],
+    "your-bed": [
+      "comments",
+      "arguments",
+      "strings"
+    ],
+    "the-lost-book": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "the-book-returned": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "the-hidden-key": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "the-moving-key": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "eldras-door": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "eldras-room": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "the-doors-corridor": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "the-dark-tunnel": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "the-tunnel-exit": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic"
+    ],
+    "by-the-statues": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if"
+    ],
+    "left-or-right": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else"
+    ],
+    "the-wrong-door": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else"
+    ],
+    "the-three-doors": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range"
+    ],
+    "past-the-teacher": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while"
+    ],
+    "the-opening-hole": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while"
+    ],
+    "the-dark-room": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while"
+    ],
+    "the-night-walk": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while"
+    ],
+    "the-broom-at-your-feet": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while"
+    ],
+    "the-shed": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len"
+    ],
+    "the-brooms-on-the-wall": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each"
+    ],
+    "the-check": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each"
+    ],
+    "the-nearest-broom": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater"
+    ],
+    "the-brooms-in-the-straw": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater"
+    ],
+    "the-first-flight": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater"
+    ],
+    "the-rings": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def"
+    ],
+    "the-race": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments"
+    ],
+    "the-rematch": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments"
+    ],
+    "the-circle": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class"
+    ],
+    "the-name-and-the-colour": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes"
+    ],
+    "one-line-in-the-book": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes",
+      "init"
+    ],
+    "the-slate": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes",
+      "init"
+    ],
+    "out-of-the-circle": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes",
+      "init",
+      "inherit"
+    ],
+    "orlas-orders": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes",
+      "init",
+      "inherit",
+      "methods"
+    ],
+    "the-small-passage": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes",
+      "init",
+      "inherit",
+      "methods"
+    ],
+    "the-forgotten-room": [
+      "comments",
+      "arguments",
+      "strings",
+      "print",
+      "variables",
+      "arithmetic",
+      "equal",
+      "not",
+      "if",
+      "else",
+      "for_range",
+      "while",
+      "lists",
+      "len",
+      "for_each",
+      "less_greater",
+      "def",
+      "def_arguments",
+      "class",
+      "attributes",
+      "init",
+      "inherit",
+      "methods"
+    ]
+  },
+  "numbers": {
+    "story:the-letter": {
+      "kind": "story",
+      "n": 1,
+      "chapter": 1
+    },
+    "story:at-the-gate": {
+      "kind": "story",
+      "n": 2,
+      "chapter": 1
+    },
+    "lesson:what-a-program-is": {
+      "kind": "lesson",
+      "n": 1,
+      "chapter": 1
+    },
+    "level:the-gate": {
+      "kind": "practice",
+      "n": 1,
+      "chapter": 1
+    },
+    "lesson:objects-and-actions": {
+      "kind": "lesson",
+      "n": 2,
+      "chapter": 1
+    },
+    "level:the-corridor": {
+      "kind": "practice",
+      "n": 2,
+      "chapter": 1
+    },
+    "lesson:notes": {
+      "kind": "lesson",
+      "n": 3,
+      "chapter": 1
+    },
+    "level:the-dark-note": {
+      "kind": "fix",
+      "n": 1,
+      "chapter": 1
+    },
+    "lesson:how-much": {
+      "kind": "lesson",
+      "n": 4,
+      "chapter": 1
+    },
+    "level:the-long-corridor": {
+      "kind": "practice",
+      "n": 3,
+      "chapter": 1
+    },
+    "level:the-stairs": {
+      "kind": "improve",
+      "n": 1,
+      "chapter": 1
+    },
+    "lesson:words": {
+      "kind": "lesson",
+      "n": 5,
+      "chapter": 1
+    },
+    "level:the-password": {
+      "kind": "practice",
+      "n": 4,
+      "chapter": 1
+    },
+    "lesson:things-to-carry": {
+      "kind": "lesson",
+      "n": 6,
+      "chapter": 1
+    },
+    "level:the-wand": {
+      "kind": "practice",
+      "n": 5,
+      "chapter": 1
+    },
+    "lesson:your-first-spell": {
+      "kind": "lesson",
+      "n": 7,
+      "chapter": 1
+    },
+    "level:the-sealed-door": {
+      "kind": "practice",
+      "n": 6,
+      "chapter": 1
+    },
+    "level:the-way-in": {
+      "kind": "practice",
+      "n": 7,
+      "chapter": 1
+    },
+    "story:up-to-the-castle": {
+      "kind": "story",
+      "n": 3,
+      "chapter": 1
+    },
+    "story:the-entrance": {
+      "kind": "story",
+      "n": 1,
+      "chapter": 2
+    },
+    "story:the-first-night": {
+      "kind": "story",
+      "n": 2,
+      "chapter": 2
+    },
+    "lesson:the-right-place": {
+      "kind": "lesson",
+      "n": 1,
+      "chapter": 2
+    },
+    "level:your-bed": {
+      "kind": "practice",
+      "n": 1,
+      "chapter": 2
+    },
+    "story:the-morning": {
+      "kind": "story",
+      "n": 3,
+      "chapter": 2
+    },
+    "story:at-the-library": {
+      "kind": "story",
+      "n": 4,
+      "chapter": 2
+    },
+    "lesson:what-things-know": {
+      "kind": "lesson",
+      "n": 2,
+      "chapter": 2
+    },
+    "level:the-lost-book": {
+      "kind": "practice",
+      "n": 2,
+      "chapter": 2
+    },
+    "lesson:giving-things": {
+      "kind": "lesson",
+      "n": 3,
+      "chapter": 2
+    },
+    "level:the-book-returned": {
+      "kind": "practice",
+      "n": 3,
+      "chapter": 2
+    },
+    "lesson:keys-and-doors": {
+      "kind": "lesson",
+      "n": 4,
+      "chapter": 2
+    },
+    "level:the-hidden-key": {
+      "kind": "practice",
+      "n": 4,
+      "chapter": 2
+    },
+    "lesson:the-distance": {
+      "kind": "lesson",
+      "n": 5,
+      "chapter": 2
+    },
+    "level:the-moving-key": {
+      "kind": "fix",
+      "n": 1,
+      "chapter": 2
+    },
+    "lesson:counting-with-names": {
+      "kind": "lesson",
+      "n": 6,
+      "chapter": 2
+    },
+    "level:eldras-door": {
+      "kind": "improve",
+      "n": 1,
+      "chapter": 2
+    },
+    "lesson:fendra": {
+      "kind": "lesson",
+      "n": 7,
+      "chapter": 2
+    },
+    "level:eldras-room": {
+      "kind": "practice",
+      "n": 5,
+      "chapter": 2
+    },
+    "story:the-wand-bank": {
+      "kind": "story",
+      "n": 5,
+      "chapter": 2
+    },
+    "story:after-dark": {
+      "kind": "story",
+      "n": 1,
+      "chapter": 3
+    },
+    "lesson:the-cells": {
+      "kind": "lesson",
+      "n": 1,
+      "chapter": 3
+    },
+    "level:the-doors-corridor": {
+      "kind": "practice",
+      "n": 1,
+      "chapter": 3
+    },
+    "lesson:where-i-am": {
+      "kind": "lesson",
+      "n": 2,
+      "chapter": 3
+    },
+    "level:the-dark-tunnel": {
+      "kind": "practice",
+      "n": 2,
+      "chapter": 3
+    },
+    "lesson:waiting": {
+      "kind": "lesson",
+      "n": 3,
+      "chapter": 3
+    },
+    "level:the-tunnel-exit": {
+      "kind": "practice",
+      "n": 3,
+      "chapter": 3
+    },
+    "lesson:true-or-false": {
+      "kind": "lesson",
+      "n": 4,
+      "chapter": 3
+    },
+    "lesson:if": {
+      "kind": "lesson",
+      "n": 5,
+      "chapter": 3
+    },
+    "level:by-the-statues": {
+      "kind": "practice",
+      "n": 4,
+      "chapter": 3
+    },
+    "lesson:else": {
+      "kind": "lesson",
+      "n": 6,
+      "chapter": 3
+    },
+    "level:left-or-right": {
+      "kind": "practice",
+      "n": 5,
+      "chapter": 3
+    },
+    "level:the-wrong-door": {
+      "kind": "fix",
+      "n": 1,
+      "chapter": 3
+    },
+    "lesson:repeat": {
+      "kind": "lesson",
+      "n": 7,
+      "chapter": 3
+    },
+    "level:the-three-doors": {
+      "kind": "improve",
+      "n": 1,
+      "chapter": 3
+    },
+    "story:beyond-the-doors": {
+      "kind": "story",
+      "n": 2,
+      "chapter": 3
+    },
+    "lesson:while": {
+      "kind": "lesson",
+      "n": 8,
+      "chapter": 3
+    },
+    "level:past-the-teacher": {
+      "kind": "practice",
+      "n": 6,
+      "chapter": 3
+    },
+    "lesson:kirra-and-osto": {
+      "kind": "lesson",
+      "n": 9,
+      "chapter": 3
+    },
+    "level:the-opening-hole": {
+      "kind": "practice",
+      "n": 7,
+      "chapter": 3
+    },
+    "lesson:the-two-coordinates": {
+      "kind": "lesson",
+      "n": 10,
+      "chapter": 3
+    },
+    "level:the-dark-room": {
+      "kind": "practice",
+      "n": 8,
+      "chapter": 3
+    },
+    "story:the-voices": {
+      "kind": "story",
+      "n": 3,
+      "chapter": 3
+    },
+    "lesson:the-portal": {
+      "kind": "lesson",
+      "n": 11,
+      "chapter": 3
+    },
+    "level:the-night-walk": {
+      "kind": "practice",
+      "n": 9,
+      "chapter": 3
+    },
+    "story:caught": {
+      "kind": "story",
+      "n": 4,
+      "chapter": 3
+    },
+    "story:the-morning-after": {
+      "kind": "story",
+      "n": 1,
+      "chapter": 4
+    },
+    "lesson:the-broom": {
+      "kind": "lesson",
+      "n": 1,
+      "chapter": 4
+    },
+    "level:the-broom-at-your-feet": {
+      "kind": "practice",
+      "n": 1,
+      "chapter": 4
+    },
+    "lesson:lists": {
+      "kind": "lesson",
+      "n": 2,
+      "chapter": 4
+    },
+    "level:the-shed": {
+      "kind": "practice",
+      "n": 2,
+      "chapter": 4
+    },
+    "lesson:for-each": {
+      "kind": "lesson",
+      "n": 3,
+      "chapter": 4
+    },
+    "level:the-brooms-on-the-wall": {
+      "kind": "practice",
+      "n": 3,
+      "chapter": 4
+    },
+    "lesson:checking-each": {
+      "kind": "lesson",
+      "n": 4,
+      "chapter": 4
+    },
+    "level:the-check": {
+      "kind": "fix",
+      "n": 1,
+      "chapter": 4
+    },
+    "lesson:less-or-greater": {
+      "kind": "lesson",
+      "n": 5,
+      "chapter": 4
+    },
+    "level:the-nearest-broom": {
+      "kind": "practice",
+      "n": 4,
+      "chapter": 4
+    },
+    "level:the-brooms-in-the-straw": {
+      "kind": "practice",
+      "n": 5,
+      "chapter": 4
+    },
+    "story:the-flying-lesson": {
+      "kind": "story",
+      "n": 2,
+      "chapter": 4
+    },
+    "lesson:drevo": {
+      "kind": "lesson",
+      "n": 6,
+      "chapter": 4
+    },
+    "level:the-first-flight": {
+      "kind": "practice",
+      "n": 6,
+      "chapter": 4
+    },
+    "lesson:an-action-of-your-own": {
+      "kind": "lesson",
+      "n": 7,
+      "chapter": 4
+    },
+    "level:the-rings": {
+      "kind": "improve",
+      "n": 1,
+      "chapter": 4
+    },
+    "lesson:arguments-of-your-own": {
+      "kind": "lesson",
+      "n": 8,
+      "chapter": 4
+    },
+    "level:the-race": {
+      "kind": "practice",
+      "n": 7,
+      "chapter": 4
+    },
+    "level:the-rematch": {
+      "kind": "fix",
+      "n": 2,
+      "chapter": 4
+    },
+    "story:the-finish": {
+      "kind": "story",
+      "n": 3,
+      "chapter": 4
+    },
+    "story:the-tower": {
+      "kind": "story",
+      "n": 1,
+      "chapter": 5
+    },
+    "lesson:a-kind-of-thing": {
+      "kind": "lesson",
+      "n": 1,
+      "chapter": 5
+    },
+    "level:the-circle": {
+      "kind": "practice",
+      "n": 1,
+      "chapter": 5
+    },
+    "lesson:what-it-knows": {
+      "kind": "lesson",
+      "n": 2,
+      "chapter": 5
+    },
+    "level:the-name-and-the-colour": {
+      "kind": "practice",
+      "n": 2,
+      "chapter": 5
+    },
+    "lesson:born-complete": {
+      "kind": "lesson",
+      "n": 3,
+      "chapter": 5
+    },
+    "level:one-line-in-the-book": {
+      "kind": "practice",
+      "n": 3,
+      "chapter": 5
+    },
+    "level:the-slate": {
+      "kind": "fix",
+      "n": 1,
+      "chapter": 5
+    },
+    "lesson:what-it-inherits": {
+      "kind": "lesson",
+      "n": 4,
+      "chapter": 5
+    },
+    "level:out-of-the-circle": {
+      "kind": "practice",
+      "n": 4,
+      "chapter": 5
+    },
+    "lesson:what-it-does": {
+      "kind": "lesson",
+      "n": 5,
+      "chapter": 5
+    },
+    "level:orlas-orders": {
+      "kind": "practice",
+      "n": 5,
+      "chapter": 5
+    },
+    "story:the-trail": {
+      "kind": "story",
+      "n": 2,
+      "chapter": 5
+    },
+    "level:the-small-passage": {
+      "kind": "practice",
+      "n": 6,
+      "chapter": 5
+    },
+    "story:the-voice-in-the-tunnel": {
+      "kind": "story",
+      "n": 3,
+      "chapter": 5
+    },
+    "level:the-forgotten-room": {
+      "kind": "challenge",
+      "n": 1,
+      "chapter": 5
+    },
+    "story:what-the-familiar-brought": {
+      "kind": "story",
+      "n": 4,
+      "chapter": 5
+    },
+    "story:the-end-of-the-year": {
+      "kind": "story",
+      "n": 5,
+      "chapter": 5
+    }
+  },
+  "titles": {
+    "story:the-letter": {
+      "en": "The letter",
+      "es": "La carta"
+    },
+    "story:at-the-gate": {
+      "en": "At the gate",
+      "es": "Ante la puerta"
+    },
+    "lesson:what-a-program-is": {
+      "en": "What a program is",
+      "es": "Qué es un programa"
+    },
+    "level:the-gate": {
+      "en": "The gate",
+      "es": "La verja"
+    },
+    "lesson:objects-and-actions": {
+      "en": "Objects and actions",
+      "es": "Objetos y acciones"
+    },
+    "level:the-corridor": {
+      "en": "The path",
+      "es": "El camino"
+    },
+    "lesson:notes": {
+      "en": "Notes",
+      "es": "Notas"
+    },
+    "level:the-dark-note": {
+      "en": "Fixing the program",
+      "es": "Arreglando el programa"
+    },
+    "lesson:how-much": {
+      "en": "How far we move",
+      "es": "Cuánto nos movemos"
+    },
+    "level:the-long-corridor": {
+      "en": "The long walk",
+      "es": "El paseo largo"
+    },
+    "level:the-stairs": {
+      "en": "Back to the gate",
+      "es": "De vuelta a la verja"
+    },
+    "lesson:words": {
+      "en": "Words",
+      "es": "Palabras"
+    },
+    "level:the-password": {
+      "en": "The password",
+      "es": "La contraseña"
+    },
+    "lesson:things-to-carry": {
+      "en": "Things to carry",
+      "es": "Cosas que llevar"
+    },
+    "level:the-wand": {
+      "en": "The wand",
+      "es": "La varita"
+    },
+    "lesson:your-first-spell": {
+      "en": "Your first spell",
+      "es": "Tu primer hechizo"
+    },
+    "level:the-sealed-door": {
+      "en": "The sealed door",
+      "es": "La puerta sellada"
+    },
+    "level:the-way-in": {
+      "en": "The way in",
+      "es": "La entrada"
+    },
+    "story:up-to-the-castle": {
+      "en": "Up to the castle",
+      "es": "Hacia el castillo"
+    },
+    "chapter:01-arrival": {
+      "en": "Arrival",
+      "es": "La llegada"
+    },
+    "story:the-entrance": {
+      "en": "The entrance",
+      "es": "El vestíbulo"
+    },
+    "story:the-first-night": {
+      "en": "The first night",
+      "es": "La primera noche"
+    },
+    "lesson:the-right-place": {
+      "en": "The right place",
+      "es": "Cada cosa en su sitio"
+    },
+    "level:your-bed": {
+      "en": "Your bed",
+      "es": "Tu cama"
+    },
+    "story:the-morning": {
+      "en": "The morning",
+      "es": "La mañana"
+    },
+    "story:at-the-library": {
+      "en": "At the library",
+      "es": "En la biblioteca"
+    },
+    "lesson:what-things-know": {
+      "en": "What things know",
+      "es": "Lo que saben las cosas"
+    },
+    "level:the-lost-book": {
+      "en": "The lost book",
+      "es": "El libro perdido"
+    },
+    "lesson:giving-things": {
+      "en": "Giving things",
+      "es": "Dar cosas"
+    },
+    "level:the-book-returned": {
+      "en": "The book returned",
+      "es": "El libro devuelto"
+    },
+    "lesson:keys-and-doors": {
+      "en": "Keys and doors",
+      "es": "Llaves y puertas"
+    },
+    "level:the-hidden-key": {
+      "en": "The hidden key",
+      "es": "La llave oculta"
+    },
+    "lesson:the-distance": {
+      "en": "How far",
+      "es": "A qué distancia"
+    },
+    "level:the-moving-key": {
+      "en": "The moving key",
+      "es": "La llave que se mueve"
+    },
+    "lesson:counting-with-names": {
+      "en": "Counting with variables",
+      "es": "Contar con variables"
+    },
+    "level:eldras-door": {
+      "en": "Eldra's door",
+      "es": "La puerta de Eldra"
+    },
+    "lesson:fendra": {
+      "en": "A spell that reaches",
+      "es": "Un hechizo que alcanza"
+    },
+    "level:eldras-room": {
+      "en": "Eldra's little room",
+      "es": "La pequeña habitación de Eldra"
+    },
+    "story:the-wand-bank": {
+      "en": "The wand bank",
+      "es": "El banco de varitas"
+    },
+    "chapter:02-the-library": {
+      "en": "The library",
+      "es": "La biblioteca"
+    },
+    "story:after-dark": {
+      "en": "After dark",
+      "es": "Después del anochecer"
+    },
+    "lesson:the-cells": {
+      "en": "The cells",
+      "es": "Las casillas"
+    },
+    "level:the-doors-corridor": {
+      "en": "The corridor of doors",
+      "es": "El pasillo de las puertas"
+    },
+    "lesson:where-i-am": {
+      "en": "Where I am",
+      "es": "Dónde estoy"
+    },
+    "level:the-dark-tunnel": {
+      "en": "The dark tunnel",
+      "es": "El túnel oscuro"
+    },
+    "lesson:waiting": {
+      "en": "Waiting",
+      "es": "Esperar"
+    },
+    "level:the-tunnel-exit": {
+      "en": "The tunnel's exit",
+      "es": "La salida del túnel"
+    },
+    "lesson:true-or-false": {
+      "en": "True or false",
+      "es": "Verdadero o falso"
+    },
+    "lesson:if": {
+      "en": "If",
+      "es": "Si"
+    },
+    "level:by-the-statues": {
+      "en": "By the statues",
+      "es": "Junto a las estatuas"
+    },
+    "lesson:else": {
+      "en": "Else",
+      "es": "Si no"
+    },
+    "level:left-or-right": {
+      "en": "Left or right",
+      "es": "Izquierda o derecha"
+    },
+    "level:the-wrong-door": {
+      "en": "The wrong door",
+      "es": "La puerta equivocada"
+    },
+    "lesson:repeat": {
+      "en": "Repeat",
+      "es": "Repetir"
+    },
+    "level:the-three-doors": {
+      "en": "The corridor of three doors",
+      "es": "El pasillo de las tres puertas"
+    },
+    "story:beyond-the-doors": {
+      "en": "Beyond the doors",
+      "es": "Al otro lado de las puertas"
+    },
+    "lesson:while": {
+      "en": "While",
+      "es": "Mientras"
+    },
+    "level:past-the-teacher": {
+      "en": "Past the teacher",
+      "es": "Pasar al profesor"
+    },
+    "lesson:kirra-and-osto": {
+      "en": "Light and traps",
+      "es": "Luz y trampas"
+    },
+    "level:the-opening-hole": {
+      "en": "The hole that opens",
+      "es": "El agujero que se abre"
+    },
+    "lesson:the-two-coordinates": {
+      "en": "The two coordinates",
+      "es": "Las dos coordenadas"
+    },
+    "level:the-dark-room": {
+      "en": "The dark room",
+      "es": "La sala oscura"
+    },
+    "story:the-voices": {
+      "en": "Voices in the wall",
+      "es": "Voces en el muro"
+    },
+    "lesson:the-portal": {
+      "en": "The portal that never closes",
+      "es": "El portal que no se cierra"
+    },
+    "level:the-night-walk": {
+      "en": "The night walk",
+      "es": "El paseo nocturno"
+    },
+    "story:caught": {
+      "en": "Caught",
+      "es": "Atrapados"
+    },
+    "chapter:03-passages": {
+      "en": "The passages",
+      "es": "Los pasadizos"
+    },
+    "story:the-morning-after": {
+      "en": "The morning after",
+      "es": "La mañana siguiente"
+    },
+    "lesson:the-broom": {
+      "en": "The broom and its knot",
+      "es": "La escoba y su nudo"
+    },
+    "level:the-broom-at-your-feet": {
+      "en": "The broom at your feet",
+      "es": "La escoba a tus pies"
+    },
+    "lesson:lists": {
+      "en": "Lists",
+      "es": "Las listas"
+    },
+    "level:the-shed": {
+      "en": "The shed",
+      "es": "El cobertizo"
+    },
+    "lesson:for-each": {
+      "en": "For each one",
+      "es": "Para cada una"
+    },
+    "level:the-brooms-on-the-wall": {
+      "en": "The brooms on the wall",
+      "es": "Las escobas de la pared"
+    },
+    "lesson:checking-each": {
+      "en": "An if inside the loop",
+      "es": "Un si dentro del bucle"
+    },
+    "level:the-check": {
+      "en": "The check",
+      "es": "La revisión"
+    },
+    "lesson:less-or-greater": {
+      "en": "Smaller or greater",
+      "es": "Menor o mayor"
+    },
+    "level:the-nearest-broom": {
+      "en": "The nearest broom",
+      "es": "La escoba más cercana"
+    },
+    "level:the-brooms-in-the-straw": {
+      "en": "The brooms in the straw",
+      "es": "Las escobas de la paja"
+    },
+    "story:the-flying-lesson": {
+      "en": "The flying lesson",
+      "es": "La clase de vuelo"
+    },
+    "lesson:drevo": {
+      "en": "Drevo",
+      "es": "Drevo"
+    },
+    "level:the-first-flight": {
+      "en": "The first flight",
+      "es": "El primer vuelo"
+    },
+    "lesson:an-action-of-your-own": {
+      "en": "An action of your own",
+      "es": "Una acción propia"
+    },
+    "level:the-rings": {
+      "en": "The rings",
+      "es": "Los aros"
+    },
+    "lesson:arguments-of-your-own": {
+      "en": "Arguments of your own",
+      "es": "Argumentos propios"
+    },
+    "level:the-race": {
+      "en": "The race",
+      "es": "La carrera"
+    },
+    "level:the-rematch": {
+      "en": "The rematch",
+      "es": "La revancha"
+    },
+    "story:the-finish": {
+      "en": "The finish",
+      "es": "La meta"
+    },
+    "chapter:04-the-broom": {
+      "en": "The broom",
+      "es": "La escoba"
+    },
+    "story:the-tower": {
+      "en": "The tower",
+      "es": "La torre"
+    },
+    "lesson:a-kind-of-thing": {
+      "en": "A kind of thing",
+      "es": "Un tipo de cosa"
+    },
+    "level:the-circle": {
+      "en": "The circle",
+      "es": "El círculo"
+    },
+    "lesson:what-it-knows": {
+      "en": "What it knows",
+      "es": "Lo que sabe"
+    },
+    "level:the-name-and-the-colour": {
+      "en": "The name and the colour",
+      "es": "El nombre y el color"
+    },
+    "lesson:born-complete": {
+      "en": "Born complete",
+      "es": "Nacer completo"
+    },
+    "level:one-line-in-the-book": {
+      "en": "One line in the book",
+      "es": "Una línea en el libro"
+    },
+    "level:the-slate": {
+      "en": "{mate}'s slate",
+      "es": "La pizarra de {mate}"
+    },
+    "lesson:what-it-inherits": {
+      "en": "What it inherits",
+      "es": "Lo que hereda"
+    },
+    "level:out-of-the-circle": {
+      "en": "Out of the circle",
+      "es": "Fuera del círculo"
+    },
+    "lesson:what-it-does": {
+      "en": "What it does",
+      "es": "Lo que hace"
+    },
+    "level:orlas-orders": {
+      "en": "Orla's orders",
+      "es": "Las órdenes de Orla"
+    },
+    "story:the-trail": {
+      "en": "The trail",
+      "es": "El rastro"
+    },
+    "level:the-small-passage": {
+      "en": "The small passage",
+      "es": "El pasadizo pequeño"
+    },
+    "story:the-voice-in-the-tunnel": {
+      "en": "The voice in the tunnel",
+      "es": "La voz en el túnel"
+    },
+    "level:the-forgotten-room": {
+      "en": "The forgotten room",
+      "es": "El cuarto olvidado"
+    },
+    "story:what-the-familiar-brought": {
+      "en": "What the familiar brought",
+      "es": "Lo que trajo el familiar"
+    },
+    "story:the-end-of-the-year": {
+      "en": "The end of the year",
+      "es": "El fin de curso"
+    },
+    "chapter:05-the-familiar": {
+      "en": "The familiar",
+      "es": "El familiar"
+    }
+  },
+  "opening": "story:the-letter",
+  "scenes": {
+    "story:the-letter": "the-field",
+    "story:at-the-gate": "the-field",
+    "level:the-gate": "the-field",
+    "level:the-corridor": "the-field",
+    "level:the-dark-note": "the-field",
+    "level:the-long-corridor": "the-field",
+    "level:the-stairs": "the-field",
+    "level:the-password": "the-field",
+    "level:the-wand": "the-field",
+    "level:the-sealed-door": "the-field",
+    "level:the-way-in": "the-field",
+    "story:up-to-the-castle": "the-field",
+    "story:the-entrance": "the-entrance",
+    "story:the-first-night": "the-dormitory",
+    "level:your-bed": "the-dormitory",
+    "story:the-morning": "the-dormitory",
+    "story:at-the-library": "the-library",
+    "level:the-lost-book": "the-library",
+    "level:the-book-returned": "the-library",
+    "level:the-hidden-key": "the-library",
+    "level:the-moving-key": "the-library",
+    "level:eldras-door": "the-library",
+    "level:eldras-room": "the-library",
+    "story:the-wand-bank": "the-library",
+    "story:after-dark": "the-dormitory",
+    "level:the-doors-corridor": "the-tunnel",
+    "level:the-dark-tunnel": "the-tunnel",
+    "level:the-tunnel-exit": "the-crossing",
+    "level:by-the-statues": "the-crossing",
+    "level:left-or-right": "the-two-doors",
+    "level:the-wrong-door": "the-two-doors",
+    "level:the-three-doors": "the-three-doors",
+    "story:beyond-the-doors": "the-long-round",
+    "level:past-the-teacher": "the-long-round",
+    "level:the-opening-hole": "the-storeroom",
+    "level:the-dark-room": "the-storeroom",
+    "story:the-voices": "the-storeroom",
+    "level:the-night-walk": "the-way-down",
+    "story:caught": "the-way-down",
+    "story:the-morning-after": "the-dormitory",
+    "level:the-broom-at-your-feet": "the-broom-shed",
+    "level:the-shed": "the-broom-shed",
+    "level:the-brooms-on-the-wall": "the-broom-shed",
+    "level:the-check": "the-broom-shed",
+    "level:the-nearest-broom": "the-broom-shed",
+    "level:the-brooms-in-the-straw": "the-broom-shed",
+    "story:the-flying-lesson": "the-broom-shed",
+    "level:the-first-flight": "the-lake-edge",
+    "level:the-rings": "the-ring-field",
+    "level:the-race": "the-race-course",
+    "level:the-rematch": "the-race-course",
+    "story:the-finish": "the-race-course",
+    "story:the-tower": "the-dormitory",
+    "level:the-circle": "the-tower-hall",
+    "level:the-name-and-the-colour": "the-tower-hall",
+    "level:one-line-in-the-book": "the-tower-hall",
+    "level:the-slate": "the-tower-hall",
+    "level:out-of-the-circle": "the-tower-hall",
+    "level:orlas-orders": "the-tower-hall",
+    "story:the-trail": "the-tower-hall",
+    "level:the-small-passage": "the-tower-passage",
+    "story:the-voice-in-the-tunnel": "the-tower-passage",
+    "level:the-forgotten-room": "the-tower-passage",
+    "story:what-the-familiar-brought": "the-tower-passage",
+    "story:the-end-of-the-year": "the-tower-hall"
+  },
+  "music": {
+    "story:the-end-of-the-year": "the-truth/name"
+  }
+}

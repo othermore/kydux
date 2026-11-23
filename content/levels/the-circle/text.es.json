@@ -1,0 +1,19 @@
+{
+  "title": "El círculo",
+  "goals": [
+    "Una prueba de uno de los seis tipos en el círculo."
+  ],
+  "starting_code": "# Describe tu tipo de familiar con `class` y `(Familiar)`, vacío por ahora, con `pass` debajo.\n\n# Haz una criatura de esa clase y guárdala con un nombre.\n\n# Llámala al círculo con `cast` y `minka`.\n\n",
+  "hints": [
+    "Los seis tipos del libro son `Fox`, `Crow`, `Bat`, `Hare`, `Mouse` y `Frog`: uno de ellos es el nombre de tu clase.",
+    "Un objeto se hace con el nombre de su clase y unos paréntesis, y se guarda con `=`, como cualquier valor.",
+    "Al final, `wizard.cast` con dos cosas: `\"minka\"` y el nombre con el que has guardado tu criatura."
+  ],
+  "intro": "Mira: {friend} ya tiene su prueba en el círculo. Ahora tú: describe un tipo de familiar, haz uno y llámalo al círculo. Los seis tipos están en mi libro.",
+  "outro": "Por suerte, mientras no lo saques del círculo, es solo una prueba que desaparece enseguida.\n\nLa próxima vez le darás su nombre y su color.",
+  "learned": "Ahora sabes que una clase describe un tipo de cosa, y que un objeto es una cosa hecha con ella, con el nombre de la clase y unos paréntesis; el nombre con el que lo guardas es solo el que le da tu programa.",
+  "told": {
+    "won": "No está mal. Al menos, es {familiar_a_kind}, sí.\n\nComo veis, vuestro familiar desaparece a los pocos segundos.\n\nNecesita un nombre y un color para ser estable y poder mantenerse más tiempo en el círculo.",
+    "bimo": "*(Abre un ojo, y lo vuelve a cerrar.)* Mrrr…"
+  }
+}

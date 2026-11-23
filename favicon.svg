@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 32" width="32" height="32">
+  <!-- Kydux's mark: a pointed hat in ink with a gold band and a wand of wood with a gold
+       star (D193, D254, app/src/ui/mark.ts). -->
+  <path d="M6.5 24.5 L14.6 3.2 Q15.6 1.6 16.6 3.4 L21.5 24.5 Z" fill="#2b2533"/>
+  <path d="M7.6 20.6 L20.6 20.6 L21.3 23.6 L6.7 23.6 Z" fill="#d49b2a"/>
+  <ellipse cx="14" cy="25.4" rx="12.5" ry="3.2" fill="#2b2533"/>
+  <path d="M22.4 30 L29.2 15.6" stroke="#a06c38" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M22.4 30 L24.4 25.8" stroke="#6b4423" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M29.6 9.2 L30.6 12.4 L33.8 13.4 L30.6 14.4 L29.6 17.6 L28.6 14.4 L25.4 13.4 L28.6 12.4 Z" fill="#d49b2a"/>
+</svg>

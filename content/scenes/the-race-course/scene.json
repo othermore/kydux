@@ -1,0 +1,62 @@
+{
+  "terrains": {
+    "G": {
+      "kind": "gate",
+      "walk": false,
+      "sight": false
+    },
+    "P": {
+      "kind": "pole",
+      "walk": false,
+      "sight": false
+    },
+    "R": {
+      "kind": "rock",
+      "walk": false,
+      "sight": false
+    },
+    "T": {
+      "kind": "tree",
+      "walk": false,
+      "sight": false
+    },
+    "b": {
+      "kind": "hedge",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "f": {
+      "kind": "fence",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "g": {
+      "kind": "grass",
+      "walk": true
+    },
+    "h": {
+      "kind": "hedge",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "p": {
+      "kind": "path",
+      "walk": true
+    },
+    "s": {
+      "kind": "stand",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "w": {
+      "kind": "water",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Left or right",
+  "goals": [
+    "Reach the mark."
+  ],
+  "starting_code": "# Look at the attribute `locked` to see whether the left door is locked.\n\n# If it is, walk to the right door, open it with `open`, go through and along the corridor.\n\n# Else do the same by the left door.\n",
+  "hints": [
+    "We can look at the left door's attribute `locked`!",
+    "If the left is locked, walk 2 down and 3 right to `right_door`, open it, walk 3 down and 3 right to the mark.",
+    "If it is not, `else:`, walk 2 down, 3 left to `left_door`, open it, walk 3 down and 9 right!"
+  ],
+  "intro": "Look, a room with two doors! One of them is locked tonight, and there are no keys anywhere. But we can look at the attribute `locked` of the left door, `left_door.locked`! If it is locked, we will go through the right door, and if not, through the left one. The mark waits for us in the corridor, to the right!",
+  "outro": "We are on the other side! I think these doors change every night, and I have a program for when we come back that does not work at all...",
+  "learned": "Now you know that `if` and `else` can look at an attribute, like `locked`, and choose the way by it.",
+  "changes": "The door that is locked is not always the same one.",
+  "changed": "This time, the locked door is the other one."
+}

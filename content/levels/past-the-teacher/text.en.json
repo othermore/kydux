@@ -1,0 +1,18 @@
+{
+  "title": "Past the teacher",
+  "goals": [
+    "Reach the mark in the arch below.",
+    "Do not let Dask see you."
+  ],
+  "starting_code": "# Walk down to the cell before the crossing with `move_down`.\n\n# Wait while Dask is facing right, with `while`, `facing` and `wait`.\n\n# Keep walking down.\n",
+  "hints": [
+    "Dask's lantern shines very far! Walk down 4 cells to stop just before the crossing.",
+    "Use `while` with `dask.facing` to wait while he looks right.",
+    "When he turns around, walk down 7 cells to the arch!"
+  ],
+  "intro": "It is Dask again! His lantern lights up almost the whole corridor. We need to reach the mark in the arch below, but we must cross his path. We do not know how long he will look this way, so we will wait while he looks right. We should walk down to the cell before the crossing and wait.",
+  "outro": "We got past! Beyond this arch there is a corridor with a hole in its floor.",
+  "learned": "Now you know that `while` waits while something remains true, no matter how long.",
+  "changes": "Dask starts from a different place each time.",
+  "changed": "This time, Dask starts from another place."
+}

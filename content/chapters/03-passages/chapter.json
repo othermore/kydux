@@ -1,0 +1,32 @@
+{
+  "id": "03-passages",
+  "music": "the-passages",
+  "items": [
+    "story:after-dark",
+    "lesson:the-cells",
+    "level:the-doors-corridor",
+    "lesson:where-i-am",
+    "level:the-dark-tunnel",
+    "lesson:waiting",
+    "level:the-tunnel-exit",
+    "lesson:true-or-false",
+    "lesson:if",
+    "level:by-the-statues",
+    "lesson:else",
+    "level:left-or-right",
+    "level:the-wrong-door",
+    "lesson:repeat",
+    "level:the-three-doors",
+    "story:beyond-the-doors",
+    "lesson:while",
+    "level:past-the-teacher",
+    "lesson:kirra-and-osto",
+    "level:the-opening-hole",
+    "lesson:the-two-coordinates",
+    "level:the-dark-room",
+    "story:the-voices",
+    "lesson:the-portal",
+    "level:the-night-walk",
+    "story:caught"
+  ]
+}

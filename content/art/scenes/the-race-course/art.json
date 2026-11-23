@@ -1,0 +1,30 @@
+{
+  "cell": 96,
+  "size": [
+    42,
+    18
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 5,
+      "image": "row-5-static.webp",
+      "top": 197,
+      "static": true
+    },
+    {
+      "row": 14,
+      "image": "row-14-static.webp",
+      "top": 998,
+      "static": true
+    },
+    {
+      "row": 15,
+      "image": "row-15-static.webp",
+      "top": 1406,
+      "static": true
+    }
+  ],
+  "things": {},
+  "source": "SOURCE.md"
+}

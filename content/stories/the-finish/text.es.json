@@ -1,0 +1,12 @@
+{
+  "title": "La meta",
+  "steps": [
+    "Cruzas la meta y te posas, y un momento después aterriza Zarek, por segunda vez. Tus compañeros aplauden, e Ilda sonríe.",
+    "No puede ser. Estoy seguro de que has hecho trampas, {wizard}. ¡Pienso devolvértela!",
+    "Tengo la sospecha de que esta mañana ha pasado algo en el cobertizo de las escobas: estaba todo revuelto. Por suerte, todas las escobas estaban bien y nadie ha resultado herido.",
+    "{wizard}, hace muchos años que no veía a un alumno de primer curso completar estas carreras en su primer día, ¡y menos aún ganarlas! Puedes quedarte la escoba, la necesitarás para entrenar como nuevo miembro del equipo de carreras de escoba de Arvelia.",
+    "Al borde del campo, junto a la cancela, apartado de la clase, un alumno mayor mira las escobas. Masculla para sí mismo, sin ver que os acercáis: *...dijo que nadie se haría daño... que así se acabarían las clases de vuelo...*",
+    "Es él, el que oímos por la grieta. No sé cómo se llama. Pero ahora estoy más {{seguro|segura}} que nunca: la otra voz no era de ningún alumno.",
+    "Tienes una escoba, un secreto más grande que el de esta mañana y una voz en los muros que nadie más ha oído. Ahora sabes lo que es una lista, cómo usar un bucle sobre ella y cómo poner un `if` en cada vuelta. Has aprendido a volar, y qué son las funciones y sus argumentos."
+  ]
+}

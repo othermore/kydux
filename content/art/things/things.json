@@ -1,0 +1,109 @@
+{
+  "broom": {
+    "image": "broom.webp",
+    "size": [
+      1.0,
+      0.39
+    ],
+    "foot": [
+      0.5,
+      0.82
+    ],
+    "lying": true
+  },
+  "ring": {
+    "image": "ring.webp",
+    "size": [
+      1.4,
+      2.0
+    ],
+    "foot": [
+      0.5,
+      0.88
+    ]
+  },
+  "broom-hung": {
+    "image": "broom-hung.webp",
+    "size": [
+      0.264,
+      1.35
+    ],
+    "foot": [
+      0.5,
+      0.646
+    ],
+    "origin": [
+      0.41,
+      0.068
+    ],
+    "anchor": "top"
+  },
+  "ring-red": {
+    "image": "ring-red.webp",
+    "size": [
+      1.4,
+      2.0
+    ],
+    "foot": [
+      0.5,
+      0.88
+    ]
+  },
+  "ring-blue": {
+    "image": "ring-blue.webp",
+    "size": [
+      1.4,
+      2.0
+    ],
+    "foot": [
+      0.5,
+      0.88
+    ]
+  },
+  "ring-yellow": {
+    "image": "ring-yellow.webp",
+    "size": [
+      1.4,
+      2.0
+    ],
+    "foot": [
+      0.5,
+      0.88
+    ]
+  },
+  "ring-purple": {
+    "image": "ring-purple.webp",
+    "size": [
+      1.4,
+      2.0
+    ],
+    "foot": [
+      0.5,
+      0.88
+    ]
+  },
+  "thread": {
+    "image": "thread.webp",
+    "size": [
+      0.62,
+      0.1
+    ],
+    "foot": [
+      0.5,
+      0.72
+    ],
+    "lying": true
+  },
+  "trail": {
+    "image": "trail.webp",
+    "size": [
+      0.95,
+      0.29
+    ],
+    "foot": [
+      0.5,
+      0.78
+    ],
+    "lying": true
+  }
+}

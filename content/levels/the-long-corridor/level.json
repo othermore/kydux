@@ -1,0 +1,162 @@
+{
+  "id": "the-long-corridor",
+  "kind": "practice",
+  "speaker": "friend",
+  "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "at": [
+        8,
+        19
+      ],
+      "password": "ambrel"
+    },
+    {
+      "kind": "door",
+      "id": "seal_gate",
+      "at": [
+        8,
+        11
+      ],
+      "sealed": "zelim"
+    },
+    {
+      "kind": "door",
+      "id": "castle_door",
+      "at": [
+        8,
+        6
+      ],
+      "sealed": "zelim",
+      "password": "ambrel"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        4,
+        24
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "lines_under",
+      "lines": 2,
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "map": [
+    "#################",
+    "#################",
+    "#################",
+    "#################",
+    "#################",
+    "########.########",
+    "########.########",
+    "#######...#######",
+    "######.....######",
+    "#######....######",
+    "#######...#######",
+    "########.########",
+    "#######....######",
+    "#######...#...###",
+    "#######.....==###",
+    "#######.......###",
+    "#######...#######",
+    "########.########",
+    "########.########",
+    "########.########",
+    "......=....##....",
+    "......=........##",
+    "==..===.......##.",
+    "...........===...",
+    ".........##..=...",
+    "##..S.......E=...",
+    "..##.........=###",
+    "..........====...",
+    ".....##..........",
+    "###.......##...##"
+  ],
+  "terrain": [
+    "#################",
+    "#################",
+    "#################",
+    "#################",
+    "#################",
+    "########.########",
+    "########.########",
+    "tttttttsssttttttt",
+    "ttttttgpppgtttttt",
+    "tttttttpppgtttttt",
+    "tttttttpppttttttt",
+    "tttt####.####tttt",
+    "tttttttgpggtttttt",
+    "tttttttppgrgggttt",
+    "tttttttgppggoottt",
+    "tttttttgppggggrtt",
+    "tttttttpppttttttt",
+    "########.########",
+    "########.########",
+    "########.########",
+    "ggggggbgppgrrgggg",
+    "ggssggbgppgggggtt",
+    "bbssbbbgpgggggtrg",
+    "ggppgggppggfffggg",
+    "gggppppppttggfggg",
+    "ttgggggppggggfggg",
+    "ggrrgggppggggfttt",
+    "gggggggppgffffggg",
+    "gggggttppgggggggg",
+    "tttggggppgrrgggtt"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "b": "bank",
+    "f": "fence",
+    "g": "grass",
+    "p": "path",
+    "r": "rock",
+    "s": "steps",
+    "t": "tree",
+    "o": "stone"
+  },
+  "walked": [
+    ".",
+    "g",
+    "p",
+    "s"
+  ],
+  "fixed": [
+    "gate",
+    "seal_gate",
+    "castle_door"
+  ],
+  "forbidden": {
+    "reason": "not_inside_yet",
+    "cells": [
+      [
+        8,
+        5
+      ]
+    ]
+  },
+  "art": "the-field"
+}

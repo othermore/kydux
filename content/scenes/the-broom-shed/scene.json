@@ -1,0 +1,64 @@
+{
+  "terrains": {
+    "T": {
+      "kind": "tree",
+      "walk": false,
+      "sight": false
+    },
+    "h": {
+      "kind": "hedge",
+      "walk": false,
+      "sight": true,
+      "fly": true
+    },
+    "l": {
+      "kind": "lawn",
+      "walk": false,
+      "sight": true
+    },
+    "p": {
+      "kind": "path",
+      "walk": true
+    },
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    },
+    "#": {
+      "kind": "wall",
+      "walk": false,
+      "sight": false
+    }
+  },
+  "straw": [
+    [
+      6,
+      6
+    ],
+    [
+      7,
+      6
+    ],
+    [
+      13,
+      6
+    ],
+    [
+      5,
+      8
+    ],
+    [
+      6,
+      8
+    ],
+    [
+      12,
+      8
+    ],
+    [
+      13,
+      8
+    ]
+  ]
+}

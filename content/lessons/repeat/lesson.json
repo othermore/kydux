@@ -1,0 +1,7 @@
+{
+  "id": "repeat",
+  "speaker": "friend",
+  "teaches": [
+    "concept:for_range"
+  ]
+}

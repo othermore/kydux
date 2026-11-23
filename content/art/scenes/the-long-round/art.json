@@ -1,0 +1,89 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 1,
+      "image": "row-1-static-under.webp",
+      "top": 0,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static-over.webp",
+      "top": 818,
+      "static": true,
+      "over": true
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-under.webp",
+      "top": 1210,
+      "static": true,
+      "under": true
+    }
+  ],
+  "things": {},
+  "nudged": [
+    {
+      "about": "Round the top arch (D149).",
+      "cells": [
+        [
+          9,
+          0
+        ],
+        [
+          9,
+          2
+        ]
+      ],
+      "by": 0.3
+    },
+    {
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          2
+        ]
+      ],
+      "by": -0.3
+    },
+    {
+      "about": "Round the bottom arch.",
+      "cells": [
+        [
+          9,
+          12
+        ],
+        [
+          9,
+          14
+        ]
+      ],
+      "by": 0.3
+    },
+    {
+      "cells": [
+        [
+          10,
+          12
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.3
+    }
+  ],
+  "source": "SOURCE.md"
+}

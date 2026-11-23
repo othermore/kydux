@@ -1,0 +1,15 @@
+{
+  "title": "The gate",
+  "goals": [
+    "Walk to the gate."
+  ],
+  "starting_code": "",
+  "hints": [
+    "You need to move to the right to stand in front of the gate.",
+    "The lesson's first instruction is the one that moves your wizard to the right.",
+    "Look back at the lesson's example: it takes exactly one step, and that is all you need."
+  ],
+  "intro": "We need to get to the spot right in front of the great gate. Let us walk there and see if it opens!",
+  "outro": "Great! You've learned to move your wizard. Now let's see how we get through this gate.",
+  "learned": "Now you know what a program and an instruction are, and the instruction that moves your wizard."
+}

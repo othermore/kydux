@@ -1,0 +1,16 @@
+{
+  "title": "La varita",
+  "goals": [
+    "Recoge la varita.",
+    "Llega a la marca."
+  ],
+  "starting_code": "# Ve hasta allí, recoge la varita y vuelve a la marca.\n",
+  "hints": [
+    "Primero, muévete a la derecha para ponerte junto a la piedra plana.",
+    "Usa el método `pick_up` para coger la varita.",
+    "Una vez tengas la varita, usa `move_left` y `move_down` para llegar a la marca."
+  ],
+  "intro": "Tengo una varita de repuesto que te puedo prestar, pero para que practiques un poco, la he dejado en esa piedra. ¡Ve hasta allí, recógela y vuelve a la marca junto al camino!",
+  "outro": "¡La tienes! Ahora que tienes una varita, podemos intentar hacer algo de magia de verdad.",
+  "learned": "Ahora sabes que las cosas también son objetos, y cómo recogerlas."
+}

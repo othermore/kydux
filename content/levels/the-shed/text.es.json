@@ -1,0 +1,18 @@
+{
+  "title": "El cobertizo",
+  "goals": [
+    "Di cuántas escobas hay en el suelo, con `say`.",
+    "Imprime una lista con `print`."
+  ],
+  "starting_code": "# Encuentra las escobas del suelo con `find_all`.\n# Imprime la lista con `print`.\n# Di cuántas hay con `say` y `len`.\n",
+  "hints": [
+    "Las escobas colgadas se ven muy bien, ¡así que solo tenemos que contar las que están en el suelo!",
+    "Si usas `find_all` desde donde estás en el suelo, encontrarás las escobas tiradas, incluso las escondidas bajo la paja.",
+    "Usa `print` para mostrar la lista, y luego `say` con `len` para decir el número de escobas de la lista."
+  ],
+  "intro": "Pero ¿cuántas hay en el suelo? Algunas están a la vista, pero otras están escondidas en la paja. Las de los ganchos se ven de sobra, así que no hace falta contarlas.",
+  "outro": "¡Perfecto! Has contado las escobas del suelo. Antes de ponernos con ellas, vamos a quitar los nudos a las que están colgadas de la pared.",
+  "learned": "Ahora sabes que `find_all` da una lista de las escobas que puedes encontrar desde donde estás, y `len` te dice cuántas son.",
+  "changes": "El número de escobas del suelo cambia cada vez, y algunas están escondidas en la paja.",
+  "changed": "Esta vez, hay otro número de escobas en el suelo."
+}

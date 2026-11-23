@@ -1,0 +1,250 @@
+{
+  "id": "the-finish",
+  "speaker": "friend",
+  "scene": "the-race-course",
+  "camera": [
+    32,
+    10
+  ],
+  "flying": [
+    "wizard",
+    "zarek"
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "by": "wizard",
+      "camera": {
+        "wide": true
+      },
+      "do": [
+        {
+          "by": "wizard",
+          "land": true
+        },
+        {
+          "by": "zarek",
+          "fly": [
+            32,
+            12
+          ]
+        },
+        {
+          "by": "zarek",
+          "land": true
+        }
+      ]
+    },
+    {
+      "who": "zarek",
+      "do": {
+        "face": "down"
+      }
+    },
+    {
+      "who": "ilda",
+      "do": [
+        {
+          "walk": [
+            33,
+            8
+          ]
+        },
+        {
+          "face": "left"
+        }
+      ]
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "voice",
+      "by": "wizard",
+      "camera": {
+        "fit": [
+          [
+            30,
+            5
+          ],
+          [
+            40,
+            12
+          ]
+        ]
+      },
+      "do": [
+        {
+          "by": "wizard",
+          "walk": [
+            [
+              32,
+              9
+            ],
+            [
+              35,
+              9
+            ]
+          ]
+        },
+        {
+          "by": "mate",
+          "walk": [
+            [
+              35,
+              8
+            ],
+            [
+              36,
+              8
+            ],
+            [
+              36,
+              10
+            ]
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            [
+              34,
+              7
+            ],
+            [
+              34,
+              8
+            ]
+          ]
+        },
+        {
+          "by": "wizard",
+          "face": "right"
+        }
+      ]
+    },
+    {
+      "who": "friend"
+    },
+    {
+      "who": "voice"
+    }
+  ],
+  "world": {
+    "map": [
+      "######~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####",
+      "######~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####",
+      "######~#####~~~~~~~~~~~~~~~####~~~~#######",
+      "##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##",
+      "##~............................#.....~~~##",
+      "##~............................#.....~~~##",
+      "##~..................................~~~##",
+      "##~...................................#~~~",
+      "##~.............................S.....#~~~",
+      "##~...................................#...",
+      "##~..................................~~~~~",
+      "##~..................................~~~~~",
+      "##~..................................~~~~~",
+      "##~............................#.....~####",
+      "##~............................#.....~####",
+      "##~..............~~~~~~~~............~####",
+      "##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####",
+      "##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####"
+    ],
+    "terrain": [
+      "TTTTTTwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwTTTTT",
+      "TTTTTTwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwTTTTT",
+      "TTTTTTwRRRRRwwwwwwwwwwwwwwwRRRRwwwwRRTTTTT",
+      "TTfffffffffffffffffffffffffffffffffffhhhTT",
+      "TTfggggggggggggggggggggggggggggPggggghhhTT",
+      "RRfggggggggggggggggggggggggggggPggggghhhTT",
+      "RRfgggggggggggggggggggggggggggggggggghhhTT",
+      "RRfgggggggggggggggggggggggggggggggggggGhhh",
+      "RRfgggggggggggggggggggggggggggggggggggGhhh",
+      "RRfgggggggggggggggggggggggggggggggggggGppp",
+      "RRfgggggggggggggggggggggggggggggggggghhhhh",
+      "RRfgggggggggggggggggggggggggggggggggghhhhh",
+      "RRfgggggggggggggggggggggggggggggggggghhhhh",
+      "RRfggggggggggggggggggggggggggggPggggghRRRR",
+      "TTfggggggggggggggggggggggggggggPggggghRRRR",
+      "TTfggggggggggggggssssssssgggggggggggghRRRR",
+      "TTbbbbbbbbbbbbbbbssssssssbbbbbbbbbbbbhRRRR",
+      "TTbbbbbbbbbbbbbbbssssssssbbbbbbbbbbbbhRRRR"
+    ],
+    "terrains": {
+      "#": "wall",
+      ".": "floor",
+      "=": "shelf",
+      "~": "low",
+      "G": "gate",
+      "P": "pole",
+      "R": "rock",
+      "T": "tree",
+      "b": "hedge",
+      "f": "fence",
+      "g": "grass",
+      "h": "hedge",
+      "p": "path",
+      "s": "stand",
+      "w": "water"
+    },
+    "walked": [
+      ".",
+      "g",
+      "p"
+    ],
+    "actors": [
+      {
+        "id": "zarek",
+        "kind": "racer",
+        "at": [
+          26,
+          12
+        ],
+        "facing": "right",
+        "sight": 0
+      },
+      {
+        "id": "ilda",
+        "kind": "teacher",
+        "facing": "left",
+        "at": [
+          33,
+          9
+        ],
+        "sight": 0
+      },
+      {
+        "id": "friend",
+        "kind": "friend",
+        "facing": "left",
+        "at": [
+          33,
+          7
+        ],
+        "sight": 0
+      },
+      {
+        "id": "mate",
+        "kind": "friend",
+        "facing": "left",
+        "at": [
+          34,
+          8
+        ],
+        "sight": 0
+      },
+      {
+        "id": "rinlo",
+        "kind": "friend",
+        "at": [
+          37,
+          9
+        ],
+        "facing": "left",
+        "sight": 0
+      }
+    ],
+    "art": "the-race-course"
+  }
+}

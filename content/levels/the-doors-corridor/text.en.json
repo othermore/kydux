@@ -1,0 +1,16 @@
+{
+  "title": "The corridor of doors",
+  "goals": [
+    "Walk to the tunnel's mouth, cell (15, 3).",
+    "Open the map with its spell."
+  ],
+  "starting_code": "# Walk right to the tunnel's column with `move_right`.\n\n# Walk up to its mouth with `move_up`.\n",
+  "hints": [
+    "Look at the map: we are on cell (1, 12) and want to go to (15, 3). How much does each number change?",
+    "From 1 to 15 is fourteen steps right. From 12 to 3 is nine steps up!",
+    "Use `move_right` with 14, and then `move_up` with 9."
+  ],
+  "intro": "Look at all these doors... {mate} says the tunnel is at the end of this corridor! If you open the map by casting the spell *orvim*, you will see we are on cell (1, 12) and the map says the tunnel's mouth is (15, 3). Since there is no mark on the floor, count how much each number changes!",
+  "outro": "We did it! This tunnel we reached is very dark...",
+  "learned": "Now you know how to read two cells on the plan and count what changes in each number."
+}

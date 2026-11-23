@@ -1,0 +1,206 @@
+{
+  "id": "the-broom-at-your-feet",
+  "kind": "practice",
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "zones": {
+    "wall": [
+      [
+        6,
+        5,
+        13,
+        5
+      ]
+    ],
+    "straw": [
+      [
+        6,
+        6,
+        13,
+        8
+      ],
+      [
+        5,
+        8,
+        5,
+        8
+      ]
+    ]
+  },
+  "camera": {
+    "fit": [
+      [
+        3,
+        0
+      ],
+      [
+        16,
+        10
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        10,
+        8
+      ]
+    }
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_0",
+      "at": [
+        9,
+        8
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        7,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        11,
+        7
+      ],
+      "zone": "straw",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_6",
+      "at": [
+        6,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_8",
+      "at": [
+        8,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_9",
+      "at": [
+        9,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    }
+  ],
+  "api": [
+    "wizard.find_nearest",
+    "broom.untie"
+  ],
+  "goals": [
+    {
+      "kind": "untied",
+      "ids": [
+        "broom_0"
+      ]
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ],
+  "map": [
+    "####################",
+    "####################",
+    "####################",
+    "~~=#################",
+    "~~=###========######",
+    "~~=#==........==####",
+    "~~=#==........==####",
+    "~~=#==........==####",
+    "~~=#=....S....==####",
+    "~~=######..#########",
+    "~~=######..#########",
+    "~~=======..======###",
+    "~~=======..======###",
+    "~~=======..======###",
+    "~~=======..======###"
+  ],
+  "terrain": [
+    "####################",
+    "####################",
+    "####################",
+    "hhl##############TTT",
+    "hhl###uuuuuuuu###TTT",
+    "hhl#uu........uu#TTT",
+    "hhl#uu........uu#TTT",
+    "hhl#uu........uu#TTT",
+    "hhl#u.........uu#TTT",
+    "hhl######..######TTT",
+    "hhl######..######TTT",
+    "hhlllllluppulllllTTT",
+    "hhlllllllppllllllTTT",
+    "hhlllllllppllllllTTT",
+    "hhlllllllppllllllTTT"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "T": "tree",
+    "h": "hedge",
+    "l": "lawn",
+    "p": "path",
+    "u": "furniture"
+  },
+  "walked": [
+    ".",
+    "p"
+  ],
+  "art": "the-broom-shed"
+}

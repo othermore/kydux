@@ -1,0 +1,335 @@
+{
+  "id": "the-shed",
+  "kind": "practice",
+  "speaker": "friend",
+  "carrying": [
+    "wand"
+  ],
+  "zones": {
+    "wall": [
+      [
+        6,
+        5,
+        13,
+        5
+      ]
+    ]
+  },
+  "forbidden": {
+    "reason": "stay_by_the_brooms",
+    "cells": [
+      [
+        6,
+        5
+      ],
+      [
+        7,
+        5
+      ],
+      [
+        8,
+        5
+      ],
+      [
+        9,
+        5
+      ],
+      [
+        10,
+        5
+      ],
+      [
+        11,
+        5
+      ],
+      [
+        12,
+        5
+      ],
+      [
+        13,
+        5
+      ]
+    ]
+  },
+  "camera": {
+    "fit": [
+      [
+        3,
+        0
+      ],
+      [
+        16,
+        10
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        10,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        8,
+        7
+      ]
+    }
+  ],
+  "things": [
+    {
+      "kind": "broom",
+      "id": "broom_7",
+      "at": [
+        7,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_10",
+      "at": [
+        10,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_11",
+      "at": [
+        11,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_13",
+      "at": [
+        13,
+        4
+      ],
+      "hung": true,
+      "zone": "wall",
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_0",
+      "at": [
+        9,
+        8
+      ]
+    },
+    {
+      "kind": "broom",
+      "id": "broom_1",
+      "at": [
+        7,
+        7
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_2",
+      "at": [
+        11,
+        7
+      ],
+      "knotted": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_3",
+      "at": [
+        6,
+        8
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_4",
+      "at": [
+        13,
+        6
+      ],
+      "knotted": true,
+      "hidden": true
+    },
+    {
+      "kind": "broom",
+      "id": "broom_5",
+      "at": [
+        5,
+        8
+      ],
+      "knotted": true,
+      "hidden": true
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.find_all",
+    "wizard.say"
+  ],
+  "goals": [
+    {
+      "kind": "say",
+      "count_of": "broom",
+      "hung": false
+    },
+    {
+      "kind": "uses",
+      "member": "print",
+      "bonus": true
+    }
+  ],
+  "ways": [
+    {
+      "id": "a",
+      "things": [
+        {
+          "id": "broom_5",
+          "gone": true
+        }
+      ]
+    },
+    {
+      "id": "b",
+      "things": [
+        {
+          "id": "broom_1",
+          "at": [
+            10,
+            7
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_2",
+          "at": [
+            11,
+            8
+          ],
+          "hidden": false
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            7,
+            6
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_4",
+          "at": [
+            12,
+            8
+          ],
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "id": "c",
+      "things": [
+        {
+          "id": "broom_1",
+          "gone": true
+        },
+        {
+          "id": "broom_5",
+          "gone": true
+        },
+        {
+          "id": "broom_3",
+          "at": [
+            6,
+            6
+          ],
+          "hidden": true
+        },
+        {
+          "id": "broom_4",
+          "at": [
+            13,
+            8
+          ],
+          "hidden": true
+        }
+      ]
+    }
+  ],
+  "map": [
+    "####################",
+    "####################",
+    "####################",
+    "~~=#################",
+    "~~=###========######",
+    "~~=#==........==####",
+    "~~=#==........==####",
+    "~~=#==........==####",
+    "~~=#=....S....==####",
+    "~~=######..#########",
+    "~~=######..#########",
+    "~~=======..======###",
+    "~~=======..======###",
+    "~~=======..======###",
+    "~~=======..======###"
+  ],
+  "terrain": [
+    "####################",
+    "####################",
+    "####################",
+    "hhl##############TTT",
+    "hhl###uuuuuuuu###TTT",
+    "hhl#uu........uu#TTT",
+    "hhl#uu........uu#TTT",
+    "hhl#uu........uu#TTT",
+    "hhl#u.........uu#TTT",
+    "hhl######..######TTT",
+    "hhl######..######TTT",
+    "hhlllllluppulllllTTT",
+    "hhlllllllppllllllTTT",
+    "hhlllllllppllllllTTT",
+    "hhlllllllppllllllTTT"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "T": "tree",
+    "h": "hedge",
+    "l": "lawn",
+    "p": "path",
+    "u": "furniture"
+  },
+  "walked": [
+    ".",
+    "p"
+  ],
+  "art": "the-broom-shed"
+}

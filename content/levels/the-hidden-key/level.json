@@ -1,0 +1,147 @@
+{
+  "id": "the-hidden-key",
+  "kind": "practice",
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [
+        3,
+        14
+      ],
+      "opens": "door",
+      "hidden": true,
+      "art": "centre_key"
+    },
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        7,
+        8
+      ],
+      "locked": true,
+      "art": "centre_door"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        10,
+        10
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        9,
+        10
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.items",
+    "door.locked",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "wizard.find_item",
+    "wizard.give",
+    "door.open",
+    "thing.reveal"
+  ],
+  "goals": [
+    {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "uses",
+      "member": "find_nearest",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "map": [
+    "###############",
+    "###############",
+    "###############",
+    "#==#======#===#",
+    "#==#======#...#",
+    "##.#======.===#",
+    "#......E......#",
+    "#.............#",
+    "#######.###=###",
+    "#===.=...=.=###",
+    "#===........###",
+    "#..........S###",
+    "#.=========.###",
+    "#=..........###",
+    "#==========.###",
+    "#...........###",
+    "#====##.##====#",
+    "#=........====#",
+    "#====.===.====#",
+    "##...........##",
+    "##....###....##",
+    "###############",
+    "###############",
+    "###############"
+  ],
+  "terrain": [
+    "###############",
+    "###############",
+    "###############",
+    "#kk#kkkkkk#uuu#",
+    "#kk#kkkkkk#...#",
+    "##.#kkkkkk.uuu#",
+    "#.............#",
+    "#.............#",
+    "#######.###u###",
+    "#uuu.u...u.u###",
+    "#uuu........###",
+    "#...........###",
+    "#.kkkkkkkkk.###",
+    "#u..........###",
+    "#ukkkkkkkkk.###",
+    "#...........###",
+    "#ukkk##.##kkku#",
+    "#u........kkku#",
+    "#uuuu.uuu.uuuu#",
+    "##...........##",
+    "##....###....##",
+    "###############",
+    "###############",
+    "###############"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "k": "bookcase",
+    "u": "furniture"
+  },
+  "walked": [
+    "."
+  ],
+  "art": "the-library"
+}

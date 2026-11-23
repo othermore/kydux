@@ -1,0 +1,169 @@
+{
+  "cell": 96,
+  "frame": [
+    98,
+    172
+  ],
+  "foot": 6,
+  "height_cells": 1.02,
+  "ways": [
+    "down",
+    "left",
+    "right",
+    "up"
+  ],
+  "frames": 3,
+  "standing": 1,
+  "figures": [
+    "baro",
+    "classmate-boy",
+    "classmate-girl",
+    "dask",
+    "eldra",
+    "familiar-bat-black",
+    "familiar-bat-white",
+    "familiar-crow-black",
+    "familiar-crow-white",
+    "familiar-fox-black",
+    "familiar-fox-red",
+    "familiar-fox-white",
+    "familiar-frog-green",
+    "familiar-frog-red",
+    "familiar-hare-brown",
+    "familiar-hare-grey",
+    "familiar-hare-white",
+    "familiar-mouse-brown",
+    "familiar-mouse-white",
+    "ilda",
+    "nuri-a",
+    "nuri-b",
+    "orla",
+    "rinlo",
+    "teku-a",
+    "teku-b",
+    "wenna",
+    "wizard-amber",
+    "wizard-coral",
+    "wizard-moss",
+    "wizard-plum",
+    "wizard-rose",
+    "wizard-sand",
+    "wizard-sky",
+    "wizard-teal",
+    "zarek"
+  ],
+  "floating": [
+    "eldra"
+  ],
+  "adults": [
+    "baro",
+    "dask",
+    "ilda",
+    "orla",
+    "wenna"
+  ],
+  "rows": {
+    "walk": 0,
+    "cast": 4,
+    "pickup": 8,
+    "win": 12,
+    "sleep": 13,
+    "fly": 14
+  },
+  "sheets": {
+    "teku-a": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "teku-b": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "nuri-a": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "nuri-b": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "classmate-girl": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "classmate-boy": {
+      "walk": 0,
+      "sleep": 4
+    },
+    "zarek": {
+      "walk": 0,
+      "fly": 4
+    },
+    "rinlo": {
+      "walk": 0,
+      "sit": 4
+    },
+    "orla": {
+      "walk": 0
+    },
+    "familiar-fox-red": {
+      "walk": 0
+    },
+    "familiar-fox-white": {
+      "walk": 0
+    },
+    "familiar-fox-black": {
+      "walk": 0
+    },
+    "familiar-crow-black": {
+      "walk": 0
+    },
+    "familiar-crow-white": {
+      "walk": 0
+    },
+    "familiar-bat-black": {
+      "walk": 0
+    },
+    "familiar-bat-white": {
+      "walk": 0
+    },
+    "familiar-hare-brown": {
+      "walk": 0
+    },
+    "familiar-hare-white": {
+      "walk": 0
+    },
+    "familiar-hare-grey": {
+      "walk": 0
+    },
+    "familiar-mouse-brown": {
+      "walk": 0
+    },
+    "familiar-mouse-white": {
+      "walk": 0
+    },
+    "familiar-frog-green": {
+      "walk": 0
+    },
+    "familiar-frog-red": {
+      "walk": 0
+    }
+  },
+  "familiars": [
+    "familiar-bat-black",
+    "familiar-bat-white",
+    "familiar-crow-black",
+    "familiar-crow-white",
+    "familiar-fox-black",
+    "familiar-fox-red",
+    "familiar-fox-white",
+    "familiar-frog-green",
+    "familiar-frog-red",
+    "familiar-hare-brown",
+    "familiar-hare-grey",
+    "familiar-hare-white",
+    "familiar-mouse-brown",
+    "familiar-mouse-white"
+  ],
+  "familiar_height_cells": 0.57
+}

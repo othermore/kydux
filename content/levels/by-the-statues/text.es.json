@@ -1,0 +1,19 @@
+{
+  "title": "Junto a las estatuas",
+  "goals": [
+    "Llega a la marca, a la entrada del pasillo que baja.",
+    "Que Dask no te vea.",
+    "Termina justo sobre la marca, con un segundo `if`."
+  ],
+  "starting_code": "# Si Dask mira hacia arriba, baja dos casillas con `move_down`.\n\n# Camina a la derecha con `move_right`.\n\n# Baja con `move_down`.\n",
+  "hints": [
+    "¡Podemos comprobar hacia dónde mira Dask con `facing`!",
+    "Si mira hacia arriba, baja 2 casillas dentro del `if`, con cuatro espacios delante.",
+    "Después del `if`, sin espacios delante, camina cuatro casillas a la derecha y baja dos."
+  ],
+  "intro": "Dask está quieto en medio de la galería, entre las dos primeras estatuas. Nosotros estamos en la fila de arriba. ¡Si mira hacia arriba, debemos bajar dos casillas y pasar por debajo de él, detrás del murete! Si mira hacia abajo, podemos cruzar recto por la fila de arriba, detrás de él y de las estatuas. Luego bajaremos hasta la marca, al principio del pasillo entre la segunda y la tercera estatua.",
+  "outro": "¡Hemos pasado sin que nos vea! A ver adónde lleva este pasillo.",
+  "learned": "Ahora sabes que `if` ejecuta sus líneas solo cuando su condición es cierta, y que lo que viene después se ejecuta siempre.",
+  "changes": "Dask puede empezar mirando a un sitio distinto cada vez.",
+  "changed": "Esta vez, Dask empieza mirando a otro sitio."
+}

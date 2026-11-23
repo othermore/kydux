@@ -1,0 +1,17 @@
+{
+  "title": "Los aros",
+  "goals": [
+    "Pasa por los seis aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo.",
+    "Llega a la piedra blanca.",
+    "En menos de 16 líneas."
+  ],
+  "starting_code": "# Las instrucciones para pasar por una pareja de aros se repiten tres veces igual. ¡Crea una función para no repetirlo!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(6)\nwizard.move_right(8)\nwizard.move_down(6)\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_right(11)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\n",
+  "hints": [
+    "Busca las cuatro líneas que pasan por un par de aros: arriba, derecha, abajo y derecha.",
+    "Dale a esas cuatro líneas un nombre con `def` y pon los cuatro movimientos dentro.",
+    "Llama a tu nueva función en los tres sitios, en lugar de las líneas que contiene."
+  ],
+  "intro": "¡Sigamos practicando! Los aros son una forma muy buena de aprender a controlar los giros. El primer aro de una pareja se cruza desde abajo hacia arriba, y el segundo desde arriba hacia abajo. ¡Un aro cruzado al revés no cuenta! Este es mi programa para el campo de aros. Pasa por tres parejas de aros, rodeando unos árboles por arriba entre las dos primeras, y volando sobre un estanque entre las dos últimas. ¡Tiene 19 líneas! Son las cuatro líneas de una pareja escritas tres veces. Si haces una función para la pareja y la llamas en los tres sitios, será mucho más corto.",
+  "outro": "¡Muy bien hecho! Un programa más corto es mucho más fácil de leer, y vuela igual de suave.",
+  "learned": "Ahora sabes que `def` da un nombre a unas líneas, y que escribir el nombre con paréntesis las ejecuta en cualquier sitio y tantas veces como haga falta."
+}

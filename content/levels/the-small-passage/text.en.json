@@ -1,0 +1,16 @@
+{
+  "title": "The small passage",
+  "goals": [
+    "Your familiar in the forgotten room, on (13, 3).",
+    "It bumps into nothing."
+  ],
+  "starting_code": "# Send {familiar} with `go_to` to the passage's first corner: 10, 8.\n\n# With `go_to`, along the passage to 13, 8.\n\n# With `go_to`, up into the room: 13, 3.\n\n",
+  "hints": [
+    "The passage goes up, turns right and goes up again: it has two corners before the room.",
+    "A `go_to` straight to the room walks along the corridor first and bumps into the wall. Take it from corner to corner.",
+    "`go_to` three times: to 10, 8; to 13, 8; and to 13, 3."
+  ],
+  "intro": "There is the mouth of the passage, at the foot of the wall. Inside, it goes up, turns and goes up again to the room where the owner of the threads is.\n\nSend {familiar} corner by corner.",
+  "outro": "It's there! Listen… There's someone in there.",
+  "learned": "Now you know that a method of your own class is used again and again, like your `wizard`'s, and that your class is now a tool that does what you cannot do yourself."
+}

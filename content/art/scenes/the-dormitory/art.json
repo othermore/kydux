@@ -1,0 +1,339 @@
+{
+  "cell": 96,
+  "size": [
+    25,
+    18
+  ],
+  "ground": "ground.webp",
+  "hours": {
+    "morning": "ground-morning.webp"
+  },
+  "rows": [
+    {
+      "row": 6,
+      "image": "row-6-static.webp",
+      "top": 384,
+      "static": true,
+      "hours": {
+        "morning": "row-6-static-morning.webp"
+      }
+    },
+    {
+      "row": 6,
+      "image": "row-6-static-cover.webp",
+      "top": 403,
+      "static": true,
+      "cover": true,
+      "hours": {
+        "morning": "row-6-static-cover-morning.webp"
+      }
+    },
+    {
+      "row": 7,
+      "image": "row-7-static.webp",
+      "top": 509,
+      "static": true,
+      "hours": {
+        "morning": "row-7-static-morning.webp"
+      }
+    },
+    {
+      "row": 8,
+      "image": "row-8-static.webp",
+      "top": 672,
+      "static": true,
+      "hours": {
+        "morning": "row-8-static-morning.webp"
+      }
+    },
+    {
+      "row": 8,
+      "image": "row-8-static-cover.webp",
+      "top": 634,
+      "static": true,
+      "cover": true,
+      "hours": {
+        "morning": "row-8-static-cover-morning.webp"
+      }
+    },
+    {
+      "row": 9,
+      "image": "row-9-static.webp",
+      "top": 749,
+      "static": true,
+      "hours": {
+        "morning": "row-9-static-morning.webp"
+      }
+    },
+    {
+      "row": 11,
+      "image": "row-11-static.webp",
+      "top": 864,
+      "static": true,
+      "hours": {
+        "morning": "row-11-static-morning.webp"
+      }
+    },
+    {
+      "row": 11,
+      "image": "row-11-static-cover.webp",
+      "top": 864,
+      "static": true,
+      "cover": true,
+      "hours": {
+        "morning": "row-11-static-cover-morning.webp"
+      }
+    },
+    {
+      "row": 13,
+      "image": "row-13-static.webp",
+      "top": 1142,
+      "static": true,
+      "hours": {
+        "morning": "row-13-static-morning.webp"
+      }
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-cover.webp",
+      "top": 1104,
+      "static": true,
+      "cover": true,
+      "hours": {
+        "morning": "row-13-static-cover-morning.webp"
+      }
+    },
+    {
+      "row": 13,
+      "image": "row-13-static-over.webp",
+      "top": 379,
+      "static": true,
+      "over": true,
+      "hours": {
+        "morning": "row-13-static-over-morning.webp"
+      }
+    },
+    {
+      "row": 15,
+      "image": "row-15-static.webp",
+      "top": 1181,
+      "static": true,
+      "hours": {
+        "morning": "row-15-static-morning.webp"
+      }
+    }
+  ],
+  "things": {
+    "front_door": {
+      "row": 14,
+      "left": 883,
+      "top": 1190,
+      "states": {
+        "closed": "front_door-closed.webp",
+        "open": "front_door-open.webp"
+      },
+      "kind": "door",
+      "hours": {
+        "morning": {
+          "closed": "front_door-closed-morning.webp",
+          "open": "front_door-open-morning.webp"
+        }
+      },
+      "under": true,
+      "rows": {
+        "open": 15
+      },
+      "rest": "closed",
+      "at": [
+        12,
+        14
+      ]
+    }
+  },
+  "beds": {
+    "bed_1": {
+      "head": [
+        19.53,
+        5.3
+      ],
+      "toward": "right",
+      "row": 6
+    },
+    "bed_2": {
+      "head": [
+        19.85,
+        7.65
+      ],
+      "toward": "right",
+      "row": 8
+    },
+    "bed_3": {
+      "head": [
+        20.22,
+        10.08
+      ],
+      "toward": "right",
+      "row": 11
+    },
+    "bed_4": {
+      "head": [
+        20.58,
+        12.5
+      ],
+      "toward": "right",
+      "row": 13
+    },
+    "bed_5": {
+      "head": [
+        4.8,
+        5.32
+      ],
+      "toward": "left",
+      "row": 6
+    },
+    "bed_6": {
+      "head": [
+        4.48,
+        7.65
+      ],
+      "toward": "left",
+      "row": 8
+    },
+    "bed_7": {
+      "head": [
+        4.11,
+        10.08
+      ],
+      "toward": "left",
+      "row": 11
+    },
+    "bed_8": {
+      "head": [
+        3.75,
+        12.5
+      ],
+      "toward": "left",
+      "row": 13
+    }
+  },
+  "nudged": [
+    {
+      "cells": [
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "by": -0.05
+    },
+    {
+      "cells": [
+        [
+          8,
+          9
+        ],
+        [
+          8,
+          9
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "cells": [
+        [
+          8,
+          10
+        ],
+        [
+          8,
+          10
+        ]
+      ],
+      "by": -0.12
+    },
+    {
+      "cells": [
+        [
+          8,
+          11
+        ],
+        [
+          8,
+          13
+        ]
+      ],
+      "by": -0.32
+    },
+    {
+      "cells": [
+        [
+          16,
+          5
+        ],
+        [
+          16,
+          6
+        ]
+      ],
+      "by": -0.4
+    },
+    {
+      "cells": [
+        [
+          16,
+          7
+        ],
+        [
+          16,
+          8
+        ]
+      ],
+      "by": -0.25
+    },
+    {
+      "cells": [
+        [
+          16,
+          9
+        ],
+        [
+          16,
+          10
+        ]
+      ],
+      "by": -0.1
+    },
+    {
+      "cells": [
+        [
+          15,
+          9
+        ],
+        [
+          15,
+          9
+        ]
+      ],
+      "by": -0.3
+    },
+    {
+      "cells": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "source": "SOURCE.md"
+}

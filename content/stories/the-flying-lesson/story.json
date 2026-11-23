@@ -1,0 +1,440 @@
+{
+  "id": "the-flying-lesson",
+  "speaker": "ilda",
+  "scene": "the-broom-shed",
+  "camera": [
+    9,
+    9
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "camera": {
+        "fit": [
+          [
+            3,
+            3
+          ],
+          [
+            16,
+            14
+          ]
+        ]
+      }
+    },
+    {
+      "who": "ilda",
+      "do": [
+        {
+          "enter": [
+            9,
+            14
+          ]
+        },
+        {
+          "walk": [
+            9,
+            7
+          ]
+        },
+        {
+          "face": "up"
+        },
+        {
+          "by": "classmate_boy",
+          "enter": [
+            10,
+            14
+          ]
+        },
+        {
+          "by": "classmate_boy",
+          "walk": [
+            10,
+            12
+          ]
+        },
+        {
+          "by": "classmate_girl",
+          "enter": [
+            9,
+            14
+          ]
+        },
+        {
+          "by": "classmate_girl",
+          "walk": [
+            9,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "zarek",
+      "do": [
+        {
+          "enter": [
+            8,
+            0
+          ],
+          "flying": true
+        },
+        {
+          "fly": [
+            [
+              8,
+              3
+            ],
+            [
+              4,
+              3
+            ],
+            [
+              4,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              5
+            ]
+          ]
+        },
+        {
+          "land": true
+        },
+        {
+          "face": "left"
+        }
+      ]
+    },
+    {
+      "who": "ilda"
+    },
+    {
+      "who": "mate"
+    },
+    {
+      "who": "voice"
+    }
+  ],
+  "world": {
+    "things": [
+      {
+        "kind": "broom",
+        "id": "broom_6",
+        "at": [
+          6,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_7",
+        "at": [
+          7,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_8",
+        "at": [
+          8,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_9",
+        "at": [
+          9,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_10",
+        "at": [
+          10,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_11",
+        "at": [
+          11,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_12",
+        "at": [
+          12,
+          4
+        ],
+        "hung": true
+      },
+      {
+        "kind": "broom",
+        "id": "broom_13",
+        "at": [
+          13,
+          4
+        ],
+        "hung": true
+      }
+    ],
+    "map": [
+      "####################",
+      "####################",
+      "####################",
+      "~~=#################",
+      "~~=###========######",
+      "~~=#==........==####",
+      "~~=#==........==####",
+      "~~=#==..S.....==####",
+      "~~=#=.........==####",
+      "~~=######..#########",
+      "~~=######..#########",
+      "~~=======..======###",
+      "~~=======..======###",
+      "~~=======..======###",
+      "~~=======..======###"
+    ],
+    "terrain": [
+      "####################",
+      "####################",
+      "####################",
+      "hhl##############TTT",
+      "hhl###uuuuuuuu###TTT",
+      "hhl#uu........uu#TTT",
+      "hhl#uu........uu#TTT",
+      "hhl#uu........uu#TTT",
+      "hhl#u.........uu#TTT",
+      "hhl######..######TTT",
+      "hhl######..######TTT",
+      "hhlllllluppulllllTTT",
+      "hhlllllllppllllllTTT",
+      "hhlllllllppllllllTTT",
+      "hhlllllllppllllllTTT"
+    ],
+    "terrains": {
+      "#": "wall",
+      ".": "floor",
+      "=": "shelf",
+      "~": "low",
+      "T": "tree",
+      "h": "hedge",
+      "l": "lawn",
+      "p": "path",
+      "u": "furniture"
+    },
+    "walked": [
+      ".",
+      "p"
+    ],
+    "actors": [
+      {
+        "id": "friend",
+        "kind": "friend",
+        "at": [
+          7,
+          7
+        ],
+        "facing": "down",
+        "sight": 0
+      },
+      {
+        "id": "mate",
+        "kind": "friend",
+        "at": [
+          11,
+          7
+        ],
+        "facing": "down",
+        "sight": 0
+      },
+      {
+        "id": "ilda",
+        "kind": "teacher",
+        "facing": "up",
+        "at": [
+          9,
+          14
+        ],
+        "hidden": true,
+        "sight": 0
+      },
+      {
+        "id": "classmate_boy",
+        "kind": "friend",
+        "facing": "up",
+        "at": [
+          10,
+          14
+        ],
+        "hidden": true,
+        "sight": 0
+      },
+      {
+        "id": "classmate_girl",
+        "kind": "friend",
+        "facing": "up",
+        "at": [
+          9,
+          14
+        ],
+        "hidden": true,
+        "sight": 0
+      }
+    ],
+    "art": "the-broom-shed"
+  },
+  "parts": [
+    {
+      "step": 2,
+      "scene": "the-lake-edge",
+      "world": {
+        "map": [
+          "########~~~~########",
+          "########~~~~########",
+          ".~~.....~~~~~~...~##",
+          "........~~~~......##",
+          "........~~~~......##",
+          ".......~~~~~~.....##",
+          ".......~~~~~~.....##",
+          ".S........~~~.....##",
+          ".......~~~~~~.....##",
+          ".......~~~~~~.....##",
+          "........~~~~......##",
+          "........~~~~~....~##",
+          ".......~~~~~~~~..~##",
+          "~~~~~~~~~~~~~~~~~~##",
+          "~~~~~~~~~~~~~~~~~~~~"
+        ],
+        "terrain": [
+          "TTTTTTTTwwwwTTTTTT##",
+          "TTTTTTTTrwwwTTTTTT##",
+          "gbbgggggrwwwbbgggb##",
+          "ggggggggrwwrgggggg##",
+          "ggggggggwwwrgggggg##",
+          "gggggggrwwwwwggggg##",
+          "gggggggrwwwwwggggg##",
+          "pppppppjjjwwwgoggg##",
+          "gggggggwwwwwwggggg##",
+          "gggggggwwwwwwggggg##",
+          "ggggggggrwwrgggggg##",
+          "ggggggggrwwrrggggb##",
+          "gggggggrrwwwrrrggb##",
+          "rrrwwrrrwwwwwrrwwr##",
+          "rrrwwwwwwwwwwwwwwrrr"
+        ],
+        "terrains": {
+          "#": "wall",
+          ".": "floor",
+          "=": "shelf",
+          "~": "low",
+          "T": "tree",
+          "b": "hedge",
+          "g": "grass",
+          "j": "jetty",
+          "o": "stone",
+          "p": "path",
+          "r": "reeds",
+          "w": "water"
+        },
+        "walked": [
+          ".",
+          "g",
+          "j",
+          "o",
+          "p"
+        ],
+        "actors": [
+          {
+            "id": "friend",
+            "kind": "friend",
+            "at": [
+              0,
+              6
+            ],
+            "facing": "right",
+            "sight": 0
+          },
+          {
+            "id": "mate",
+            "kind": "friend",
+            "at": [
+              0,
+              8
+            ],
+            "facing": "right",
+            "sight": 0
+          },
+          {
+            "id": "ilda",
+            "kind": "teacher",
+            "at": [
+              1,
+              5
+            ],
+            "facing": "down",
+            "sight": 0
+          },
+          {
+            "id": "classmate_boy",
+            "kind": "friend",
+            "at": [
+              0,
+              4
+            ],
+            "facing": "right",
+            "sight": 0
+          },
+          {
+            "id": "classmate_girl",
+            "kind": "friend",
+            "at": [
+              0,
+              3
+            ],
+            "facing": "right",
+            "sight": 0
+          },
+          {
+            "id": "zarek",
+            "kind": "racer",
+            "facing": "down",
+            "at": [
+              8,
+              0
+            ],
+            "hidden": true,
+            "sight": 0
+          }
+        ],
+        "art": "the-lake-edge"
+      },
+      "camera": [
+        3,
+        6
+      ]
+    }
+  ]
+}

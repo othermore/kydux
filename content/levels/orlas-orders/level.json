@@ -1,0 +1,217 @@
+{
+  "id": "orlas-orders",
+  "kind": "practice",
+  "speaker": "orla",
+  "carrying": [],
+  "spells": [],
+  "camera": {
+    "fit": [
+      [
+        4,
+        2
+      ],
+      [
+        15,
+        11
+      ]
+    ]
+  },
+  "tick_limit": 100,
+  "facing": "up",
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "orla",
+      "at": [
+        11,
+        4
+      ],
+      "facing": "down",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        7,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "kind": "familiar",
+      "id": "friend_familiar",
+      "creature": "Hare",
+      "color": "grey",
+      "at": [
+        6,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        8,
+        10
+      ],
+      "facing": "up"
+    },
+    {
+      "kind": "familiar",
+      "id": "mate_familiar",
+      "of": "mate",
+      "at": [
+        9,
+        10
+      ],
+      "facing": "up"
+    }
+  ],
+  "familiar": {
+    "stage": "living",
+    "from": "source",
+    "methods": [
+      "__init__",
+      "go_to"
+    ],
+    "living": {
+      "kind": "Fox",
+      "name": "Pimu",
+      "color": "red",
+      "source": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n",
+      "at": [
+        10,
+        9
+      ],
+      "facing": "up"
+    },
+    "orders": {
+      "on": "sun",
+      "steps": [
+        {
+          "to": [
+            13,
+            10
+          ],
+          "key": "order_star"
+        },
+        {
+          "to": [
+            11,
+            10
+          ],
+          "key": "order_wizard"
+        }
+      ]
+    }
+  },
+  "api": [
+    "familiar.name",
+    "familiar.color",
+    "familiar.position",
+    "familiar.move_up",
+    "familiar.move_down",
+    "familiar.move_left",
+    "familiar.move_right"
+  ],
+  "goals": [
+    {
+      "kind": "familiar_at",
+      "on": "sun"
+    },
+    {
+      "kind": "orders"
+    },
+    {
+      "kind": "no_bumps",
+      "of": "familiar",
+      "bonus": true
+    }
+  ],
+  "map": [
+    "####################",
+    "####################",
+    "####################",
+    "#########==#########",
+    "####=....==....=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=..........=####",
+    "####=.....S....=####",
+    "#########..#########",
+    "#########==#########",
+    "########===#########",
+    "########===#########"
+  ],
+  "terrain": [
+    "####################",
+    "##############l#####",
+    "##############l#####",
+    "#########uu###l#####",
+    "####u....uu....u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "####u..........u####",
+    "#########..#########",
+    "#########ss#########",
+    "########sss#########",
+    "########sss#########"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "u": "furniture",
+    "s": "stair",
+    "l": "wall"
+  },
+  "walked": [
+    "."
+  ],
+  "things": [
+    {
+      "kind": "plate",
+      "id": "moon",
+      "at": [
+        6,
+        4
+      ]
+    },
+    {
+      "kind": "plate",
+      "id": "sun",
+      "at": [
+        13,
+        4
+      ]
+    },
+    {
+      "kind": "plate",
+      "id": "star",
+      "at": [
+        13,
+        10
+      ]
+    }
+  ],
+  "fixed": [
+    "moon",
+    "sun",
+    "star"
+  ],
+  "voices": {
+    "bimo": [
+      9,
+      3
+    ]
+  },
+  "art": "the-tower-hall"
+}

@@ -1,0 +1,36 @@
+{
+  "steps": {
+    "scene": {
+      "title": "La escena del juego",
+      "text": "Aquí ves el juego y los personajes del juego. Puedes arrastrar la escena para mirar alrededor, y acercarla o alejarla con los botones `+` y `−`."
+    },
+    "goals": {
+      "title": "Objetivos del nivel",
+      "text": "Estas son las tareas que debes terminar para completar el nivel. La marca redonda que late en el suelo es el lugar al que {el mago|la maga} debe llegar, y un objetivo se marca cuando está hecho."
+    },
+    "editor": {
+      "title": "El editor de código",
+      "text": "Aquí es donde escribes tu programa para controlar a tu personaje en el juego. Escribes una instrucción en cada línea y con ellas le dices al personaje lo que debe hacer."
+    },
+    "run": {
+      "title": "Ejecutar y Reiniciar",
+      "text": "El botón *Ejecutar* hace que {el mago|la maga} haga lo que dice el programa. El botón *Reiniciar* vuelve a poner todo en donde empezó."
+    },
+    "notebook": {
+      "title": "El cuaderno",
+      "text": "Este botón abre el *Cuaderno*. Allí hay una lista de lo que {el mago|la maga} puede hacer, cada acción con un ejemplo, y al hacer clic en un ejemplo se pone directamente en el editor."
+    },
+    "hint": {
+      "title": "El botón Pista",
+      "text": "Después de un intento que no funcionó, el botón *Pista* te da una ayuda. Una pista cuesta una de las estrellas del nivel."
+    },
+    "about": {
+      "title": "La tarjeta del nivel",
+      "text": "El botón `?` muestra la tarjeta inicial del nivel de nuevo. Te recuerda lo que pide el nivel, y te deja ver esta guía una vez más."
+    },
+    "method": {
+      "title": "Cómo aprendemos aquí",
+      "text": "¡Inténtalo, mira lo que pasa y vuelve a intentarlo! Un intento que no funciona es la forma en que {un mago|una maga} descubre qué cambiar. Ahora vamos a escribir la primera instrucción."
+    }
+  }
+}

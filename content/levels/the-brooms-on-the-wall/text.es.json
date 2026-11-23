@@ -1,0 +1,18 @@
+{
+  "title": "Las escobas de la pared",
+  "goals": [
+    "No dejes ninguna escoba colgada con nudo.",
+    "Usa `for`."
+  ],
+  "starting_code": "# Sube hasta la fila de debajo de los ganchos.\n# Ve a un extremo de esa fila.\n# Encuentra las escobas colgadas con `find_all`.\n# Para cada escoba de la lista:\n#     mira a qué distancia está con `distance_to`, camina esos pasos y quítale el nudo.\n",
+  "hints": [
+    "Sube hasta la pared y ve a un extremo. Como `find_all` da primero la más cercana, desde un extremo caminas siempre hacia el mismo lado.",
+    "Usa un bucle `for` para recorrer la lista. En cada vuelta, averigua a qué distancia está la escoba con `distance_to`.",
+    "Guarda la distancia en una variable, camina esos pasos con `move_left` o `move_right` y quítale el nudo con `untie`."
+  ],
+  "intro": "Las escobas de la paja las dejamos para luego. Primero vamos a ocuparnos de las colgadas. Tenemos que caminar junto a la pared y quitarle el nudo a cada una. Cuelgan de ganchos diferentes cada vez, con huecos entre ellas. Si vas primero a un extremo de la pared, `find_all` te las da empezando por la más cercana, y solo tienes que caminar hacia un lado. ¿Recuerdas `distance_to`, de la biblioteca? Te dice a cuántos pasos de ti está una cosa.",
+  "outro": "¡Lo conseguimos! Las escobas de la pared están a salvo.",
+  "learned": "Ahora sabes que un bucle `for` te deja quitarle el nudo a cada escoba, y que `distance_to` te dice cuántos pasos caminar hasta la siguiente.",
+  "changes": "El número de escobas de la pared y los ganchos de los que cuelgan cambian cada vez.",
+  "changed": "Esta vez, hay otras escobas colgadas."
+}

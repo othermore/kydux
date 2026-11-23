@@ -1,0 +1,25 @@
+{
+  "id": "01-arrival",
+  "music": "arrival",
+  "items": [
+    "story:the-letter",
+    "story:at-the-gate",
+    "lesson:what-a-program-is",
+    "level:the-gate",
+    "lesson:objects-and-actions",
+    "level:the-corridor",
+    "lesson:notes",
+    "level:the-dark-note",
+    "lesson:how-much",
+    "level:the-long-corridor",
+    "level:the-stairs",
+    "lesson:words",
+    "level:the-password",
+    "lesson:things-to-carry",
+    "level:the-wand",
+    "lesson:your-first-spell",
+    "level:the-sealed-door",
+    "level:the-way-in",
+    "story:up-to-the-castle"
+  ]
+}

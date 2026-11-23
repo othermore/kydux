@@ -1,0 +1,195 @@
+{
+  "cell": 96,
+  "size": [
+    17,
+    30
+  ],
+  "ground": "ground.webp",
+  "margin": [
+    3,
+    2,
+    3,
+    2
+  ],
+  "origin": [
+    288,
+    192
+  ],
+  "rows": [
+    {
+      "row": 6,
+      "image": "row-6.webp",
+      "top": 645
+    },
+    {
+      "row": 7,
+      "image": "row-7.webp",
+      "top": 645
+    },
+    {
+      "row": 8,
+      "image": "row-8.webp",
+      "top": 662
+    },
+    {
+      "row": 9,
+      "image": "row-9.webp",
+      "top": 756
+    },
+    {
+      "row": 10,
+      "image": "row-10.webp",
+      "top": 645
+    },
+    {
+      "row": 11,
+      "image": "row-11-under.webp",
+      "top": 975,
+      "under": true
+    },
+    {
+      "row": 11,
+      "image": "row-11-static-under.webp",
+      "top": 1003,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 12,
+      "image": "row-12.webp",
+      "top": 1149
+    },
+    {
+      "row": 13,
+      "image": "row-13.webp",
+      "top": 1106
+    },
+    {
+      "row": 14,
+      "image": "row-14.webp",
+      "top": 1313
+    },
+    {
+      "row": 15,
+      "image": "row-15.webp",
+      "top": 1317
+    },
+    {
+      "row": 16,
+      "image": "row-16.webp",
+      "top": 1007
+    },
+    {
+      "row": 17,
+      "image": "row-17.webp",
+      "top": 1546
+    },
+    {
+      "row": 18,
+      "image": "row-18.webp",
+      "top": 1725
+    },
+    {
+      "row": 19,
+      "image": "row-19-under.webp",
+      "top": 1821,
+      "under": true
+    },
+    {
+      "row": 20,
+      "image": "row-20.webp",
+      "top": 1917
+    },
+    {
+      "row": 21,
+      "image": "row-21.webp",
+      "top": 1590
+    },
+    {
+      "row": 22,
+      "image": "row-22.webp",
+      "top": 2091
+    },
+    {
+      "row": 23,
+      "image": "row-23.webp",
+      "top": 2181
+    },
+    {
+      "row": 24,
+      "image": "row-24.webp",
+      "top": 2072
+    },
+    {
+      "row": 25,
+      "image": "row-25.webp",
+      "top": 2127
+    },
+    {
+      "row": 26,
+      "image": "row-26.webp",
+      "top": 2277
+    },
+    {
+      "row": 27,
+      "image": "row-27.webp",
+      "top": 2568
+    },
+    {
+      "row": 28,
+      "image": "row-28.webp",
+      "top": 2456
+    },
+    {
+      "row": 29,
+      "image": "row-29.webp",
+      "top": 2554
+    }
+  ],
+  "things": {
+    "gate": {
+      "row": 19,
+      "left": 667,
+      "top": 1526,
+      "states": {
+        "closed": "gate-closed.webp",
+        "ajar": "gate-ajar.webp",
+        "open": "gate-open.webp"
+      },
+      "kind": "door",
+      "under": true
+    },
+    "seal_gate": {
+      "row": 11,
+      "left": 715,
+      "top": 994,
+      "states": {
+        "closed": "seal_gate-closed.webp",
+        "open": "seal_gate-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rune": "painted"
+    },
+    "castle_door": {
+      "row": 6,
+      "left": 715,
+      "top": 379,
+      "states": {
+        "closed": "castle_door-closed.webp",
+        "open": "castle_door-open.webp"
+      },
+      "kind": "door",
+      "under": true
+    },
+    "wand": {
+      "row": 15,
+      "left": 1142,
+      "top": 1296,
+      "states": {
+        "lying": "wand-lying.webp"
+      }
+    }
+  },
+  "source": "SOURCE.md"
+}

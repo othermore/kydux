@@ -1,0 +1,16 @@
+{
+  "title": "El libro perdido",
+  "goals": [
+    "Recoge el libro.",
+    "Haz que el libro brille con `reveal`."
+  ],
+  "starting_code": "# Encuentra el libro con `find_nearest` y la palabra \"book\", y guárdalo en una variable (el nombre bajo el que lo guardas).\n\n# Haz que brille con `reveal`.\n\n# Camina hacia él: sube por la puerta, ve a la derecha hasta el paso del lado, sube hasta la sala, recórrela hacia la izquierda hasta el final y baja un paso, junto a la pila.\n\n# Recógelo con `pick_up`.\n",
+  "hints": [
+    "Encuéntralo con `find_nearest` y la palabra \"book\", guárdalo en una variable y usa `reveal` en él.",
+    "Camina: sube por la puerta, ve a la derecha hasta el paso del lado, sube hasta la sala, recórrela hacia la izquierda hasta el final y baja un paso.",
+    "Junto a la pila de libros, usa `pick_up`."
+  ],
+  "intro": "Eldra perdió un libro hace mucho tiempo. Está en el rincón, junto a la pila de libros viejos, al final del pasillo entre las dos grandes estanterías, medio escondido; llegas a él desde el final de la sala, justo encima. Encuéntralo, haz que brille y recógelo.",
+  "outro": "¡Lo tienes! Eldra espera al otro extremo de la sala, y se alegrará muchísimo de volver a verlo.",
+  "learned": "Ahora sabes que un método puede devolver algo, que una variable lo guarda y que una cosa revelada muestra adónde ir."
+}

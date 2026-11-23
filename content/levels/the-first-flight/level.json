@@ -1,0 +1,115 @@
+{
+  "id": "the-first-flight",
+  "kind": "practice",
+  "speaker": "ilda",
+  "carrying": [
+    "wand",
+    "broom"
+  ],
+  "spells": [
+    "drevo"
+  ],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "ilda",
+      "at": [
+        1,
+        5
+      ],
+      "facing": "right",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        0,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        0,
+        8
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "land",
+      "marker": "E",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "map": [
+    "########~~~~########",
+    "########~~~~########",
+    ".~~.....~~~~~~...~##",
+    "........~~~~......##",
+    "........~~~~......##",
+    ".......~~~~~~.....##",
+    ".......~~~~~~.....##",
+    ".S........~~~.E...##",
+    ".......~~~~~~.....##",
+    ".......~~~~~~.....##",
+    "........~~~~......##",
+    "........~~~~~....~##",
+    ".......~~~~~~~~..~##",
+    "~~~~~~~~~~~~~~~~~~##",
+    "~~~~~~~~~~~~~~~~~~~~"
+  ],
+  "terrain": [
+    "TTTTTTTTwwwwTTTTTT##",
+    "TTTTTTTTrwwwTTTTTT##",
+    "gbbgggggrwwwbbgggb##",
+    "ggggggggrwwrgggggg##",
+    "ggggggggwwwrgggggg##",
+    "gggggggrwwwwwggggg##",
+    "gggggggrwwwwwggggg##",
+    "pppppppjjjwwwgoggg##",
+    "gggggggwwwwwwggggg##",
+    "gggggggwwwwwwggggg##",
+    "ggggggggrwwrgggggg##",
+    "ggggggggrwwrrggggb##",
+    "gggggggrrwwwrrrggb##",
+    "rrrwwrrrwwwwwrrwwr##",
+    "rrrwwwwwwwwwwwwwwrrr"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "T": "tree",
+    "b": "hedge",
+    "g": "grass",
+    "j": "jetty",
+    "o": "stone",
+    "p": "path",
+    "r": "reeds",
+    "w": "water"
+  },
+  "walked": [
+    ".",
+    "g",
+    "j",
+    "o",
+    "p"
+  ],
+  "art": "the-lake-edge"
+}

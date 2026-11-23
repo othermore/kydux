@@ -1,0 +1,16 @@
+{
+  "title": "The broom at your feet",
+  "goals": [
+    "Take the knot off the broom at your feet.",
+    "Use `find_nearest`."
+  ],
+  "starting_code": "# Find the broom under your feet with `find_nearest`.\n# Take its knot off with `untie`.\n",
+  "hints": [
+    "We need to find the broom first. Use `find_nearest` and save it in a variable.",
+    "What you're looking for is a broom, `\"broom\"`: put it between the brackets of `find_nearest`.",
+    "On the next line, use the `untie()` method on your broom to take the knot off!"
+  ],
+  "intro": "There's a broom right here at your feet, and it has an enchanted knot! We have to take it off. The ones on the pegs are knotted too, but let's deal with this one first. I'll remind you how: first find it, then take the knot off.",
+  "outro": "Great! That's one broom safe. But there are more...",
+  "learned": "Now you know that a broom is an object, that its `untie()` method takes the knot off when you stand on it, and that `find_nearest` gives you the nearest one."
+}

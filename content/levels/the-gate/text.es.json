@@ -1,0 +1,15 @@
+{
+  "title": "La verja",
+  "goals": [
+    "Camina hasta la verja."
+  ],
+  "starting_code": "",
+  "hints": [
+    "Tienes que moverte a la derecha para ponerte delante de la verja.",
+    "La primera instrucción de la lección es la que mueve a tu {mago|maga} a la derecha.",
+    "Vuelve a mirar el ejemplo de la lección: da exactamente un paso, y es todo lo que necesitas."
+  ],
+  "intro": "Tenemos que llegar a la marca que hay justo delante de la gran verja. ¡Caminemos hasta allí a ver si se abre!",
+  "outro": "¡Genial! Has aprendido a mover a tu {mago|maga}. Ahora veamos cómo pasamos esta verja.",
+  "learned": "Ahora sabes qué son un programa y una instrucción, y la instrucción que mueve a tu {mago|maga}."
+}

@@ -1,0 +1,15 @@
+{
+  "title": "La revancha",
+  "goals": [
+    "Gana la carrera contra Zarek.",
+    "Pasa por los ocho aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo."
+  ],
+  "starting_code": "# Este es el programa que ganó la carrera, y Zarek ha movido los aros.\ndef two_rings(to_second, to_next):\n    wizard.move_up(2)\n    wizard.move_right(to_second)\n    wizard.move_down(2)\n    wizard.move_right(to_next)\n\nwizard.cast(\"drevo\")\nwizard.move_right(1)\ntwo_rings(2, 4)\ntwo_rings(3, 5)\ntwo_rings(2, 4)\ntwo_rings(3, 2)\n",
+  "hints": [
+    "Fíjate bien en los aros. ¡Ya no están en el mismo sitio!",
+    "No añadas ninguna línea nueva, solo tienes que cambiar los números.",
+    "Cuenta las casillas de un aro a otro para cada llamada, y también para el primer paso hasta el primer aro."
+  ],
+  "intro": "¡Zarek pide la revancha, y ha cambiado los aros de sitio! Esta vez, te daré un programa que funcionaba para la carrera anterior y lo hacía solo en 11 líneas, pero tienes que arreglarlo para que funcione con las nuevas posiciones de los aros. A ver si consigues ganarle.",
+  "outro": "¡Lo lograste! Has vuelto a cruzar la meta antes que Zarek."
+}

@@ -1,0 +1,80 @@
+{
+  "terrains": {
+    "b": {
+      "kind": "bank",
+      "walk": false,
+      "sight": true
+    },
+    "f": {
+      "kind": "fence",
+      "walk": false,
+      "sight": true
+    },
+    "g": {
+      "kind": "grass",
+      "walk": true
+    },
+    "p": {
+      "kind": "path",
+      "walk": true
+    },
+    "r": {
+      "kind": "rock",
+      "walk": false,
+      "sight": false
+    },
+    "s": {
+      "kind": "steps",
+      "walk": true
+    },
+    "t": {
+      "kind": "tree",
+      "walk": false,
+      "sight": false
+    },
+    "o": {
+      "kind": "stone",
+      "walk": false,
+      "sight": true
+    }
+  },
+  "forbidden": {
+    "reason": "not_inside_yet",
+    "cells": [
+      [
+        8,
+        5
+      ]
+    ]
+  },
+  "things": [
+    {
+      "kind": "door",
+      "id": "gate",
+      "at": [
+        8,
+        19
+      ],
+      "password": "ambrel"
+    },
+    {
+      "kind": "door",
+      "id": "seal_gate",
+      "at": [
+        8,
+        11
+      ],
+      "sealed": "zelim"
+    },
+    {
+      "kind": "door",
+      "id": "castle_door",
+      "at": [
+        8,
+        6
+      ],
+      "sealed": "zelim",
+      "password": "ambrel"
+    }
+  ]
+}

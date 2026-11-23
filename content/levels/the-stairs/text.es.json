@@ -1,0 +1,17 @@
+{
+  "title": "De vuelta a la verja",
+  "goals": [
+    "Llega al punto antes de la verja.",
+    "No choques contra nada.",
+    "En menos de 3 líneas."
+  ],
+  "starting_code": "# Este programa llega, pero choca contra la verja. ¡Mejóralo!\nwizard.move_left(4)\nwizard.move_up(6)\n",
+  "hints": [
+    "Fíjate en lo que pasa cuando ejecutas el programa para ver dónde choca tu {mago|maga}.",
+    "Uno de los movimientos llega demasiado lejos.",
+    "Cambia el argumento del método `move_up` para que tu {mago|maga} se detenga antes de la verja."
+  ],
+  "intro": "Escribí un programa para volver a la verja, pero podría estar mejor. Llega hasta allí, ¡pero tu {mago|maga} choca contra la verja cerrada!",
+  "outro": "¡Mucho mejor! Ahora nos detenemos exactamente donde debemos, sin chocar con nada.",
+  "learned": "Ahora sabes que un programa que funciona todavía puede mejorarse, aquí dándole a cada movimiento el argumento que necesita."
+}

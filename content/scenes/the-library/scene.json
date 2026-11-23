@@ -1,0 +1,15 @@
+{
+  "terrains": {
+    "k": {
+      "kind": "bookcase",
+      "walk": false,
+      "sight": true
+    },
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    }
+  },
+  "things": []
+}

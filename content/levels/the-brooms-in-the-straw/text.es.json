@@ -1,0 +1,18 @@
+{
+  "title": "Las escobas de la paja",
+  "goals": [
+    "No dejes ninguna escoba con nudo.",
+    "Usa `x`."
+  ],
+  "starting_code": "# Para que sea un poco más fácil, he escrito comentarios y te he dejado huecos para que, debajo de cada comentario, escribas el código que hace lo que dice el comentario.\n# ¡Incluso te he dejado los espacios para que sepas lo que va dentro de los for y los if!\n\n# Busca todas las escobas con find_all\n\n# Ahora haz un bucle para pasar por todas las escobas\n\n    # Primero nos movemos a la izquierda o a la derecha.\n    # Si la x de la escoba es menor que la tuya, está a tu izquierda:\n    \n        # Deberás usar move_left\n        \n    # Si no, está a tu derecha:\n    \n        # Deberás usar move_right\n        \n    # Luego nos movemos hacia arriba o hacia abajo.\n    # Si la y de la escoba es menor que la tuya, está arriba:\n    \n        # Deberás usar move_up\n        \n    # Si no, está debajo de ti:\n    \n        # Deberás usar move_down\n        \n    # Ya estás sobre la escoba: quítale el nudo con broom.untie\n    \n",
+  "hints": [
+    "El bucle recorre la lista que da `find_all`, y todo lo que haces para una escoba va dentro de él.",
+    "Dentro del bucle tienes que hacer las mismas dos comparaciones que en el nivel anterior.",
+    "El método `broom.untie()` va dentro del bucle, después de los dos movimientos: el de izquierda o derecha y el de arriba o abajo."
+  ],
+  "intro": "¡Vale, ya lo tienes! Pero intentemos hacerlo para todas las escobas que hay por el suelo, en lugar de ir una a una. La función `find_all` te las da empezando por la más cercana, pero cada una puede estar a cualquier lado de donde esté tu {mago|maga} en ese momento. Los comentarios del programa te guiarán paso a paso, uno para cada instrucción.",
+  "outro": "Ya hemos terminado, ¡todas las escobas están a salvo!",
+  "learned": "Ahora sabes que puedes usar `if` y `<` dentro de un bucle para comparar coordenadas y encontrar los pasos exactos hacia cualquier lado.",
+  "changes": "El número de escobas del suelo y dónde están cambian cada vez, así que la siguiente puede estar a cualquier lado.",
+  "changed": "Esta vez, las escobas del suelo están en otros sitios."
+}

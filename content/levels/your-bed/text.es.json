@@ -1,0 +1,16 @@
+{
+  "title": "Tu cama",
+  "goals": [
+    "Duerme en la cama libre junto a la de {mate}.",
+    "Sin chocar con nada."
+  ],
+  "starting_code": "# Ve al baúl de la cama libre y duerme.\n",
+  "hints": [
+    "`sleep` solo funciona junto al baúl que hay a los pies de una cama libre, y la cama libre es la que está debajo de la de {mate}.",
+    "Con un paso hacia abajo te quedas junto a su baúl.",
+    "Luego usa el método `sleep`."
+  ],
+  "intro": "¡Este es nuestro dormitorio! La cama libre es la que está justo al lado de la mía. Para dormir, ponte junto a su baúl y luego duerme.",
+  "outro": "¡Buenos días! Vamos a la biblioteca a buscarte una varita de la escuela para ti.",
+  "learned": "Ahora sabes que un método solo se puede usar en el lugar correcto, y que un programa debe caminar hasta allí primero."
+}

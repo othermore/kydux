@@ -1,0 +1,17 @@
+{
+  "title": "Back to the gate",
+  "goals": [
+    "Reach the spot before the gate.",
+    "Never bump into anything.",
+    "In fewer than 3 lines."
+  ],
+  "starting_code": "# This program gets there, but it bumps into the gate. Make it better!\nwizard.move_left(4)\nwizard.move_up(6)\n",
+  "hints": [
+    "Watch what happens when you run the program to see where the wizard bumps.",
+    "One of the moves goes too far.",
+    "Change the argument of the `move_up` method so your wizard stops before the gate."
+  ],
+  "intro": "I wrote a program to walk back to the gate, but it could be better. It gets there, but your wizard bumps into the shut gate!",
+  "outro": "Much better! Now we stop exactly where we need to, without bumping into anything.",
+  "learned": "Now you know that a program that works can still be made better, here by giving each move the argument it needs."
+}

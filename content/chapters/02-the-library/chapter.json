@@ -1,0 +1,25 @@
+{
+  "id": "02-the-library",
+  "music": "the-library",
+  "items": [
+    "story:the-entrance",
+    "story:the-first-night",
+    "lesson:the-right-place",
+    "level:your-bed",
+    "story:the-morning",
+    "story:at-the-library",
+    "lesson:what-things-know",
+    "level:the-lost-book",
+    "lesson:giving-things",
+    "level:the-book-returned",
+    "lesson:keys-and-doors",
+    "level:the-hidden-key",
+    "lesson:the-distance",
+    "level:the-moving-key",
+    "lesson:counting-with-names",
+    "level:eldras-door",
+    "lesson:fendra",
+    "level:eldras-room",
+    "story:the-wand-bank"
+  ]
+}

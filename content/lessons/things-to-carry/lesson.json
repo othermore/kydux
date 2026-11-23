@@ -1,0 +1,7 @@
+{
+  "id": "things-to-carry",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.pick_up"
+  ]
+}

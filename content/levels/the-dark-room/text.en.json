@@ -1,0 +1,20 @@
+{
+  "title": "The dark room",
+  "goals": [
+    "Pick up the key.",
+    "Open the door.",
+    "Reach the mark.",
+    "Count the steps with `x`."
+  ],
+  "starting_code": "# Light up the room with a spell.\n\n# Find the key with `find_nearest`.\n\n# Keep the steps to the right and down in two variables, with `position.x` and `position.y`.\n\n# Walk to it.\n\n# Pick it up with `pick_up`.\n\n# Count the steps again to the cell above the door.\n\n# Walk.\n\n# Open it with `open`.\n",
+  "hints": [
+    "Cast *kirra* first! If you do not, `find_nearest` will see nothing in the dark.",
+    "Subtract your position's `x` from the key's `x` to know how many steps to walk right. Do the same with the `y` to walk down!",
+    "To go to the cell above the door, count the steps to `store_door` and subtract one from its `y`."
+  ],
+  "intro": "The storeroom is dark! The key is in another place each night, so we cannot know the steps to it before we enter. We must light up the room with *kirra*, find the key, count the steps with the two numbers and walk there to pick it up. Then we will count the steps the same way to the cell above the door, `store_door`, and open it!",
+  "outro": "The light showed everything, and the door is open! But wait... can you hear voices?",
+  "learned": "Now you know that a position holds two numbers, `x` and `y`, and that their differences say the steps between two cells.",
+  "changes": "The key is in a different place in the storeroom each time.",
+  "changed": "This time, the key is in another place in the storeroom."
+}

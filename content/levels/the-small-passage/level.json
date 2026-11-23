@@ -1,0 +1,177 @@
+{
+  "id": "the-small-passage",
+  "kind": "practice",
+  "speaker": "friend",
+  "camera": {
+    "fit": [
+      [
+        0,
+        0
+      ],
+      [
+        19,
+        14
+      ]
+    ]
+  },
+  "tick_limit": 200,
+  "facing": "up",
+  "zones": {
+    "room": [
+      [
+        5,
+        1,
+        15,
+        3
+      ]
+    ]
+  },
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        8,
+        13
+      ],
+      "facing": "right"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        11,
+        14
+      ],
+      "facing": "up"
+    },
+    {
+      "kind": "friend",
+      "id": "rinlo",
+      "at": [
+        8,
+        3
+      ],
+      "facing": "right",
+      "sitting": true
+    }
+  ],
+  "familiar": {
+    "stage": "living",
+    "from": "learned",
+    "methods": [
+      "__init__",
+      "go_to"
+    ],
+    "living": {
+      "kind": "Fox",
+      "name": "Pimu",
+      "color": "red",
+      "source": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n",
+      "learned": "class Fox(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n    def go_to(self, x, y):\n        if x < self.position.x:\n            self.move_left(self.position.x - x)\n        else:\n            self.move_right(x - self.position.x)\n        if y < self.position.y:\n            self.move_up(self.position.y - y)\n        else:\n            self.move_down(y - self.position.y)\n",
+      "at": [
+        10,
+        13
+      ],
+      "facing": "up"
+    }
+  },
+  "things": [
+    {
+      "kind": "trail",
+      "id": "trail_1",
+      "at": [
+        10,
+        10
+      ]
+    },
+    {
+      "kind": "trail",
+      "id": "trail_2",
+      "at": [
+        12,
+        8
+      ]
+    },
+    {
+      "kind": "trail",
+      "id": "trail_3",
+      "at": [
+        13,
+        7
+      ]
+    }
+  ],
+  "api": [
+    "familiar.position",
+    "familiar.go_to"
+  ],
+  "goals": [
+    {
+      "kind": "familiar_at",
+      "at": [
+        13,
+        3
+      ]
+    },
+    {
+      "kind": "no_bumps",
+      "of": "familiar",
+      "bonus": true
+    }
+  ],
+  "map": [
+    "####################",
+    "####################",
+    "######===...===#####",
+    "######==......=#####",
+    "#############,######",
+    "#############,######",
+    "#############,######",
+    "#############,######",
+    "##########,,,,######",
+    "##########,#########",
+    "##########,#########",
+    "##########,#########",
+    "##.#######,#########",
+    "#........S.........#",
+    "#..................#"
+  ],
+  "terrain": [
+    "####################",
+    "####################",
+    "######uuu...uuu#####",
+    "##llllvv......u#####",
+    "##l##########p######",
+    "##l##########p######",
+    "##l##########p######",
+    "##l##########p######",
+    "##l#######pppp######",
+    "##l#######p#########",
+    "##l#######p#########",
+    "##l#######p#########",
+    "##.#######p#########",
+    "#..................#",
+    "#..................#"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "u": "furniture",
+    "p": "passage",
+    "l": "wall",
+    "v": "furniture"
+  },
+  "walked": [
+    "."
+  ],
+  "voices": {
+    "cold_voice": [
+      8,
+      2
+    ]
+  },
+  "art": "the-tower-passage"
+}

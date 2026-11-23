@@ -1,0 +1,17 @@
+{
+  "title": "La voz en el túnel",
+  "steps": [
+    "{familiar} está dentro del cuarto. Por el pasadizo llegan voces y los tres os agacháis para intentar escuchar.",
+    "Alguien deshizo tus nudos, Rinlo. Yo sé quién fue. Se llama {wizard}.",
+    "{familiar} se encoge de miedo y vuelve a toda prisa por el pasadizo, hasta tus pies.",
+    "Te queda un hilo. Átalo a su varita. Su próximo hechizo le estallará en las manos.",
+    "No. Dijiste que nadie se haría daño. Lo de las escobas fue peligroso, y esto podría matar{lo|la}.",
+    "No. Vete, vete de aquí.",
+    "Oís algunos ruidos más. Luego, silencio. La voz no contesta.",
+    "¿Rinlo? ¡Escucha! Te hemos oído. Podemos ayudarte, sabemos que te has resistido y le has dicho que no.",
+    "Baja con nosotros e iremos todos a hablar con Orla para que nos ayude.",
+    "Lo he roto. He hecho añicos todo el hilo… pero sigue estando aquí, lo siento y me da miedo.",
+    "No puedo salir ahí fuera. Llevaos los trozos, alejadlos de mí. No quiero ni tocarlos.",
+    "{familiar} puede traerlos, así quizás Rinlo se calme."
+  ]
+}

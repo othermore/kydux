@@ -1,0 +1,17 @@
+{
+  "title": "La puerta equivocada",
+  "goals": [
+    "Llega a la marca."
+  ],
+  "starting_code": "if left_door.locked:\n    wizard.move_down(2)\n    wizard.move_left(3)\n    left_door.open()\n    wizard.move_down(3)\n    wizard.move_right(9)\nelse:\n    wizard.move_down(2)\n    wizard.move_right(3)\n    right_door.open()\n    wizard.move_down(3)\n    wizard.move_right(3)\n",
+  "hints": [
+    "¡Mi programa intenta abrir siempre la puerta cerrada con llave! Hace justo lo contrario.",
+    "Fíjate en las partes `if` y `else`. ¡Las líneas bajo `if` deberían ir bajo `else`!",
+    "Intercambia las líneas bajo `if` por las que hay bajo `else`."
+  ],
+  "intro": "¡Oh, no! He escrito un programa para cuando volvamos por esta sala, ¡y va directo a la puerta cerrada con llave! Creo que he puesto las líneas del `if` donde iban las del `else`... ¿Puedes arreglarlo?",
+  "outro": "¡Gracias! Ahora podremos volver por aquí cualquier noche. Mira, al fondo hay un pasillo con tres puertas seguidas.",
+  "learned": "Ahora sabes cómo leer una condición y ver qué líneas se ejecutan.",
+  "changes": "La puerta que está cerrada no siempre es la misma.",
+  "changed": "Esta vez, la puerta cerrada es la otra."
+}

@@ -1,0 +1,505 @@
+{
+  "roles": {
+    "wizard": [
+      {
+        "name": "move_right",
+        "kind": "action",
+        "example": "wizard.move_right(3)",
+        "simple": "wizard.move_right()"
+      },
+      {
+        "name": "move_left",
+        "kind": "action",
+        "example": "wizard.move_left(3)",
+        "simple": "wizard.move_left()"
+      },
+      {
+        "name": "move_up",
+        "kind": "action",
+        "example": "wizard.move_up(3)",
+        "simple": "wizard.move_up()"
+      },
+      {
+        "name": "move_down",
+        "kind": "action",
+        "example": "wizard.move_down(3)",
+        "simple": "wizard.move_down()"
+      },
+      {
+        "name": "say",
+        "kind": "action",
+        "example": "wizard.say(\"Hello!\")"
+      },
+      {
+        "name": "wait",
+        "kind": "action",
+        "example": "wizard.wait(2)",
+        "simple": "wizard.wait()"
+      },
+      {
+        "name": "pick_up",
+        "kind": "action",
+        "example": "wizard.pick_up()"
+      },
+      {
+        "name": "find_nearest",
+        "kind": "action",
+        "example": "wizard.find_nearest(\"key\")"
+      },
+      {
+        "name": "find_item",
+        "kind": "action",
+        "example": "wizard.find_item(\"book\")"
+      },
+      {
+        "name": "find_all",
+        "kind": "action",
+        "example": "wizard.find_all(\"broom\")"
+      },
+      {
+        "name": "has",
+        "kind": "action",
+        "example": "wizard.has(\"key\")"
+      },
+      {
+        "name": "give",
+        "kind": "action",
+        "example": "wizard.give(book)"
+      },
+      {
+        "name": "cast",
+        "kind": "action",
+        "example": "wizard.cast(\"zelim\")"
+      },
+      {
+        "name": "sleep",
+        "kind": "action",
+        "example": "wizard.sleep()"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "wizard.distance_to(key)"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "wizard.position.x"
+      },
+      {
+        "name": "facing",
+        "kind": "attribute",
+        "example": "wizard.facing"
+      },
+      {
+        "name": "items",
+        "kind": "attribute",
+        "example": "wizard.items"
+      },
+      {
+        "name": "flying",
+        "kind": "attribute",
+        "example": "wizard.flying"
+      }
+    ],
+    "thing": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "key.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "key.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "key.distance_to(wizard)"
+      },
+      {
+        "name": "reveal",
+        "kind": "action",
+        "example": "key.reveal()"
+      }
+    ],
+    "door": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "key.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "key.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "key.distance_to(wizard)"
+      },
+      {
+        "name": "reveal",
+        "kind": "action",
+        "example": "key.reveal()"
+      },
+      {
+        "name": "locked",
+        "kind": "attribute",
+        "example": "door.locked"
+      },
+      {
+        "name": "sealed",
+        "kind": "attribute",
+        "example": "door.sealed"
+      },
+      {
+        "name": "password",
+        "kind": "attribute",
+        "example": "door.password"
+      },
+      {
+        "name": "is_open",
+        "kind": "attribute",
+        "example": "door.is_open"
+      },
+      {
+        "name": "open",
+        "kind": "action",
+        "example": "door.open()"
+      }
+    ],
+    "key": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "key.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "key.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "key.distance_to(wizard)"
+      },
+      {
+        "name": "reveal",
+        "kind": "action",
+        "example": "key.reveal()"
+      }
+    ],
+    "hole": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "key.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "key.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "key.distance_to(wizard)"
+      },
+      {
+        "name": "reveal",
+        "kind": "action",
+        "example": "key.reveal()"
+      },
+      {
+        "name": "open",
+        "kind": "attribute",
+        "example": "hole.open"
+      },
+      {
+        "name": "closed",
+        "kind": "attribute",
+        "example": "hole.closed"
+      }
+    ],
+    "bed": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "key.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "key.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "key.distance_to(wizard)"
+      },
+      {
+        "name": "reveal",
+        "kind": "action",
+        "example": "key.reveal()"
+      },
+      {
+        "name": "free",
+        "kind": "attribute",
+        "example": "bed.free"
+      }
+    ],
+    "broom": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "key.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "key.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "key.distance_to(wizard)"
+      },
+      {
+        "name": "reveal",
+        "kind": "action",
+        "example": "key.reveal()"
+      },
+      {
+        "name": "knotted",
+        "kind": "attribute",
+        "example": "broom.knotted"
+      },
+      {
+        "name": "untie",
+        "kind": "action",
+        "example": "broom.untie()"
+      }
+    ],
+    "teacher": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "teacher.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "teacher.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "teacher.position"
+      },
+      {
+        "name": "facing",
+        "kind": "attribute",
+        "example": "teacher.facing"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "eldra.distance_to(wizard)"
+      },
+      {
+        "name": "can_see",
+        "kind": "action",
+        "example": "teacher.can_see(wizard)"
+      }
+    ],
+    "ghost": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "teacher.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "teacher.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "teacher.position"
+      },
+      {
+        "name": "facing",
+        "kind": "attribute",
+        "example": "teacher.facing"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "eldra.distance_to(wizard)"
+      }
+    ],
+    "cat": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "teacher.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "teacher.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "teacher.position"
+      },
+      {
+        "name": "facing",
+        "kind": "attribute",
+        "example": "teacher.facing"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "eldra.distance_to(wizard)"
+      }
+    ],
+    "racer": [
+      {
+        "name": "kind",
+        "kind": "attribute",
+        "example": "teacher.kind"
+      },
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "teacher.name"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "teacher.position"
+      },
+      {
+        "name": "facing",
+        "kind": "attribute",
+        "example": "teacher.facing"
+      },
+      {
+        "name": "distance_to",
+        "kind": "action",
+        "example": "eldra.distance_to(wizard)"
+      }
+    ],
+    "friend": [],
+    "familiar": [
+      {
+        "name": "name",
+        "kind": "attribute",
+        "example": "pimu.name"
+      },
+      {
+        "name": "color",
+        "kind": "attribute",
+        "example": "pimu.color"
+      },
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "pimu.position.x"
+      },
+      {
+        "name": "move_up",
+        "kind": "action",
+        "example": "pimu.move_up(3)",
+        "simple": "pimu.move_up()"
+      },
+      {
+        "name": "move_down",
+        "kind": "action",
+        "example": "pimu.move_down(3)",
+        "simple": "pimu.move_down()"
+      },
+      {
+        "name": "move_left",
+        "kind": "action",
+        "example": "pimu.move_left(3)",
+        "simple": "pimu.move_left()"
+      },
+      {
+        "name": "move_right",
+        "kind": "action",
+        "example": "pimu.move_right(3)",
+        "simple": "pimu.move_right()"
+      },
+      {
+        "name": "pick_up",
+        "kind": "action",
+        "example": "pimu.pick_up()"
+      }
+    ],
+    "position": [
+      {
+        "name": "x",
+        "kind": "attribute",
+        "example": "wizard.position.x"
+      },
+      {
+        "name": "y",
+        "kind": "attribute",
+        "example": "wizard.position.y"
+      }
+    ],
+    "plate": [
+      {
+        "name": "position",
+        "kind": "attribute",
+        "example": "key.position"
+      }
+    ]
+  },
+  "thing_roles": [
+    "thing",
+    "door",
+    "key",
+    "hole",
+    "bed",
+    "broom"
+  ]
+}

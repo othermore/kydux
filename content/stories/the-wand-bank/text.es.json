@@ -1,0 +1,15 @@
+{
+  "title": "El banco de varitas",
+  "steps": [
+    "Después de tantos años, Eldra por fin vuelve a sostener su propio libro.",
+    "Os doy mis más profundas gracias, {joven mago|joven maga}. Habéis traído mucha paz a esta vieja alma.",
+    "Llegas al final del pasillo, donde está el banco de varitas. Tras su mostrador se encuentra Baro, padre de un alumno, que lo atiende por las mañanas.",
+    "{Bienvenidos|Bienvenidas}, {alumnos|alumnas} de primer año. Aquí tenéis vuestras varitas de la escuela para este año, una para ti y otra para {mate}. Cuidadlas bien.",
+    "¡{wizard}! He venido a la biblioteca a por un libro antiguo sobre los pasadizos del castillo, por los rumores que he escuchado, y he oído tu voz a través de las estanterías. ¡Supe que eras tú al instante! Estoy muy {{contento|contenta}} de volver a verte.",
+    "¡Yo también me alegro mucho de verte! {mate}, te presento a {friend}, que conocí al llegar y me dejó su varita y me enseñó algunos trucos. Y {friend}, te presento a {mate}, mi {compañero|compañera} de dormitorio.",
+    "Hola, {friend}. Estoy encantad{o|a} de conocerte. ¡{wizard} me ha contado cómo abristeis la gran verja juntos!",
+    "Y como por fin tengo mi propia varita de la escuela, aquí te devuelvo tu varita de repuesto. ¡Muchísimas gracias por prestármela!",
+    "¡Lo habéis hecho de maravilla! Habéis aprendido a mirar los atributos de las cosas y a guardar lo que un método devuelve en una variable. Habéis abierto puertas con su método, habéis encontrado una llave oculta y una distancia que cambia, ¡y habéis atraído libros con *fendra*!",
+    "Al salir, miras por las ventanas y ves que ya está anocheciendo. Cerca, escuchas a unos alumnos mayores susurrar un rumor: por la noche, los pasillos del castillo cambian y cobran vida."
+  ]
+}

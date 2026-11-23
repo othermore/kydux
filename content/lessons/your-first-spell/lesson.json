@@ -1,0 +1,7 @@
+{
+  "id": "your-first-spell",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.cast"
+  ]
+}

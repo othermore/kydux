@@ -1,0 +1,11 @@
+{
+  "id": "what-it-knows",
+  "speaker": "orla",
+  "teaches": [
+    "concept:attributes",
+    "familiar.name",
+    "familiar.color"
+  ],
+  "try": "error",
+  "error": "no_attribute"
+}

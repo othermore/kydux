@@ -1,0 +1,15 @@
+{
+  "title": "The rematch",
+  "goals": [
+    "Win the race against Zarek.",
+    "Fly through the eight rings in order: in each pair, the first upward and the second downward."
+  ],
+  "starting_code": "# This is the program that won the race, and Zarek has moved the rings.\ndef two_rings(to_second, to_next):\n    wizard.move_up(2)\n    wizard.move_right(to_second)\n    wizard.move_down(2)\n    wizard.move_right(to_next)\n\nwizard.cast(\"drevo\")\nwizard.move_right(1)\ntwo_rings(2, 4)\ntwo_rings(3, 5)\ntwo_rings(2, 4)\ntwo_rings(3, 2)\n",
+  "hints": [
+    "Look at the rings closely. They are no longer in the same places!",
+    "Do not add any new lines, you only have to change the numbers.",
+    "Count the cells from ring to ring for each call, and also for the first move to the first ring."
+  ],
+  "intro": "Zarek wants a rematch, and he has moved the rings! This time, I will give you a program that worked for the last race in just 11 lines, but you have to fix it so it works with the new positions of the rings. Let's see if you can beat him.",
+  "outro": "You did it! You crossed the finish before Zarek again."
+}

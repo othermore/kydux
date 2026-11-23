@@ -1,0 +1,151 @@
+{
+  "id": "eldras-room",
+  "kind": "practice",
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "spells": [
+    "fendra"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        2,
+        5
+      ],
+      "open": true,
+      "art": "room_door"
+    },
+    {
+      "kind": "book",
+      "id": "eldras_book",
+      "at": [
+        2,
+        3
+      ]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "ghost",
+      "id": "eldra",
+      "at": [
+        3,
+        6
+      ],
+      "facing": "left"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        4,
+        6
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        5,
+        6
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.items",
+    "door.locked",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "wizard.find_item",
+    "wizard.give",
+    "door.open",
+    "thing.reveal",
+    "thing.distance_to",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "give",
+      "id": "eldras_book",
+      "to": "eldra"
+    },
+    {
+      "kind": "uses",
+      "member": "reveal",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "map": [
+    "###############",
+    "###############",
+    "###############",
+    "#==#======#===#",
+    "#==#======#...#",
+    "##.#======.===#",
+    "#.S...........#",
+    "#.............#",
+    "#######.###=###",
+    "#===.=...=.=###",
+    "#===........###",
+    "#...........###",
+    "#.=========.###",
+    "#=..........###",
+    "#==========.###",
+    "#...........###",
+    "#====##.##====#",
+    "#=........====#",
+    "#====.===.====#",
+    "##...........##",
+    "##....###....##",
+    "###############",
+    "###############",
+    "###############"
+  ],
+  "terrain": [
+    "###############",
+    "###############",
+    "###############",
+    "#kk#kkkkkk#uuu#",
+    "#kk#kkkkkk#...#",
+    "##.#kkkkkk.uuu#",
+    "#.............#",
+    "#.............#",
+    "#######.###u###",
+    "#uuu.u...u.u###",
+    "#uuu........###",
+    "#...........###",
+    "#.kkkkkkkkk.###",
+    "#u..........###",
+    "#ukkkkkkkkk.###",
+    "#...........###",
+    "#ukkk##.##kkku#",
+    "#u........kkku#",
+    "#uuuu.uuu.uuuu#",
+    "##...........##",
+    "##....###....##",
+    "###############",
+    "###############",
+    "###############"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "k": "bookcase",
+    "u": "furniture"
+  },
+  "walked": [
+    "."
+  ],
+  "art": "the-library"
+}

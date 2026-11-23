@@ -1,0 +1,15 @@
+{
+  "title": "Arreglando el programa",
+  "goals": [
+    "Llega a la marca."
+  ],
+  "starting_code": "# Un movimiento en este programa está mal. ¡Encuéntralo y arréglalo!\nwizard.move_up()\nwizard.move_left()\nwizard.move_down()\nwizard.move_down()\n",
+  "hints": [
+    "Lee el comentario para saber qué tienes que hacer.",
+    "Fíjate bien en la primera instrucción para ver si va en la dirección correcta.",
+    "Cambia la primera instrucción por el método `move_left` para que tu {mago|maga} vaya en la buena dirección."
+  ],
+  "intro": "Escribí un programa para llegar a esa marca, ¡pero creo que algo está mal! Tu {mago|maga} choca contra el montículo de hierba. ¿Puedes encontrar el movimiento equivocado y arreglarlo?",
+  "outro": "¡Lo has arreglado! Leer los comentarios ayuda mucho a entender un programa.",
+  "learned": "Ahora sabes qué es un comentario, y que un comentario en un programa puede decirte qué hacer."
+}

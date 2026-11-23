@@ -1,0 +1,204 @@
+{
+  "id": "up-to-the-castle",
+  "speaker": "friend",
+  "scene": "the-field",
+  "camera": [
+    8,
+    8
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          8,
+          7
+        ]
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "friend",
+      "do": {
+        "walk": [
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "who": "friend",
+      "do": {
+        "walk": [
+          7,
+          7
+        ]
+      }
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "wizard",
+      "do": {
+        "face": "left"
+      }
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          8,
+          6
+        ]
+      },
+      "by": "wizard"
+    }
+  ],
+  "world": {
+    "things": [
+      {
+        "kind": "door",
+        "id": "gate",
+        "at": [
+          8,
+          19
+        ],
+        "open": true
+      },
+      {
+        "kind": "door",
+        "id": "seal_gate",
+        "at": [
+          8,
+          11
+        ],
+        "open": true
+      },
+      {
+        "kind": "door",
+        "id": "castle_door",
+        "at": [
+          8,
+          6
+        ],
+        "open": true
+      }
+    ],
+    "map": [
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "########.########",
+      "########.########",
+      "#######...#######",
+      "######..S..######",
+      "#######....######",
+      "#######...#######",
+      "########.########",
+      "#######....######",
+      "#######...#...###",
+      "#######.....==###",
+      "#######.......###",
+      "#######...#######",
+      "########.########",
+      "########.########",
+      "########.########",
+      "......=....##....",
+      "......=........##",
+      "==..===.......##.",
+      "...........===...",
+      ".........##..=...",
+      "##...........=...",
+      "..##.........=###",
+      "..........====...",
+      ".....##..........",
+      "###.......##...##"
+    ],
+    "terrain": [
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "########.########",
+      "########.########",
+      "tttttttsssttttttt",
+      "ttttttgpppgtttttt",
+      "tttttttpppgtttttt",
+      "tttttttpppttttttt",
+      "tttt####.####tttt",
+      "tttttttgpggtttttt",
+      "tttttttppgrgggttt",
+      "tttttttgppggoottt",
+      "tttttttgppggggrtt",
+      "tttttttpppttttttt",
+      "########.########",
+      "########.########",
+      "########.########",
+      "ggggggbgppgrrgggg",
+      "ggssggbgppgggggtt",
+      "bbssbbbgpgggggtrg",
+      "ggppgggppggfffggg",
+      "gggppppppttggfggg",
+      "ttgggggppggggfggg",
+      "ggrrgggppggggfttt",
+      "gggggggppgffffggg",
+      "gggggttppgggggggg",
+      "tttggggppgrrgggtt"
+    ],
+    "terrains": {
+      "#": "wall",
+      ".": "floor",
+      "=": "shelf",
+      "~": "low",
+      "b": "bank",
+      "f": "fence",
+      "g": "grass",
+      "p": "path",
+      "r": "rock",
+      "s": "steps",
+      "t": "tree",
+      "o": "stone"
+    },
+    "walked": [
+      ".",
+      "g",
+      "p",
+      "s"
+    ],
+    "fixed": [
+      "gate",
+      "seal_gate",
+      "castle_door"
+    ],
+    "forbidden": {
+      "reason": "not_inside_yet",
+      "cells": [
+        [
+          8,
+          5
+        ]
+      ]
+    },
+    "actors": [
+      {
+        "id": "friend",
+        "kind": "friend",
+        "at": [
+          7,
+          9
+        ],
+        "sight": 0
+      }
+    ],
+    "art": "the-field"
+  }
+}

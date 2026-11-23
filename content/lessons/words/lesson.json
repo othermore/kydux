@@ -1,0 +1,8 @@
+{
+  "id": "words",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.say",
+    "concept:strings"
+  ]
+}

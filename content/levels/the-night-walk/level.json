@@ -1,0 +1,231 @@
+{
+  "id": "the-night-walk",
+  "kind": "practice",
+  "speaker": "friend",
+  "carrying": [
+    "wand",
+    "map"
+  ],
+  "spells": [
+    "osto"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        10,
+        5
+      ],
+      "cells": [
+        [
+          10,
+          5
+        ],
+        [
+          9,
+          5
+        ]
+      ],
+      "locked": true
+    },
+    {
+      "kind": "key",
+      "id": "key",
+      "at": [
+        10,
+        3
+      ],
+      "opens": "door"
+    },
+    {
+      "kind": "hole",
+      "id": "hole",
+      "at": [
+        10,
+        7
+      ],
+      "cells": [
+        [
+          10,
+          7
+        ],
+        [
+          9,
+          7
+        ]
+      ],
+      "period": 0
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        9,
+        2
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        9,
+        3
+      ]
+    },
+    {
+      "kind": "teacher",
+      "id": "dask",
+      "at": [
+        1,
+        10
+      ],
+      "facing": "right",
+      "sight": 8,
+      "patrol": [
+        [
+          1,
+          10
+        ],
+        [
+          8,
+          10
+        ]
+      ]
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.wait",
+    "wizard.cast",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "thing.position",
+    "door.open",
+    "door.locked",
+    "teacher.facing",
+    "hole.open",
+    "hole.closed"
+  ],
+  "goals": [
+    {
+      "kind": "collect",
+      "id": "key"
+    },
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
+      "kind": "cast",
+      "spell": "osto"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "not_seen_by",
+      "id": "dask"
+    },
+    {
+      "kind": "no_bumps",
+      "bonus": true
+    }
+  ],
+  "tick_limit": 100,
+  "ways": [
+    {
+      "id": "near",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            1,
+            10
+          ],
+          "facing": "right"
+        }
+      ]
+    },
+    {
+      "id": "middle",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            6,
+            10
+          ],
+          "facing": "right"
+        }
+      ]
+    },
+    {
+      "id": "far",
+      "actors": [
+        {
+          "id": "dask",
+          "at": [
+            5,
+            10
+          ],
+          "facing": "left"
+        }
+      ]
+    }
+  ],
+  "map": [
+    "#########..#########",
+    "#########..#########",
+    "#########.S#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "...........#########",
+    "...........#########",
+    "#########..#########",
+    "#########.E#########",
+    "#########..#########"
+  ],
+  "terrain": [
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########",
+    "...........#########",
+    "...........#########",
+    "#########..#########",
+    "#########..#########",
+    "#########..#########"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "u": "furniture"
+  },
+  "walked": [
+    "."
+  ],
+  "fixed": [
+    "door"
+  ],
+  "art": "the-way-down"
+}

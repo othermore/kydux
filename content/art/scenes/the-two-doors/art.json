@@ -1,0 +1,212 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 4,
+      "image": "row-4-static.webp",
+      "top": 221,
+      "static": true
+    },
+    {
+      "row": 9,
+      "image": "row-9-static.webp",
+      "top": 672,
+      "static": true
+    },
+    {
+      "row": 11,
+      "image": "row-11-static-over.webp",
+      "top": 1058,
+      "static": true,
+      "over": true
+    }
+  ],
+  "things": {
+    "left_door": {
+      "row": 9,
+      "left": 509,
+      "top": 667,
+      "states": {
+        "closed": "left_door-closed.webp",
+        "open": "left_door-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rows": {
+        "open": 9
+      },
+      "rest": "closed",
+      "at": [
+        7,
+        8
+      ]
+    },
+    "right_door": {
+      "row": 9,
+      "left": 1094,
+      "top": 667,
+      "states": {
+        "closed": "right_door-closed.webp",
+        "open": "right_door-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rows": {
+        "open": 9
+      },
+      "rest": "closed",
+      "at": [
+        13,
+        8
+      ]
+    }
+  },
+  "lowered": [
+    {
+      "about": "Touched by left_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          5,
+          10
+        ],
+        [
+          5,
+          10
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "left_door"
+    },
+    {
+      "about": "Touched by right_door's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          14,
+          10
+        ],
+        [
+          14,
+          10
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "right_door"
+    },
+    {
+      "about": "Behind the lower wall's top, a figure drawn a little higher, so that its head shows.",
+      "cells": [
+        [
+          0,
+          11
+        ],
+        [
+          8,
+          11
+        ]
+      ],
+      "by": -0.3
+    },
+    {
+      "cells": [
+        [
+          11,
+          11
+        ],
+        [
+          19,
+          11
+        ]
+      ],
+      "by": -0.3
+    }
+  ],
+  "nudged": [
+    {
+      "about": "Round the left door, both columns toward its middle (D149).",
+      "cells": [
+        [
+          6,
+          7
+        ],
+        [
+          6,
+          10
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          7,
+          7
+        ],
+        [
+          7,
+          10
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the right door.",
+      "cells": [
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          10
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          13,
+          7
+        ],
+        [
+          13,
+          10
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the arch in the upper wall.",
+      "cells": [
+        [
+          9,
+          2
+        ],
+        [
+          9,
+          5
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          2
+        ],
+        [
+          10,
+          5
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "source": "SOURCE.md"
+}

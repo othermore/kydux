@@ -1,0 +1,19 @@
+{
+  "title": "{mate}'s slate",
+  "goals": [
+    "Conjure two familiars of different colours, one for you and one for {mate}, who has copied your very description."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\n{mate_var} = {familiar_class}(\"{mate_familiar}\", \"{mate_color}\")\nwizard.cast(\"minka\", {familiar_var})\nwizard.cast(\"minka\", {mate_var})\n",
+  "hints": [
+    "The first thing `__init__` takes is always the object being born.",
+    "With `self` in its place, the trials come with no name: `name = name` keeps the name only inside the action, not in the object.",
+    "Two fixes: `self` first between the brackets of `__init__`, and `self.` before the two names that are kept."
+  ],
+  "intro": "I give up: I'm hopeless at this, not one of mine comes out right. Let me copy your description, and I'll have a familiar just like yours, but in another colour.\n\nI copied yours onto my slate in a hurry and added my own line. Mine will be called *(softly)* {mate_familiar}. You'd better do the conjuring too: nothing works for me today.",
+  "outro": "One class, and two familiars, each with its name and its colour. Thank you, {wizard}!",
+  "learned": "Now you know the two slips everyone makes with a class: one Python tells you about, a missing `self`, and one nobody tells you about, a name kept only inside the action; and that one class makes as many objects as needed, each with its own data.",
+  "told": {
+    "won": "That one. Yes, that one.",
+    "two_familiars": "Stop! Two familiars are enough: one for you and one for {mate}."
+  }
+}

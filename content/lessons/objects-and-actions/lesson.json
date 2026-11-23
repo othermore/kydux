@@ -1,0 +1,9 @@
+{
+  "id": "objects-and-actions",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ]
+}

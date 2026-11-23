@@ -1,0 +1,17 @@
+{
+  "title": "El cuarto olvidado",
+  "goals": [
+    "Todos los trozos de hilo acaban en tus manos.",
+    "Tu familiar no choca con nada."
+  ],
+  "starting_code": "# Manda a {familiar} con `go_to` a la primera esquina.\n\n# Con `go_to`, a la segunda.\n\n# Con `go_to`, hacia arriba hasta el cuarto.\n\n# Por cada trozo de hilo que encuentre `find_all`, manda a {familiar} hasta él con `go_to`.\n# Allí, haz que lo recoja con `pick_up`.\n\n# Haz que vuelva contigo con `minka`.\n\n",
+  "hints": [
+    "Primero, lleva a {familiar} al cuarto de esquina en esquina, como antes.",
+    "Lo que ve tu familiar lo ves tú: desde el cuarto, `wizard.find_all` con `\"thread\"` da la lista de los trozos.",
+    "Recorre esa lista con `for`: manda a tu familiar a la x y la y de la posición de cada trozo y, allí, que lo recoja con `pick_up`, que heredó de `Familiar`. Al final, `minka` lo trae de vuelta con todo."
+  ],
+  "intro": "Tenemos que ayudar a Rinlo. Que {familiar} vaya a la habitación, recoja todos los trozos y vuelva contigo.\n\nRecuerda: por ser un `Familiar`, también tiene `pick_up`.",
+  "outro": "¡Los tienes todos! … ¿Has oído eso? Un cerrojo, arriba.",
+  "changes": "Los trozos están desperdigados por todo el suelo. Podrían estar en cualquier parte.",
+  "changed": "Esta vez, los trozos han caído en otros sitios del cuarto."
+}

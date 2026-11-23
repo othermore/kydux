@@ -1,0 +1,51 @@
+{
+  "terrains": {
+    "u": {
+      "kind": "furniture",
+      "walk": false,
+      "sight": true
+    },
+    "s": {
+      "kind": "stair",
+      "walk": "story",
+      "sight": true
+    },
+    "l": {
+      "kind": "wall",
+      "walk": "story",
+      "sight": false
+    }
+  },
+  "things": [
+    {
+      "kind": "plate",
+      "id": "moon",
+      "at": [
+        6,
+        4
+      ]
+    },
+    {
+      "kind": "plate",
+      "id": "sun",
+      "at": [
+        13,
+        4
+      ]
+    },
+    {
+      "kind": "plate",
+      "id": "star",
+      "at": [
+        13,
+        10
+      ]
+    }
+  ],
+  "voices": {
+    "bimo": [
+      9,
+      3
+    ]
+  }
+}

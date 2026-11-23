@@ -1,0 +1,261 @@
+{
+  "cell": 96,
+  "size": [
+    20,
+    15
+  ],
+  "ground": "ground.webp",
+  "rows": [
+    {
+      "row": 1,
+      "image": "row-1-static-under.webp",
+      "top": 0,
+      "static": true,
+      "under": true
+    },
+    {
+      "row": 4,
+      "image": "row-4-static.webp",
+      "top": 202,
+      "static": true
+    },
+    {
+      "row": 8,
+      "image": "row-8-static.webp",
+      "top": 586,
+      "static": true
+    },
+    {
+      "row": 12,
+      "image": "row-12-static.webp",
+      "top": 970,
+      "static": true
+    },
+    {
+      "row": 14,
+      "image": "row-14-static.webp",
+      "top": 1243,
+      "static": true
+    }
+  ],
+  "things": {
+    "door_1": {
+      "row": 11,
+      "left": 883,
+      "top": 960,
+      "states": {
+        "closed": "door_1-closed.webp",
+        "open": "door_1-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rows": {
+        "open": 12
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        11
+      ]
+    },
+    "door_2": {
+      "row": 7,
+      "left": 883,
+      "top": 576,
+      "states": {
+        "closed": "door_2-closed.webp",
+        "open": "door_2-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rows": {
+        "open": 8
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        7
+      ]
+    },
+    "door_3": {
+      "row": 3,
+      "left": 883,
+      "top": 192,
+      "states": {
+        "closed": "door_3-closed.webp",
+        "open": "door_3-open.webp"
+      },
+      "kind": "door",
+      "under": true,
+      "rows": {
+        "open": 4
+      },
+      "rest": "closed",
+      "at": [
+        10,
+        3
+      ]
+    }
+  },
+  "nudged": [
+    {
+      "about": "Touched by door_1's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          11,
+          12
+        ],
+        [
+          11,
+          12
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_1"
+    },
+    {
+      "about": "Touched by door_2's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          11,
+          8
+        ],
+        [
+          11,
+          8
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_2"
+    },
+    {
+      "about": "Touched by door_3's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          11,
+          4
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_3"
+    },
+    {
+      "about": "Round the top arch and the third door (D149).",
+      "cells": [
+        [
+          9,
+          0
+        ],
+        [
+          9,
+          4
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          0
+        ],
+        [
+          10,
+          4
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the second door.",
+      "cells": [
+        [
+          9,
+          6
+        ],
+        [
+          9,
+          8
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          6
+        ],
+        [
+          10,
+          8
+        ]
+      ],
+      "by": -0.2
+    },
+    {
+      "about": "Round the first door and the bottom arch.",
+      "cells": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          14
+        ]
+      ],
+      "by": 0.2
+    },
+    {
+      "cells": [
+        [
+          10,
+          10
+        ],
+        [
+          10,
+          14
+        ]
+      ],
+      "by": -0.2
+    }
+  ],
+  "source": "SOURCE.md",
+  "lowered": [
+    {
+      "about": "Touched by door_2's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          9
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_2"
+    },
+    {
+      "about": "Touched by door_3's open leaf, the figure drawn away from it (D157).",
+      "cells": [
+        [
+          10,
+          5
+        ],
+        [
+          10,
+          5
+        ]
+      ],
+      "by": 0.3,
+      "leaf": "door_3"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "title": "La llave oculta",
+  "goals": [
+    "Recoge la llave.",
+    "Abre la puerta.",
+    "Pasa por ella.",
+    "Encuentra la llave con `find_nearest`."
+  ],
+  "starting_code": "# Encuentra la llave con `find_nearest` y la palabra \"key\", y guárdala en una variable.\n\n# Haz que brille con `reveal`.\n\n# Baja al pasillo y ve a la izquierda hasta ponerte junto a la llave.\n\n# Recógela con `pick_up`.\n\n# Vuelve a la derecha hasta el final del pasillo, sube a la sala, ve a la izquierda y sube hasta la puerta.\n\n# Ábrela con su método `open`.\n\n# Sube para pasar por ella.\n",
+  "hints": [
+    "Encuentra la llave con `find_nearest` y usa `reveal` en ella.",
+    "Camina hasta donde brilla: baja al pasillo que hay entre las dos estanterías y recórrelo hacia la izquierda; usa `pick_up` desde allí, a su lado.",
+    "Vuelve por el pasillo hasta su extremo derecho, sube a la sala, camina hasta la puerta cerrada, usa su método `open` y pasa."
+  ],
+  "intro": "El camino sigue por esa puerta cerrada. Su llave cayó bajo la gran estantería hace mucho tiempo, donde nadie puede verla. El libro de Eldra ha vuelto con ella y ya no hay ningún libro en el pasillo; esta vez es la llave la que no está a la vista. Encuéntrala, muestra dónde está, recógela, abre la puerta y pasa.",
+  "outro": "¡Bien hecho! La puerta está abierta, y el pasillo superior está justo delante.",
+  "learned": "Ahora sabes que una cosa que no está a la vista sigue ahí para un programa, y cómo una puerta se abre con su llave."
+}

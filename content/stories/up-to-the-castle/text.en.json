@@ -1,0 +1,12 @@
+{
+  "title": "Up to the castle",
+  "steps": [
+    "The castle's great door stands open at last, the last seal broken.",
+    "We did it! We worked together and finally got it open!",
+    "It has been quite a day, from your very first step to the gate to when you picked up the wand and made that long walk in one instruction! We learned that a program is a list of instructions; your wizard is an object, the one the code calls `wizard`, and its actions are methods; a comment is a note for a person, and a move's argument says how many steps to take.",
+    "The password *ambrel* was a string, words in quotes kept exactly as written, and saying it with `say` opened the gate. Then `pick_up` picked up the wand, and with it you cast a spell, *zelim*, which broke the two seals!",
+    "Thank you so much for your help! Casting my first spell with the wand was definitely my favorite part.",
+    "You are welcome, but that wand is only lent! Our teacher, Ilda, waits inside, and the wand bank is a counter in the castle run by the Parent-Teacher Association that lends every new pupil a school wand for the year; then you can give my spare back.",
+    "You walk into the castle together, out of the dusk and into its great dark hall: your first year at Arvelia begins."
+  ]
+}

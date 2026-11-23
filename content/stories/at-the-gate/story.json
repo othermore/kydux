@@ -1,0 +1,227 @@
+{
+  "id": "at-the-gate",
+  "speaker": "friend",
+  "scene": "the-field",
+  "camera": [
+    8,
+    23
+  ],
+  "steps": [
+    {
+      "who": "voice",
+      "do": {
+        "face": "up"
+      },
+      "by": "wizard"
+    },
+    {
+      "who": "wizard",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "camera": {
+        "follow": "friend"
+      },
+      "do": [
+        {
+          "by": "friend",
+          "walk": [
+            8,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "who": "friend",
+      "camera": {
+        "fit": [
+          [
+            4,
+            17
+          ],
+          [
+            12,
+            23
+          ]
+        ]
+      },
+      "do": {
+        "walk": [
+          8,
+          21
+        ]
+      }
+    },
+    {
+      "who": "wizard",
+      "do": {
+        "face": "down"
+      }
+    },
+    {
+      "who": "wizard",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "wizard",
+      "do": null
+    },
+    {
+      "who": "friend",
+      "do": null
+    }
+  ],
+  "world": {
+    "map": [
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "########.########",
+      "########.########",
+      "#######...#######",
+      "######.....######",
+      "#######....######",
+      "#######...#######",
+      "########.########",
+      "#######....######",
+      "#######...#...###",
+      "#######.....==###",
+      "#######.......###",
+      "#######...#######",
+      "########.########",
+      "########.########",
+      "########.########",
+      "......=S...##....",
+      "......=........##",
+      "==..===.......##.",
+      "...........===...",
+      ".........##..=...",
+      "##...........=...",
+      "..##.........=###",
+      "..........====...",
+      ".....##..........",
+      "###.......##...##"
+    ],
+    "terrain": [
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "#################",
+      "########.########",
+      "########.########",
+      "tttttttsssttttttt",
+      "ttttttgpppgtttttt",
+      "tttttttpppgtttttt",
+      "tttttttpppttttttt",
+      "tttt####.####tttt",
+      "tttttttgpggtttttt",
+      "tttttttppgrgggttt",
+      "tttttttgppggoottt",
+      "tttttttgppggggrtt",
+      "tttttttpppttttttt",
+      "########.########",
+      "########.########",
+      "########.########",
+      "ggggggbgppgrrgggg",
+      "ggssggbgppgggggtt",
+      "bbssbbbgpgggggtrg",
+      "ggppgggppggfffggg",
+      "gggppppppttggfggg",
+      "ttgggggppggggfggg",
+      "ggrrgggppggggfttt",
+      "gggggggppgffffggg",
+      "gggggttppgggggggg",
+      "tttggggppgrrgggtt"
+    ],
+    "terrains": {
+      "#": "wall",
+      ".": "floor",
+      "=": "shelf",
+      "~": "low",
+      "b": "bank",
+      "f": "fence",
+      "g": "grass",
+      "p": "path",
+      "r": "rock",
+      "s": "steps",
+      "t": "tree",
+      "o": "stone"
+    },
+    "walked": [
+      ".",
+      "g",
+      "p",
+      "s"
+    ],
+    "things": [
+      {
+        "kind": "door",
+        "id": "gate",
+        "at": [
+          8,
+          19
+        ],
+        "password": "ambrel"
+      },
+      {
+        "kind": "door",
+        "id": "seal_gate",
+        "at": [
+          8,
+          11
+        ],
+        "sealed": "zelim"
+      },
+      {
+        "kind": "door",
+        "id": "castle_door",
+        "at": [
+          8,
+          6
+        ],
+        "sealed": "zelim",
+        "password": "ambrel"
+      }
+    ],
+    "fixed": [
+      "gate",
+      "seal_gate",
+      "castle_door"
+    ],
+    "forbidden": {
+      "reason": "not_inside_yet",
+      "cells": [
+        [
+          8,
+          5
+        ]
+      ]
+    },
+    "actors": [
+      {
+        "id": "friend",
+        "kind": "friend",
+        "at": [
+          8,
+          29
+        ],
+        "facing": "up",
+        "sight": 0
+      }
+    ],
+    "art": "the-field"
+  }
+}

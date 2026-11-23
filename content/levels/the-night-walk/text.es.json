@@ -1,0 +1,21 @@
+{
+  "title": "El paseo nocturno",
+  "goals": [
+    "Recoge la llave.",
+    "Abre la puerta.",
+    "Sujeta el agujero con *osto*.",
+    "Llega a la marca en el arco de abajo.",
+    "Que Dask no te vea.",
+    "Sin chocar con nada."
+  ],
+  "starting_code": "# Baja hasta la llave.\n\n# Recógela.\n\n# Baja hasta la puerta.\n\n# Ábrela, se llama `door`.\n\n# Baja hasta el borde del agujero.\n\n# Sujeta el agujero con osto.\n\n# Baja cruzándolo hasta la casilla antes del pasillo de Dask.\n\n# Espera mientras mire a la derecha.\n\n# Baja hasta el arco.\n",
+  "hints": [
+    "Recuerda, la llave está a 1 paso. Tras abrir la puerta, hay 2 pasos hasta el borde del agujero.",
+    "¡Este agujero nunca se cierra solo, así que un bucle `while` esperaría para siempre! Usa `wizard.cast(\"osto\")` desde la casilla justo antes del agujero para sujetarlo, y luego `while` con `dask.facing` para Dask.",
+    "Después de lanzar *osto*, baja 3 hasta la casilla antes del pasillo de Dask. ¡Cuando Dask se gire, baja 4 hasta el arco!"
+  ],
+  "intro": "¡Aquí está el camino a casa! Hay que usar todo junto: coger la llave del suelo, abrir la puerta, sujetar ese agujero con *osto* porque nunca se cierra solo y esperar a que Dask se dé la vuelta en el último pasillo. ¡Su farol llega muy lejos! Es un camino largo, pero sé que podemos hacerlo.",
+  "outro": "¡Lo hemos conseguido! Ya casi estamos de vuelta en nuestras camas.",
+  "changes": "Dask empieza en un sitio distinto cada vez.",
+  "changed": "Esta vez, Dask empieza en otro sitio."
+}

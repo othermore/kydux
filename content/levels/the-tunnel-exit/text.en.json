@@ -1,0 +1,16 @@
+{
+  "title": "The tunnel's exit",
+  "goals": [
+    "Reach the mark, by the first statue.",
+    "Do not let Dask see you."
+  ],
+  "starting_code": "# Wait for Dask to go by with `wait`.\n\n# Walk right to the mark with `move_right`.\n",
+  "hints": [
+    "Let Dask go by first, and then we cross!",
+    "Count the ticks we must wait for him to go by: two.",
+    "Wait two ticks and then walk seven cells to the right, to the mark."
+  ],
+  "intro": "We are out of the tunnel! But look, another corridor crosses this one, and Dask is coming up it. He is looking up, so if we cross now he will see us! I think we should wait two ticks for him to go by, and then walk to the mark, by the first statue.",
+  "outro": "He went by without seeing us! But look, up ahead, among the statues, there is Dask again.",
+  "learned": "Now you know that `wizard.wait()` lets a tick go by while everything else moves, and that its number says how many."
+}

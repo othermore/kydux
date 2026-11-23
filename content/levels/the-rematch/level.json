@@ -1,0 +1,390 @@
+{
+  "id": "the-rematch",
+  "kind": "fix",
+  "speaker": "ilda",
+  "carrying": [
+    "wand",
+    "broom"
+  ],
+  "spells": [
+    "drevo"
+  ],
+  "things": [
+    {
+      "kind": "ring",
+      "id": "ring_1",
+      "at": [
+        8,
+        7
+      ],
+      "way": "up",
+      "colour": "red"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_2",
+      "at": [
+        11,
+        7
+      ],
+      "way": "down",
+      "colour": "red"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_3",
+      "at": [
+        15,
+        7
+      ],
+      "way": "up",
+      "colour": "blue"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_4",
+      "at": [
+        17,
+        7
+      ],
+      "way": "down",
+      "colour": "blue"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_5",
+      "at": [
+        22,
+        7
+      ],
+      "way": "up",
+      "colour": "yellow"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_6",
+      "at": [
+        24,
+        7
+      ],
+      "way": "down",
+      "colour": "yellow"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_7",
+      "at": [
+        28,
+        7
+      ],
+      "way": "up",
+      "colour": "purple"
+    },
+    {
+      "kind": "ring",
+      "id": "ring_8",
+      "at": [
+        30,
+        7
+      ],
+      "way": "down",
+      "colour": "purple"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_1",
+      "at": [
+        8,
+        11
+      ],
+      "way": "up",
+      "colour": "red"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_2",
+      "at": [
+        11,
+        11
+      ],
+      "way": "down",
+      "colour": "red"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_3",
+      "at": [
+        15,
+        11
+      ],
+      "way": "up",
+      "colour": "blue"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_4",
+      "at": [
+        17,
+        11
+      ],
+      "way": "down",
+      "colour": "blue"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_5",
+      "at": [
+        22,
+        11
+      ],
+      "way": "up",
+      "colour": "yellow"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_6",
+      "at": [
+        24,
+        11
+      ],
+      "way": "down",
+      "colour": "yellow"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_7",
+      "at": [
+        28,
+        11
+      ],
+      "way": "up",
+      "colour": "purple"
+    },
+    {
+      "kind": "ring",
+      "id": "zarek_ring_8",
+      "at": [
+        30,
+        11
+      ],
+      "way": "down",
+      "colour": "purple"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "teacher",
+      "id": "ilda",
+      "at": [
+        5,
+        9
+      ],
+      "facing": "right",
+      "sight": 0
+    },
+    {
+      "kind": "friend",
+      "id": "friend",
+      "at": [
+        5,
+        8
+      ]
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        5,
+        7
+      ]
+    },
+    {
+      "kind": "racer",
+      "id": "zarek",
+      "at": [
+        6,
+        12
+      ],
+      "facing": "right"
+    }
+  ],
+  "race": {
+    "against": "zarek",
+    "lines": 18,
+    "path": [
+      [
+        8,
+        12
+      ],
+      [
+        8,
+        10
+      ],
+      [
+        11,
+        10
+      ],
+      [
+        11,
+        12
+      ],
+      [
+        15,
+        12
+      ],
+      [
+        15,
+        10
+      ],
+      [
+        17,
+        10
+      ],
+      [
+        17,
+        12
+      ],
+      [
+        22,
+        12
+      ],
+      [
+        22,
+        10
+      ],
+      [
+        24,
+        10
+      ],
+      [
+        24,
+        12
+      ],
+      [
+        28,
+        12
+      ],
+      [
+        28,
+        10
+      ],
+      [
+        30,
+        10
+      ],
+      [
+        30,
+        12
+      ],
+      [
+        32,
+        12
+      ]
+    ],
+    "rings": [
+      "zarek_ring_1",
+      "zarek_ring_2",
+      "zarek_ring_3",
+      "zarek_ring_4",
+      "zarek_ring_5",
+      "zarek_ring_6",
+      "zarek_ring_7",
+      "zarek_ring_8"
+    ],
+    "finish": [
+      32,
+      8
+    ]
+  },
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.cast"
+  ],
+  "goals": [
+    {
+      "kind": "before",
+      "racer": "zarek"
+    },
+    {
+      "kind": "through_in_order",
+      "ids": [
+        "ring_1",
+        "ring_2",
+        "ring_3",
+        "ring_4",
+        "ring_5",
+        "ring_6",
+        "ring_7",
+        "ring_8"
+      ],
+      "bonus": true
+    }
+  ],
+  "tick_limit": 120,
+  "map": [
+    "######~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####",
+    "######~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####",
+    "######~#####~~~~~~~~~~~~~~~####~~~~#######",
+    "##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##",
+    "##~............................#.....~~~##",
+    "##~............................#.....~~~##",
+    "##~..................................~~~##",
+    "##~...................................#~~~",
+    "##~...S.........................E.....#~~~",
+    "##~...................................#...",
+    "##~..................................~~~~~",
+    "##~..................................~~~~~",
+    "##~..................................~~~~~",
+    "##~............................#.....~####",
+    "##~............................#.....~####",
+    "##~..............~~~~~~~~............~####",
+    "##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####",
+    "##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~####"
+  ],
+  "terrain": [
+    "TTTTTTwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwTTTTT",
+    "TTTTTTwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwTTTTT",
+    "TTTTTTwRRRRRwwwwwwwwwwwwwwwRRRRwwwwRRTTTTT",
+    "TTfffffffffffffffffffffffffffffffffffhhhTT",
+    "TTfggggggggggggggggggggggggggggPggggghhhTT",
+    "RRfggggggggggggggggggggggggggggPggggghhhTT",
+    "RRfgggggggggggggggggggggggggggggggggghhhTT",
+    "RRfgggggggggggggggggggggggggggggggggggGhhh",
+    "RRfgggggggggggggggggggggggggggggggggggGhhh",
+    "RRfgggggggggggggggggggggggggggggggggggGppp",
+    "RRfgggggggggggggggggggggggggggggggggghhhhh",
+    "RRfgggggggggggggggggggggggggggggggggghhhhh",
+    "RRfgggggggggggggggggggggggggggggggggghhhhh",
+    "RRfggggggggggggggggggggggggggggPggggghRRRR",
+    "TTfggggggggggggggggggggggggggggPggggghRRRR",
+    "TTfggggggggggggggssssssssgggggggggggghRRRR",
+    "TTbbbbbbbbbbbbbbbssssssssbbbbbbbbbbbbhRRRR",
+    "TTbbbbbbbbbbbbbbbssssssssbbbbbbbbbbbbhRRRR"
+  ],
+  "terrains": {
+    "#": "wall",
+    ".": "floor",
+    "=": "shelf",
+    "~": "low",
+    "G": "gate",
+    "P": "pole",
+    "R": "rock",
+    "T": "tree",
+    "b": "hedge",
+    "f": "fence",
+    "g": "grass",
+    "h": "hedge",
+    "p": "path",
+    "s": "stand",
+    "w": "water"
+  },
+  "walked": [
+    ".",
+    "g",
+    "p"
+  ],
+  "art": "the-race-course"
+}

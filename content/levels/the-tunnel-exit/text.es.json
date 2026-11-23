@@ -1,0 +1,16 @@
+{
+  "title": "La salida del túnel",
+  "goals": [
+    "Llega a la marca, junto a la primera estatua.",
+    "Que Dask no te vea."
+  ],
+  "starting_code": "# Espera a que Dask pase con `wait`.\n\n# Camina a la derecha hasta la marca con `move_right`.\n",
+  "hints": [
+    "¡Dejemos que Dask pase primero, y luego cruzamos!",
+    "Cuenta los ticks que hay que esperar a que pase: son dos.",
+    "Espera dos ticks y luego camina siete casillas a la derecha, hasta la marca."
+  ],
+  "intro": "¡Ya hemos salido del túnel! Pero mira, otro pasillo cruza este, y Dask sube por él. Está mirando hacia arriba, ¡así que si cruzamos ahora nos verá! Creo que deberíamos esperar dos ticks a que pase, y luego caminar hasta la marca, junto a la primera estatua.",
+  "outro": "¡Ha pasado de largo sin vernos! Pero mira, ahí delante, entre las estatuas, está Dask otra vez.",
+  "learned": "Ahora sabes que `wizard.wait()` deja pasar un tick mientras todo lo demás se mueve, y que su número dice cuántos."
+}

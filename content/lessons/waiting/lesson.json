@@ -1,0 +1,7 @@
+{
+  "id": "waiting",
+  "speaker": "friend",
+  "teaches": [
+    "wizard.wait"
+  ]
+}

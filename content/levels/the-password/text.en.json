@@ -1,0 +1,16 @@
+{
+  "title": "The password",
+  "goals": [
+    "Open the gate.",
+    "Walk through it."
+  ],
+  "starting_code": "# The password is ambrel. Say it, and walk through!\n",
+  "hints": [
+    "You need to make your wizard say the password first.",
+    "Use the `say` method to speak, and then walk up the path.",
+    "The gate listens for the string \"ambrel\"."
+  ],
+  "intro": "An older pupil told me the password, *ambrel*. Say it, and walk through, six steps up the path beyond!",
+  "outro": "It opened! A string was exactly what the gate was listening for.",
+  "learned": "Now you know what a string is, and how to make your wizard say things."
+}

@@ -1,0 +1,14 @@
+{
+  "title": "La primera noche",
+  "steps": [
+    "La sala común es muy tranquila, con un cálido fuego crepitando en la chimenea, una alfombra redonda y, a cada lado, la entrada a un dormitorio.",
+    "Estas son las habitaciones de primer año. {Las chicas duermen a la izquierda, los chicos a la derecha|Los chicos duermen a la izquierda, las chicas a la derecha}, y todos compartiréis esta sala común.",
+    "Quizás conozcáis a algún otro compañero. Buenas noches a los dos, nos vemos por la mañana.",
+    "Buenas noches, {wizard}. ¡Estoy tan {{cansado|cansada}}! Nos vemos mañana.",
+    "Ilda sale por la puerta y la cierra tras de sí, y sus pasos se alejan por el pasillo. {friend} cruza la entrada de la izquierda hacia el otro dormitorio y se detiene junto a una cama.",
+    "Tú cruzas la entrada de la derecha hacia tu dormitorio, entre las camas. Junto a la primera cama, debajo de la ventana, alguien te está esperando.",
+    "Hola, soy {mate}. ¡Creo que compartimos este dormitorio! Esta cama junto a la ventana es mía, y creo que la tuya es la que está justo al lado. ¿Cómo te llamas?",
+    "Soy {wizard}. Me alegro mucho de conocerte y de compartir la habitación, ¡pero estoy muy {cansado|cansada}!",
+    "{mate} va a la primera cama, se mete bajo la sábana y se queda {dormido|dormida}. En el otro dormitorio, {friend} ya está {{dormido|dormida}}. Tú también tienes sueño, y tu cama es la siguiente: para dormir en una cama, hay que ponerse junto al baúl que tiene a los pies."
+  ]
+}

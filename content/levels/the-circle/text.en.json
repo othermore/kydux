@@ -1,0 +1,19 @@
+{
+  "title": "The circle",
+  "goals": [
+    "A trial of one of the six kinds in the circle."
+  ],
+  "starting_code": "# Describe your kind of familiar with `class` and `(Familiar)`, empty for now, with `pass` under it.\n\n# Make one creature of that class and keep it with a name.\n\n# Call it into the circle with `cast` and `minka`.\n\n",
+  "hints": [
+    "The six kinds in the book are `Fox`, `Crow`, `Bat`, `Hare`, `Mouse` and `Frog`: one of them is your class's name.",
+    "An object is made with its class's name and brackets, and kept with `=`, like any value.",
+    "Last, `wizard.cast` with two things: `\"minka\"` and the name you kept your creature with."
+  ],
+  "intro": "Look: {friend} already has a trial in the circle. Now you: describe a kind of familiar, make one and call it into the circle. The six kinds are in my book.",
+  "outro": "Luckily, as long as you do not take it out of the circle, it is only a trial, and it soon vanishes.\n\nNext time you will give it its name and its colour.",
+  "learned": "Now you know that a class describes a kind of thing, and that an object is one thing made with it, with the class's name and brackets; the name you keep it with is only your program's name for it.",
+  "told": {
+    "won": "Not bad. At least it is {familiar_a_kind}, yes.\n\nAs you see, your familiar vanishes after a few seconds.\n\nIt needs a name and a colour to be stable and to stay longer in the circle.",
+    "bimo": "*(Opens one eye, and closes it again.)* Mrrr…"
+  }
+}

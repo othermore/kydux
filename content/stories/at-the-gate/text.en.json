@@ -1,0 +1,15 @@
+{
+  "title": "At the gate",
+  "steps": [
+    "You are at the gate, and you do not know how to open it.",
+    "Hello? Is anyone there? Can someone let me in?",
+    "Someone else is coming up the path: another new pupil, out of breath.",
+    "Hi there! I am {friend}, a first-year pupil, and I am just arriving too.",
+    "Nice to meet you! I am {wizard}. Do you happen to know how this gate opens?",
+    "My parents are not wizards, so I know nothing of magic.",
+    "A wizard born to parents without magic is extremely rare, a thing to be proud of! My parents are wizards and have taught me some things, so I can teach you the basics.",
+    "You do not open this gate by pushing, because it listens to instructions.",
+    "What exactly is an instruction? And how do I give an instruction to a gate?",
+    "In Arvelia, you try, you watch what happens, and you try again. But let me show you the most important things from the beginning."
+  ]
+}

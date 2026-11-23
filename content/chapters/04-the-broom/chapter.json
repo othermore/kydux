@@ -1,0 +1,27 @@
+{
+  "id": "04-the-broom",
+  "music": "the-broom",
+  "items": [
+    "story:the-morning-after",
+    "lesson:the-broom",
+    "level:the-broom-at-your-feet",
+    "lesson:lists",
+    "level:the-shed",
+    "lesson:for-each",
+    "level:the-brooms-on-the-wall",
+    "lesson:checking-each",
+    "level:the-check",
+    "lesson:less-or-greater",
+    "level:the-nearest-broom",
+    "level:the-brooms-in-the-straw",
+    "story:the-flying-lesson",
+    "lesson:drevo",
+    "level:the-first-flight",
+    "lesson:an-action-of-your-own",
+    "level:the-rings",
+    "lesson:arguments-of-your-own",
+    "level:the-race",
+    "level:the-rematch",
+    "story:the-finish"
+  ]
+}

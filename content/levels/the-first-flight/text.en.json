@@ -1,0 +1,16 @@
+{
+  "title": "The first flight",
+  "goals": [
+    "Reach the white stone.",
+    "Land on the white stone before the program ends."
+  ],
+  "starting_code": "# Walk to the end of the jetty with `move_right`.\n\n# Cast the word that lifts the broom with `cast`.\n\n# Fly to the stone with `move_right`.\n",
+  "hints": [
+    "It is 8 steps to the end of the jetty. Walk there first!",
+    "Use `cast` with the word *drevo* to lift the broom when you reach the end of the jetty.",
+    "The stone is 5 steps away: fly to it with `move_right`. If you cast *drevo* again on the stone, you will land there."
+  ],
+  "intro": "Let's see how you do! Walk to the end of the jetty. There, cast *drevo* and fly to the white stone on the other bank.",
+  "outro": "You have reached the white stone! Did you notice how fast the broom goes over the water?",
+  "learned": "Now you know that a spell can change how the wizard moves: flying, you cross where you cannot walking, and much faster. And you also know that the same spell can be used for several things, for example to take flight and to land."
+}

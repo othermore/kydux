@@ -1,0 +1,11 @@
+{
+  "title": "The morning after",
+  "steps": [
+    "Dawn breaks in the dormitory, and you hardly slept. Through the crack last night, the three of you heard that someone is going to do something to the brooms before today's flying lesson. You cannot tell anyone without owning that you were out of bed.",
+    "Let's go to the shed before breakfast. If we get there first, we can fix it ourselves and we won't need to tell anyone.",
+    "{Let's hurry, right now!|What if it's locked, or worse, dangerous?}",
+    "The three of you walk down the gravel path behind the castle to the broom shed. The door is wide open and everything is in a mess. Many of the brooms are lying on the floor instead of hanging in their places.",
+    "Look what I found on the floor! It's a black knotted thread, an enchanted knot. If they put one of these on a broom, it would buck in the air and throw its rider. We have to take them off! Going by the conversation we overheard, they were going to tamper with every broom.",
+    "This one right here, at your feet, has one. You take it off: I'll show you how."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "title": "The forgotten room",
+  "goals": [
+    "Every piece of thread ends up in your hands.",
+    "Your familiar bumps into nothing."
+  ],
+  "starting_code": "# Send {familiar} with `go_to` to the first corner.\n\n# With `go_to`, to the second.\n\n# With `go_to`, up into the room.\n\n# For each piece of thread `find_all` finds, send {familiar} to it with `go_to`.\n# There, have it pick the piece up with `pick_up`.\n\n# Bring it back to you with `minka`.\n\n",
+  "hints": [
+    "First, take {familiar} into the room from corner to corner, as before.",
+    "What your familiar sees, you see: from the room, `wizard.find_all` with `\"thread\"` gives the list of the pieces.",
+    "Walk that list with `for`: send your familiar to the x and the y of each piece's position and, there, have it pick the piece up with `pick_up`, which it inherited from `Familiar`. Last, `minka` brings it back with everything."
+  ],
+  "intro": "We have to help Rinlo. Let {familiar} go to the room, pick up every piece and come back to you.\n\nRemember: being a `Familiar`, it has `pick_up` too.",
+  "outro": "You have them all! … Did you hear that? A bolt, up above.",
+  "changes": "The pieces are scattered all over the floor. They could be anywhere.",
+  "changed": "This time, the pieces have fallen in other places in the room."
+}

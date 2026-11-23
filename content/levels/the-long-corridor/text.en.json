@@ -1,0 +1,16 @@
+{
+  "title": "The long walk",
+  "goals": [
+    "Reach the mark.",
+    "In fewer than 2 lines."
+  ],
+  "starting_code": "# Walk to the little fence pen in one instruction.\n",
+  "hints": [
+    "You need to move right across the grass and the path.",
+    "Count the steps to the mark by the fence pen.",
+    "Use an argument inside the brackets of the `move_right` method to reach it in one instruction."
+  ],
+  "intro": "Let us walk across the meadow to that little fence pen on the right. We can reach it in just one instruction if we use an argument!",
+  "outro": "That was so fast! Arguments save us from typing the same instruction over and over.",
+  "learned": "Now you know what an argument is, and that the move methods have one that says how many steps to take."
+}

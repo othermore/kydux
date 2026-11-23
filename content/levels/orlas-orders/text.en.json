@@ -1,0 +1,21 @@
+{
+  "title": "Orla's orders",
+  "goals": [
+    "Your familiar on the sun's plate.",
+    "It obeys Orla's two orders.",
+    "It bumps into nothing."
+  ],
+  "starting_code": "{familiar_source}\n\n    # Teach it `go_to`, with `self`, `x` and `y`.\n    \n        # The position you want to go to is in the variables `x` and `y`.\n        # You can see your familiar's position with `self.position`, and its x and y coordinates with `self.position.x` and `self.position.y`.\n        # Comparing the variable `x` with `self.position.x` you can tell whether it has to move left or right, and by subtracting, how many cells.\n        \n        # For `y` it is the same, up or down.\n        \n# Remember: the plates are three objects, `sun`, `moon` and `star`, and each has its `position`.\n# Send {familiar} to the sun's plate: 13, 4.\n\n",
+  "hints": [
+    "Inside the method, `self.position.x` and `self.position.y` say where your familiar is at that moment.",
+    "The steps it has to take are the difference between the two x, the larger minus the smaller; and then the same with the two y.",
+    "Inside `go_to`, an `if` with its `else` for the x and another for the y, each with its two moves; outside the class, `go_to` with 13 and 4."
+  ],
+  "intro": "Familiars are born knowing how to walk, but if you want yours to go to one given place by itself, you have to teach it how.\n\nIn Arvelia, that is called `go_to`. Teach it, and then take it to the sun's plate.",
+  "outro": "I am going to copy your `go_to` into the book. Then, when you tell it to go somewhere, it will always know how.",
+  "learned": "Now you know that a method is an action of a class, written with `def` inside it and with `self`, used with the dot, and that whoever knows its name can send the object without knowing how it is made inside.",
+  "told": {
+    "order_star": "Now, let me try it myself, to see that you have taught it well.\n\n{familiar}: To the star!",
+    "order_wizard": "{familiar}: Back to your wizard!"
+  }
+}

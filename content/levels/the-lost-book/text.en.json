@@ -1,0 +1,16 @@
+{
+  "title": "The lost book",
+  "goals": [
+    "Pick up the book.",
+    "Make the book glow with `reveal`."
+  ],
+  "starting_code": "# Find the book with `find_nearest` and the word \"book\", and keep it in a variable (the name you keep it under).\n\n# Make it glow with `reveal`.\n\n# Walk to it: up through the door, right to the passage, up past the bookcases into the hall, left along it to its end, and one step down, beside the pile.\n\n# Pick it up with `pick_up`.\n",
+  "hints": [
+    "Find it with `find_nearest` and the word \"book\", keep it in a variable, and `reveal` it.",
+    "Walk: up through the door, right to the passage, up into the hall, left along it to its end, and one step down.",
+    "Beside the pile of books, use `pick_up`."
+  ],
+  "intro": "Eldra lost a book long ago. It lies in the corner by the pile of old books, at the end of the aisle between the two big bookcases, half hidden; you reach it from the end of the hall, just above it. Find it, make it glow, and pick it up.",
+  "outro": "You have it! Eldra waits at the other end of the hall, and she will be so glad to see it again.",
+  "learned": "Now you know that a method can give something back, that a variable keeps it, and that a revealed thing shows where to go."
+}

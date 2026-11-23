@@ -1,0 +1,14 @@
+{
+  "title": "Atrapados",
+  "steps": [
+    "Ya casi estáis: el camino de bajada al dormitorio está justo delante.",
+    "De repente, Dask sale de la oscuridad frente a vosotros. Atrapados.",
+    "¿Qué hacen tres alumnos de primer año fuera de la cama a estas horas?",
+    "¡Solo vigilábamos ese agujero que se abre en el suelo, señor! ¡Para comprobar que se cierra bien por las noches!",
+    "Dask os mira a los tres en silencio durante un largo momento. Entonces asoma en su cara la más pequeña de las sonrisas.",
+    "Os he estado observando. Habéis mirado antes de cada paso, habéis esperado, habéis iluminado la oscuridad: un trabajo muy astuto. Os dejaré ir, solo por esta vez, {wizard}.",
+    "¿Y usted qué está haciendo aquí? ¿Y por qué no ha impedido que aparezcan esos portales en el suelo? ¡Un alumno podría sufrir un accidente!",
+    "Eh... esto... bueno, hagamos una cosa: no diré a nadie que os he visto hoy, pero dejad que me encargue de esos agujeros y no digáis nada tampoco.",
+    "Dask se aleja por el pasillo, y los tres pasáis por el arco. Ya bajo las mantas, recuerdas lo que habéis aprendido esta noche. Habéis contado las casillas y mirado dónde están las cosas con `position`. Habéis esperado con `wait`. Habéis usado una expresión, algo que el ordenador comprueba, para ver si era seguro, y habéis elegido el camino con `if` y `else`. Habéis repetido los pasos con el bucle `for` y habéis esperado con el bucle `while`. Y sabéis dos hechizos más: *kirra*, que ilumina lo oscuro, y *osto*, que mantiene cerrado un agujero. Con el secreto que ahora compartís los tres, te quedas {dormido|dormida} por fin. El castillo ya es tu hogar."
+  ]
+}

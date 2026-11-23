@@ -1,0 +1,24 @@
+{
+  "title": "Fuera del círculo",
+  "goals": [
+    "Una prueba con su nombre y su color.",
+    "El libro puede conjurarla en una línea.",
+    "Tu familiar ha salido del círculo.",
+    "Está en el plato de la luna."
+  ],
+  "starting_code": "class {familiar_class}(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\nwizard.cast(\"minka\", {familiar_var})\n\n# Los platos del suelo son tres objetos: `moon`, `sun` y `star`. Cada uno tiene su atributo `position`: `print(moon.position)` te dice en qué casilla está la luna.\n\n# Dos pasos hacia abajo con `move_down`, y estará fuera del círculo.\n\n# Cuatro pasos a la izquierda con `move_left`.\n\n# Cinco pasos hacia arriba con `move_up`, hasta el plato de la luna.\n\n",
+  "hints": [
+    "Tu familiar hereda de `Familiar` los mismos movimientos que tiene tu `wizard`.",
+    "Un movimiento se usa con el punto, con el nombre que tu programa le da a tu familiar delante.",
+    "Tres movimientos: dos pasos hacia abajo, cuatro a la izquierda y cinco hacia arriba."
+  ],
+  "intro": "Recuerda que mientras tu familiar esté en el círculo, puedes deshacerlo y describir otro. Si lo sacas, vivirá.\n\nPiénsalo bien antes de sacarlo, y luego llévalo al plato de la luna.",
+  "outro": "{familiar} vive. Respira, tiene sombra, y te mira.",
+  "learned": "Ahora sabes que tu familiar anda con movimientos que nunca escribiste, heredados de `Familiar`, con los mismos nombres que los de tu `wizard`, y que un objeto se usa con el punto, sea de una clase del juego o de la tuya.",
+  "told": {
+    "go": "Si ya estás segur{o|a}, adelante.\n\nEscribiré tu descripción y tu conjuro en el libro de Arvelia, y quedará conjurado para siempre.",
+    "not_yet": "Así no funciona, si estás segur{o|a} de que quieres crear tu familiar…\n\n…necesitas sacarlo y llevarlo al lugar correcto.",
+    "halt": "¡Alto! Ya has completado este nivel, y ahora solo estás repitiéndolo para practicar.\n\nYa tienes un familiar, y eso es más que suficiente: no puedes crear otro.",
+    "copy": "¡Espera, que lo copio otra vez!\n\n¡Quiero asegurarme de que tengo lo mismo que tú, mejor no tener problemas!"
+  }
+}

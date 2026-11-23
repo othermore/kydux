@@ -2,9 +2,17 @@
 // changes the game makes to the document of the game being played: each loads
 // it, changes it, and saves it (D31).
 
-import { GamesStore, type SavedGame } from './games';
+import { GamesStore, type NameCheck, type SavedGame } from './games';
 import type { KeptFamiliar } from '../content/familiar';
-import { type LevelProgress, type Progress, type ProgressStore, type Settings, type Wizard } from './store';
+import {
+  automaticName,
+  gameName as keptGameName,
+  type LevelProgress,
+  type Progress,
+  type ProgressStore,
+  type Settings,
+  type Wizard,
+} from './store';
 
 function browserStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null {
   try {
@@ -26,6 +34,13 @@ export function useStore(next: ProgressStore): void {
 export function useGames(next: GamesStore): void {
   games = next;
   store = next;
+}
+
+/** The saved games' list, when the store is the list; a store of one document, as
+ * the tests use, has no list and so no names: every valid name is free in it, and
+ * naming its game keeps nothing. */
+function list(): GamesStore | null {
+  return store === games ? games : null;
 }
 
 /** The saved games with a wizard, the last played first (D70). */
@@ -59,9 +74,48 @@ export function deleteGame(id: string): void {
   games.remove(id);
 }
 
-/** A game brought from a file, added to the list and played. */
-export function addGame(progress: Progress): void {
-  games.add(progress);
+/** A game brought from a file, added to the list with the name given and played; a
+ * game with no wizard is added with no name (D291). False, and nothing added, for a
+ * name that breaks the rule or is a game's of the list. */
+export function addGame(progress: Progress, name: string | null = null): boolean {
+  return games.add(progress, name) !== null;
+}
+
+/** The name of the game being played (D290), or null for a game with none yet. */
+export function currentGameName(): string | null {
+  const id = list()?.current();
+  return list()?.entries().find((entry) => entry.id === id)?.name ?? null;
+}
+
+/** What `name` is for the game being played: its own name is free to it (D290). */
+export function checkGameName(name: string): NameCheck {
+  const games = list();
+  if (games) return games.check(name, games.current());
+  return keptGameName(name) === null ? 'invalid' : 'ok';
+}
+
+/** What `name` is for a game brought from a file: a game's of the list is taken. */
+export function checkNewGameName(name: string): NameCheck {
+  return list()?.check(name) ?? (keptGameName(name) === null ? 'invalid' : 'ok');
+}
+
+/** The name offered to a game whose wizard is called `wizardName` (D291): the
+ * wizard's name, or with a number after it when another game has it. `own` says
+ * the name is for the game being played, whose own name is not taken against it. */
+export function offeredGameName(wizardName: string, own = true): string {
+  const games = list();
+  return automaticName(wizardName, games?.names(own ? games.current() : null) ?? []);
+}
+
+/** The wizard kept and the game being played named, in one go (D290): false, and
+ * nothing kept, for a name that breaks the rule or is another game's. */
+export function keepWizard(made: Wizard, name: string): boolean {
+  if (checkGameName(name) !== 'ok') return false;
+  setWizard(made);
+  const games = list();
+  const id = games?.current();
+  if (games && id) games.rename(id, name);
+  return true;
 }
 
 /** Seconds of play, counted to the game being played. */

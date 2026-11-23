@@ -114,13 +114,47 @@ export function isNameCharacter(character: string): boolean {
   return NAME_CHARACTER.test(character);
 }
 
-/** A name as it is kept: trimmed, and null when it breaks the rule. */
-export function wizardName(value: unknown): string | null {
+/** A name as it is kept: trimmed, and null when it breaks the rule, `most`
+ * characters at most. */
+function keptName(value: unknown, most: number): string | null {
   if (typeof value !== 'string') return null;
   const name = value.trim();
   const characters = [...name];
-  if (characters.length === 0 || characters.length > NAME_MAX) return null;
+  if (characters.length === 0 || characters.length > most) return null;
   return characters.every(isNameCharacter) ? name : null;
+}
+
+/** A wizard's name as it is kept: trimmed, and null when it breaks the rule. */
+export function wizardName(value: unknown): string | null {
+  return keptName(value, NAME_MAX);
+}
+
+/** The longest name a saved game may have, in characters (D290). */
+export const GAME_NAME_MAX = 30;
+
+/** A game's name as it is kept (D290): trimmed, of a wizard's name's characters, 30
+ * at most, and null when it breaks the rule. */
+export function gameName(value: unknown): string | null {
+  return keptName(value, GAME_NAME_MAX);
+}
+
+/** Whether two names are the same game's: equal trimmed, without regard to case
+ * (D290). */
+export function sameName(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+/** The name a game takes from its wizard's (D291): the wizard's name when no name
+ * `taken` is the same; else the wizard's name, a space and the first number from 2
+ * that makes it free. */
+export function automaticName(wizard: string, taken: Iterable<string>): string {
+  const names = [...taken];
+  const free = (name: string) => !names.some((other) => sameName(other, name));
+  const name = wizard.trim();
+  if (free(name)) return name;
+  let number = 2;
+  while (!free(`${name} ${number}`)) number += 1;
+  return `${name} ${number}`;
 }
 
 /** A wizard read back, or null when any of its fields is not of its shape.

@@ -123,6 +123,12 @@ describe('GamesStore (D70)', () => {
     expect(before.kept.has('kydux.progress')).toBe(false);
   });
 
+  it('makes the single document of before a game named by its wizard (D291)', () => {
+    const before = memoryStorage();
+    before.setItem('kydux.progress', JSON.stringify({ version: PROGRESS_VERSION, wizard: ANA }));
+    expect(new GamesStore(before, clock()).entries().map((entry) => entry.name)).toEqual(['Ana']);
+  });
+
   it('keeps the games in memory when the storage cannot be written', () => {
     const broken = { ...memoryStorage(), setItem: () => { throw new Error('full'); } };
     const kept = new GamesStore(broken, clock());
@@ -130,5 +136,106 @@ describe('GamesStore (D70)', () => {
     progress.setWizard(ANA);
     expect(progress.wizard()?.name).toBe('Ana');
     expect(progress.savedGames()).toHaveLength(1);
+  });
+});
+
+describe("a game's name (D290, D291)", () => {
+  const MARTA = { name: 'Marta', gender: 'girl' as const, look: 'teal' };
+
+  /** A storage with the list of before: entries with no name, and each game's
+   * document, begun a day apart in the order given. */
+  function listOfBefore(wizards: ({ name: string; gender: 'girl' | 'boy'; look: string } | null)[], extra = {}) {
+    const storage = memoryStorage();
+    const entries = wizards.map((wizard, index) => {
+      const id = `g${index}`;
+      storage.setItem(`kydux.game.${id}`, JSON.stringify({ version: PROGRESS_VERSION, wizard }));
+      const day = `2026-10-${String(10 + index).padStart(2, '0')}T10:00:00.000Z`;
+      return { id, created: day, played: `2026-11-${String(20 - index).padStart(2, '0')}T10:00:00.000Z`, seconds: 0, ...extra };
+    });
+    storage.setItem('kydux.games', JSON.stringify(entries));
+    return storage;
+  }
+
+  const namesById = (games: GamesStore) =>
+    Object.fromEntries(games.entries().map((entry) => [entry.id, entry.name]));
+
+  it('names a list of before by its wizards, the game begun first taking its name first', () => {
+    const storage = listOfBefore([MARTA, LEO, { ...MARTA, look: 'sky' }, { ...MARTA, name: 'marta' }]);
+    const games = new GamesStore(storage, clock());
+    expect(namesById(games)).toEqual({ g0: 'Marta', g1: 'Leo', g2: 'Marta 2', g3: 'marta 3' });
+    expect(games.games().map((game) => game.name)).toEqual(['Marta', 'Leo', 'Marta 2', 'marta 3']);
+  });
+
+  it('a second opening of the list changes nothing, and writes nothing', () => {
+    const storage = listOfBefore([MARTA, MARTA]);
+    new GamesStore(storage, clock());
+    const kept = storage.getItem('kydux.games');
+    let writes = 0;
+    const counted = { ...storage, setItem: (key: string, value: string) => { writes += 1; storage.setItem(key, value); } };
+    expect(namesById(new GamesStore(counted, clock()))).toEqual({ g0: 'Marta', g1: 'Marta 2' });
+    expect(writes).toBe(0);
+    expect(storage.getItem('kydux.games')).toBe(kept);
+  });
+
+  it('a game named keeps its name; one with no wizard is left with none', () => {
+    const storage = listOfBefore([MARTA, MARTA, null]);
+    const list = JSON.parse(storage.getItem('kydux.games') ?? '[]');
+    list[1].name = 'Marta';
+    storage.setItem('kydux.games', JSON.stringify(list));
+    // The game begun second keeps its name, and the first is numbered round it.
+    expect(namesById(new GamesStore(storage, clock()))).toEqual({ g0: 'Marta 2', g1: 'Marta', g2: undefined });
+  });
+
+  it('reads an entry with a name that breaks the rule, or another\'s, with none, and names it', () => {
+    const storage = listOfBefore([MARTA, LEO]);
+    const list = JSON.parse(storage.getItem('kydux.games') ?? '[]');
+    list[0].name = '<b>';
+    list[1].name = 'x'.repeat(31);
+    storage.setItem('kydux.games', JSON.stringify(list));
+    expect(namesById(new GamesStore(storage, clock()))).toEqual({ g0: 'Marta', g1: 'Leo' });
+    const twice = listOfBefore([MARTA, LEO], { name: 'Same' });
+    expect(namesById(new GamesStore(twice, clock()))).toEqual({ g0: 'Same', g1: 'Leo' });
+  });
+
+  it('adds a game with the name given, and refuses a name taken or against the rule', () => {
+    const games = new GamesStore(memoryStorage(), clock());
+    progress.useGames(games);
+    progress.keepWizard(MARTA, 'Marta');
+    const brought = defaultProgress();
+    brought.wizard = MARTA;
+    expect(progress.offeredGameName('Marta', false)).toBe('Marta 2');
+    expect(progress.addGame(brought, 'MARTA ')).toBe(false);
+    expect(progress.addGame(brought, 'Marta?')).toBe(false);
+    expect(games.entries()).toHaveLength(1);
+    expect(progress.addGame(brought, ' The second ')).toBe(true);
+    expect(progress.currentGameName()).toBe('The second');
+    // A file's game with no name given takes the automatic one; one with no wizard, none.
+    expect(progress.addGame(brought)).toBe(true);
+    expect(progress.currentGameName()).toBe('Marta 2');
+    expect(progress.addGame(defaultProgress())).toBe(true);
+    expect(progress.currentGameName()).toBeNull();
+  });
+
+  it('naming refuses another game\'s name in any case of letters, and takes the game\'s own', () => {
+    const games = new GamesStore(memoryStorage(), clock());
+    progress.useGames(games);
+    expect(progress.keepWizard(MARTA, 'marta')).toBe(true);
+    progress.newGame();
+    expect(progress.offeredGameName('Marta')).toBe('Marta 2');
+    expect(progress.checkGameName('MARTA')).toBe('taken');
+    expect(progress.keepWizard(LEO, 'Marta')).toBe(false);
+    expect(progress.wizard()).toBeNull();
+    expect(progress.checkGameName('  ')).toBe('invalid');
+    expect(progress.keepWizard(LEO, 'Leo')).toBe(true);
+    const leo = games.current() as string;
+    const marta = games.entries().find((entry) => entry.id !== leo)?.id as string;
+    expect(games.rename(leo, 'mArTa')).toBe('taken');
+    progress.chooseGame(marta);
+    // Its own name, in other letters, is the game's to take.
+    expect(progress.checkGameName('Marta')).toBe('ok');
+    expect(progress.offeredGameName('Marta')).toBe('Marta');
+    expect(progress.keepWizard(MARTA, 'Marta')).toBe(true);
+    expect(progress.currentGameName()).toBe('Marta');
+    expect(games.rename(marta, 'Leo')).toBe('taken');
   });
 });

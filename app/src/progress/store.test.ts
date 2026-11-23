@@ -9,6 +9,9 @@ import {
   readProgress,
   readFamiliar,
   readWizard,
+  automaticName,
+  gameName,
+  sameName,
   wizardName,
 } from './store';
 
@@ -221,5 +224,32 @@ describe('the familiar kept (D265)', () => {
     expect(progress.familiar()).toEqual({});
     progress.keepFamiliar({ draft: { kind: 'Crow' } });
     expect(progress.familiar()).toEqual({ draft: { kind: 'Crow' } });
+  });
+});
+
+describe("a game's name (D290, D291)", () => {
+  it('has the characters of a wizard\'s name, 30 at most, trimmed', () => {
+    expect(gameName('  Marta y Leo ')).toBe('Marta y Leo');
+    expect(gameName('Partida de José-Luis O’Neill')).toBe('Partida de José-Luis O’Neill');
+    expect(gameName('a'.repeat(30))).toBe('a'.repeat(30));
+    expect(gameName('a'.repeat(31))).toBeNull();
+    expect(gameName('')).toBeNull();
+    expect(gameName('   ')).toBeNull();
+    expect(gameName('Marta!')).toBeNull();
+    expect(gameName(7)).toBeNull();
+  });
+
+  it('is the same name equal trimmed and without regard to case', () => {
+    expect(sameName('Marta', ' marta ')).toBe(true);
+    expect(sameName('Álvaro', 'ÁLVARO')).toBe(true);
+    expect(sameName('Marta', 'Marta 2')).toBe(false);
+  });
+
+  it('is taken from the wizard, with the first number from 2 that makes it free', () => {
+    expect(automaticName('Marta', [])).toBe('Marta');
+    expect(automaticName('Marta', ['Leo'])).toBe('Marta');
+    expect(automaticName('Marta', ['marta'])).toBe('Marta 2');
+    expect(automaticName('Marta', ['Marta', 'Marta 2'])).toBe('Marta 3');
+    expect(automaticName('Marta', ['Marta', 'Marta 3'])).toBe('Marta 2');
   });
 });

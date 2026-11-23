@@ -13,3 +13,6 @@ later, like the rest of it.
   rubble painted again (`scene-small-passage-8.md`), and laid back by
   `tools/art/narrow.py`.
 - Its grid taken out by it (`game-tower-passage-nogrid.md`).
+- Its second flap painted by it on a part of the corridor's wall
+  (`tower-passage-flap.md`) and laid on the painting by `tools/art/lay.py`,
+  only its own pixels.

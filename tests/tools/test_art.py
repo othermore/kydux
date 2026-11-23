@@ -16,6 +16,7 @@ import cut  # noqa: E402
 import door  # noqa: E402
 import figures  # noqa: E402
 import generate  # noqa: E402
+import lay  # noqa: E402
 import ring_colours  # noqa: E402
 import sprites  # noqa: E402
 
@@ -1932,3 +1933,26 @@ def test_the_four_rings_are_painted_from_the_ring_and_listed_with_its_size():
         assert sprite["image"] == f"ring-{name}.webp"
         assert (sprite["size"], sprite["foot"]) == (listed["ring"]["size"], listed["ring"]["foot"])
         assert Image.open(things / sprite["image"]).size == ring_colours.SIZE
+
+
+def test_a_thing_painted_on_a_part_is_laid_on_the_painting_its_own_pixels_only():
+    """A model's edit of a part of the painting, at a size of its own, is laid on the part
+    at the size and shift that fit it best, and only the difference within the thing's
+    box enters the painting (D148, D281)."""
+    rng = np.random.default_rng(3)
+    painting = rng.integers(60, 200, size=(120, 160, 3), dtype=np.uint8)
+    part = (20, 20, 140, 100)
+    box = (100, 60, 120, 80)
+    edited = painting[20:100, 20:140].copy()
+    # The thing, a dark square, and a few pixels the model changed elsewhere in the part.
+    edited[42:58, 82:98] = (10, 10, 30)
+    edited[5:8, 5:8] = (255, 255, 255)
+    # The model's picture is a little larger, and a little off the part's shape.
+    picture = Image.fromarray(edited).resize((240, 162), Image.NEAREST)
+    laid, mask, found = lay.lay(painting, picture, part, box)
+    assert found["shift"] == (0, 0)
+    differs = np.any(laid != painting, axis=2)
+    assert differs[60:80, 100:120].sum() > 150
+    assert not differs[:, :100].any() and not differs[:60].any()
+    assert not differs[80:].any() and not differs[:, 120:].any()
+    assert mask[62:78, 102:118].all()

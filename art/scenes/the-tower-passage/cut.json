@@ -1,11 +1,11 @@
 {
-  "about": "The small passage, chapter 5's second scene (D273): a corridor of the tower, the masonry behind its wall seen cut open from above with a familiars' trench narrower than a cell winding through it, and a forgotten room above. Painted by Gemini from the design's trial, its trench squeezed onto the middles of its cells by tools/art/narrow.py (narrow.json), and its grid taken out by Gemini (the base). Where a familiar walks under the painted wall, at the passage's two mouths, the wall is a box drawn over it (`over`). Pictures named here are in art/raw/, which git ignores.",
+  "about": "The small passage, chapter 5's second scene (D273): a corridor of the tower, the masonry behind its wall seen cut open from above with a familiars' trench narrower than a cell winding through it, and a forgotten room above. Painted by Gemini from the design's trial, its trench squeezed onto the middles of its cells by tools/art/narrow.py (narrow.json), its grid taken out by Gemini, and a second flap at the foot of the corridor's wall painted by Gemini on a part of it and laid on it, its own pixels only (`laid`, D281): the base. Where a familiar walks under the painted wall, at the passage's two mouths, the wall is a box drawn over it (`over`). Pictures named here are in art/raw/, which git ignores.",
   "sources": {
     "folder": "art/raw/game-tower-passage",
     "edits": "art/raw/game-tower-passage",
-    "painting": "game-tower-passage-nogrid.png",
+    "painting": "game-tower-passage-flap.png",
     "grid": "grid.json",
-    "ground": "game-tower-passage-nogrid.png"
+    "ground": "game-tower-passage-flap.png"
   },
   "things": {
     "corridor_mouth": {
@@ -29,6 +29,16 @@
       "states": {"standing": "painting"}
     }
   },
+  "laid": [
+    {
+      "about": "The corridor's second tiny entrance (D281), a twin of the trench's mouth on (10, 12): painted on the cell (16, 12), at the wall's foot to the right of the tapestry, and no more: the cell stays wall, nothing is under it and no one enters it. Painted by Gemini on the wall's part `part` of the painting without its grid, given with a mark where it goes (flap-wall.png, flap-wall-guide.png), and laid on that painting by tools/art/lay.py: the difference within `box` only.",
+      "from": "game-tower-passage-nogrid.png",
+      "picture": "tower-passage-flap-3.png",
+      "part": [9, 9.5, 17, 14.02],
+      "box": [16.15, 12.45, 16.9, 13.15],
+      "to": "game-tower-passage-flap.png"
+    }
+  ],
   "hides": [[10, 12], [10, 11], [10, 10], [13, 5], [13, 4]],
   "lowered": [
     {
@@ -42,5 +52,5 @@
   "castle": 0,
   "thresholds": {"outline": 100},
   "cut": false,
-  "source": "# The small passage\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-small-passage.md`, in the style of\n  `art/raw/image-first/field-2k.png`, and edited by it\n  (`scene-small-passage-2.md`, `scene-small-passage-3.md`).\n- Its trench painted by it on an enlargement of the wall\n  (`scene-small-passage-6.md`), squeezed onto the middles of its cells by\n  `tools/art/narrow.py`, repaired by it (`scene-small-passage-7.md`), its\n  rubble painted again (`scene-small-passage-8.md`), and laid back by\n  `tools/art/narrow.py`.\n- Its grid taken out by it (`game-tower-passage-nogrid.md`).\n"
+  "source": "# The small passage\n\nKydux's own art, made for the game and under the GNU GPL, version 3 or\nlater, like the rest of it.\n\n- Painted by Gemini 3 Pro Image (`gemini-3-pro-image`) from\n  `tools/art/prompts/scene-small-passage.md`, in the style of\n  `art/raw/image-first/field-2k.png`, and edited by it\n  (`scene-small-passage-2.md`, `scene-small-passage-3.md`).\n- Its trench painted by it on an enlargement of the wall\n  (`scene-small-passage-6.md`), squeezed onto the middles of its cells by\n  `tools/art/narrow.py`, repaired by it (`scene-small-passage-7.md`), its\n  rubble painted again (`scene-small-passage-8.md`), and laid back by\n  `tools/art/narrow.py`.\n- Its grid taken out by it (`game-tower-passage-nogrid.md`).\n- Its second flap painted by it on a part of the corridor's wall\n  (`tower-passage-flap.md`) and laid on the painting by `tools/art/lay.py`,\n  only its own pixels.\n"
 }

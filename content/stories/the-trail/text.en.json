@@ -18,7 +18,10 @@
     "They are so narrow that only a small animal fits through them.",
     "Well, I'm sure that at the other end of that passage is whoever set the trap with the brooms.",
     "And if we find him, we'll have the proof we need to talk to Orla.",
-    "You go down a floor. In the corridor under the hall, at the foot of the wall, the passage has another entrance, small as a cat flap. Inside, by the light of your wand, you find another thread.",
+    "You go down a floor. In the corridor under the hall there are two tiny entrances at the foot of the wall, small as cat flaps.",
+    "I think {familiar} came down that way, but where did it find the thread?",
+    "{familiar} slips into the other entrance.",
+    "It is out again at once with another black thread: in there is where it found the first.",
     "Not even my head fits. I think we'll have to send our familiars."
   ]
 }

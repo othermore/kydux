@@ -828,6 +828,7 @@ INNOCENT_WAYS = [
     "de la misma manera",
     "Hay una manera de encontrar",
     "a way to find all the things",
+    "came down that way",
 ]
 WAY_WORD = re.compile(r"\b(ways?|maneras?)\b", re.IGNORECASE)
 

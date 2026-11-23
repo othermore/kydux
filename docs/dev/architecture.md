@@ -4285,7 +4285,8 @@ one overturns stays, marked as superseded.
   no text: `super()`, attributes of a class, `__str__`, properties. Rules out a lesson whose
   example hides its error.
 - **D273 — What the two scenes and the figures hold.** Decided 2026-11-17 by the designer.
-  The scenes are `the-tower-hall` and `the-tower-passage`. The hall's three brass plates are
+  The scenes are `the-tower-hall` and `the-tower-passage`, whose corridor has two tiny
+  entrances, the trench's mouth and a flap painted only (D281). The hall's three brass plates are
   things of the settings' kind `plate`, each with a state `lit` made as a door's state is
   (D148): one edit of the base with the three lit, the masks by difference. The great book
   lies open on the lectern in the base painting, and Bimo sleeps on the lectern beside it in
@@ -4443,3 +4444,22 @@ one overturns stays, marked as superseded.
   there to the story's end the hall is in its evening, and *El fin de curso* opens under
   the same light. Rules out words that say time went by over a scene that does not
   change, and a light that changes between two stories with nothing that tells why.
+- **D281 — The corridor under the hall has two tiny entrances.** Decided 2026-11-18 by
+  the owner (*En esta sala debería haber otro pasadizo más (o una gatera al menos)*).
+  `the-tower-passage` has a second flap painted at the foot of the corridor's wall, on the
+  cell (16, 12), on the bare wall to the right of the tapestry, and like the trench's
+  mouth at (10, 12): it is where the way from the hall's tiny arch comes down, inside the
+  wall. No figure stands on the cell under it while it is spoken of, since a child there
+  hides it. It is painted and no more: the cell stays wall in the map, no terrain is under
+  it, and no figure enters it. Gemini paints it on the scene's base and only the flap's
+  own pixels enter the painting (D148): it is asked of the model on a part of the wall,
+  columns 9 to 17, given with a mark where it goes, and `tools/art/lay.py` lays the
+  model's picture on that part at the size and shift that fit it best and copies over
+  the base only its difference within the flap's box, (16.15, 12.45) to (16.9, 13.15);
+  every other pixel is the base's own. `cut.json` says what the flap is (`laid`), and its
+  `painting` and `ground` are the base with the flap; the covers, the map, the plan and
+  `narrow.json` are untouched. *El rastro* goes down to the corridor at its step 18 and
+  ends in twenty-two steps: the voice tells of two tiny entrances, the friend, beside the
+  new flap at (15, 13), asks where the familiar found the thread, and the familiar goes
+  into the trench's mouth to (10, 9) and is out again with another. Rules out a second
+  trench in the wall's cut, and a story where the familiar finds two threads by one way.

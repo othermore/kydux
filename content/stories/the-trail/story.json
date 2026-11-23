@@ -267,10 +267,10 @@
             "id": "friend",
             "kind": "friend",
             "at": [
-              8,
+              15,
               13
             ],
-            "facing": "up"
+            "facing": "right"
           },
           {
             "id": "mate",
@@ -293,12 +293,50 @@
         ]
       },
       "camera": {
-        "wide": true
+        "fit": [
+          [
+            0,
+            5
+          ],
+          [
+            19,
+            14
+          ]
+        ]
       },
       "do": {
         "face": "up"
       },
       "by": "wizard"
+    },
+    {
+      "who": "friend",
+      "do": null
+    },
+    {
+      "who": "voice",
+      "do": {
+        "walk": [
+          10,
+          9
+        ]
+      },
+      "by": "familiar"
+    },
+    {
+      "who": "voice",
+      "do": [
+        {
+          "walk": [
+            10,
+            13
+          ]
+        },
+        {
+          "face": "down"
+        }
+      ],
+      "by": "familiar"
     },
     {
       "who": "mate",

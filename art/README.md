@@ -511,6 +511,19 @@ about half a cell wide. Where the passage goes into a wall the figures walk behi
 wall is a row drawn over it (`over`), so that the familiar is hidden there as it walks;
 the sweep stands a familiar on every small cell (`small-<scene>.png`).
 
+## A small thing painted into the base
+
+A thing that is painted and no more, which nothing cuts out again, like the tower
+passage's second flap (D281), is asked of Gemini on a part of the base, given with a
+second picture where a flat magenta box marks its place: on a part, Gemini keeps the
+thing's size where on the whole scene it paints it far too large. `tools/art/lay.py`
+lays its picture on that part at the size and shift that fit it best, and copies over
+the base only the difference within the thing's box (D148), every other pixel the
+base's own; it says how many pixels it laid and that none differ outside the box, and
+writes `art/raw/game-check/lay-<name>.png`, the box enlarged with the mask's edge in
+magenta, to look at. The scene's `cut.json` names the new base as its `painting` and
+`ground`, and says what was laid (`laid`).
+
 ## Where the cells are
 
 The cells are where the figures walk (D149).

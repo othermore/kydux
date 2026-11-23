@@ -315,13 +315,22 @@
     },
     {
       "who": "voice",
-      "do": {
-        "walk": [
-          10,
-          9
-        ]
-      },
-      "by": "familiar"
+      "do": [
+        {
+          "by": "familiar",
+          "walk": [
+            10,
+            9
+          ]
+        },
+        {
+          "by": "friend",
+          "walk": [
+            11,
+            13
+          ]
+        }
+      ]
     },
     {
       "who": "voice",

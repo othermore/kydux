@@ -24,8 +24,8 @@ whatever you answer, and the settings change the answer later.
 The first time, the game opens on its welcome page. It tells what the game
 is, who it is for and how it is played, with pictures of the game. Its big
 *Start playing* button begins the game. The *About* link, at the top of
-every screen, opens the welcome page again later. At the foot of every
-screen, a link opens Kidux's website.
+every screen, opens the welcome page again later. Beside it, and at the
+foot of every screen, a link opens Kidux's website.
 
 The game begins with a story. A letter invites you to
 Arvelia, a school of magic, and you travel to its gate. Then you make your

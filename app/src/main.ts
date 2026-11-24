@@ -412,6 +412,17 @@ function settingsGear(): HTMLElement[] {
   return [gear];
 }
 
+/** The header's link to Kidux's website, in the page's language, beside the welcome
+ * page's: the system Kydux is of, in sight on every screen. It opens in a window of
+ * its own, as the foot's does (D339). */
+function kiduxLink(): HTMLElement {
+  return element(
+    'a',
+    { id: 'kidux-link', href: t('app.kidux_url'), target: '_blank', rel: 'noopener' },
+    [t('app.kidux_link')],
+  );
+}
+
 /** The foot's link to Kidux's website, in the page's language: the family Kydux
  * belongs to, under every screen. It opens in a window of its own, so that a level
  * being played stays as it is (D338). */
@@ -432,6 +443,7 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
       ]),
       element('div', { className: 'top-links' }, [
         element('a', { href: '#about', id: 'about-link' }, [t('about.link')]),
+        kiduxLink(),
         languagePicker(),
         ...settingsGear(),
       ]),

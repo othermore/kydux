@@ -5512,11 +5512,23 @@ one overturns stays, marked as superseded.
   which lies under every screen (`chrome`, `main.ts`), says *Part of the Kidux family*
   beside the version and the build: a link to Kidux's website in the page's language
   (`app.family`, and `app.kidux_url`, the address the welcome page's own link leads to).
-  It opens in a window of its own, so that a level being played stays as it is. It is
-  the foot's and not the header's, which holds what a player uses. The pages GitHub
+  It opens in a window of its own, so that a level being played stays as it is. The
+  header has a link of its own (D339). The pages GitHub
   shows say it under their title: `README.md` and `README.es.md`, each with the website
   in its language, and `docs/dev/README.md`. `e2e/about.spec.ts` holds the foot's link
   on a screen of each kind and through a change of language, and `test_readmes.py` the
   pages' line and that its addresses are the game's. Rules out a family named on the
   welcome page alone, which a player sees once, and a link that takes a child out of a
   level.
+- **D339 — The header of every screen leads to Kidux OS.** Decided 2026-11-24 by the
+  owner (*No tendría que haber un enlace a Kidux en la web principal en la cabecera?
+  … pongámoslo junto a Qué es Kydux, "Conoce Kidux OS"*). The header (`chrome`,
+  `main.ts`) says *Meet Kidux OS* right after the welcome page's link (`#kidux-link`,
+  `app.kidux_link`): a link to Kidux's website in the page's language, the address of
+  the foot's (`app.kidux_url`). The foot's link stays (D338): the header's is in sight
+  without scrolling on a long page, the welcome page and the map. Both open in a window
+  of their own, and so does the welcome page's own link, *Meet Kidux*, in its last
+  section: no link to Kidux takes the page of the game away. `e2e/about.spec.ts` holds
+  the header's link on a screen of each kind, in the header's line after the welcome
+  page's, through a change of language, and the welcome page's own in its window.
+  Rules out a link in the header of the welcome page alone, which a player sees once.

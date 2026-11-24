@@ -7,7 +7,8 @@
     "language": "Idioma",
     "version": "Versión {version}",
     "family": "De la familia Kidux",
-    "kidux_url": "https://kidux.org/es/"
+    "kidux_url": "https://kidux.org/es/",
+    "kidux_link": "Conoce Kidux OS"
   },
   "language": {
     "en": "English",

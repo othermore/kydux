@@ -95,7 +95,9 @@ export function aboutScreen(parts: AboutScreenParts): Screen {
           element('p', {}, [
             t('about.free_text'),
             ' ',
-            element('a', { href: t('app.kidux_url') }, [t('about.kidux_link')]),
+            element('a', { href: t('app.kidux_url'), target: '_blank', rel: 'noopener' }, [
+              t('about.kidux_link'),
+            ]),
           ]),
         ],
         ['baro', 'wenna', 'dask'],

@@ -24,8 +24,8 @@ respondas lo que respondas, y los ajustes cambian la respuesta más tarde.
 La primera vez, el juego se abre en su página de bienvenida. Cuenta qué
 es el juego, para quién es y cómo se juega, con imágenes del juego. Su
 botón grande, *Empieza a jugar*, empieza el juego. El enlace *Qué es
-Kydux*, arriba en cada pantalla, vuelve a abrirla después. Al pie de cada
-pantalla, un enlace abre la web de Kidux.
+Kydux*, arriba en cada pantalla, vuelve a abrirla después. A su lado, y
+al pie de cada pantalla, un enlace abre la web de Kidux.
 
 El juego empieza con una historia. Una carta te invita a
 Arvelia, un colegio de magia, y viajas hasta su puerta. Después creas tu

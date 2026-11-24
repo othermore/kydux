@@ -2,8 +2,9 @@
 // painting, the school's people on it (D294), for whom, its three pictures of the game in
 // their order and Play; the start screen before a wizard is made leads to it from the
 // header; a button is drawn in the look's moss green; the header has the mark and the
-// link; the foot of every screen has the family's link (D338); the map's chapters have
-// their cards, a locked one greyed.
+// link; the foot of every screen has the family's link (D338) and the header of every
+// screen the link to Kidux OS, as the welcome page's own, each in a window of its own
+// (D339); the map's chapters have their cards, a locked one greyed.
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -106,6 +107,34 @@ test.describe('the look', () => {
     );
     expect(family!.x).toBeGreaterThan(build!.x + build!.width);
     expect(Math.abs(family!.y - build!.y)).toBeLessThan(6);
+  });
+
+  test('the header of every screen leads to Kidux OS, beside the welcome page\'s link (D339)', async ({ page }) => {
+    await seedWizard(page, MARTA);
+    for (const screen of ['#start', '#map', '#about', '#settings', '#lesson/how-much', '#story/at-the-gate', '#level/the-gate']) {
+      await page.goto(`/${screen}`);
+      const kidux = page.locator('header.top #kidux-link');
+      await expect(kidux, screen).toHaveText('Conoce Kidux OS');
+      await expect(kidux, screen).toHaveAttribute('href', 'https://kidux.org/es/');
+      // A window of its own: the screen left stays as it is.
+      await expect(kidux, screen).toHaveAttribute('target', '_blank');
+      await expect(kidux, screen).toHaveAttribute('rel', 'noopener');
+      // In the header's line, right after the welcome page's link.
+      const [about, link] = await Promise.all(
+        ['#about-link', '#kidux-link'].map((part) => page.locator(part).boundingBox()),
+      );
+      expect(link!.x, screen).toBeGreaterThan(about!.x + about!.width);
+      expect(Math.abs(link!.y - about!.y), screen).toBeLessThan(6);
+    }
+    // The welcome page's own link opens a window of its own too.
+    await page.goto('/#about');
+    const own = page.locator('#about-free a');
+    await expect(own).toHaveText('Conoce Kidux');
+    await expect(own).toHaveAttribute('target', '_blank');
+    await expect(own).toHaveAttribute('rel', 'noopener');
+    await page.locator('#language').selectOption('en');
+    await expect(page.locator('#kidux-link')).toHaveText('Meet Kidux OS');
+    await expect(page.locator('#kidux-link')).toHaveAttribute('href', 'https://kidux.org');
   });
 
   test("the map's chapters have their cards, a chapter not reached greyed", async ({ page }) => {

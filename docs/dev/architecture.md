@@ -5505,3 +5505,18 @@ one overturns stays, marked as superseded.
   lightness, as the common one. Rules out one stronger pencil for every scene, which
   would weigh on the grass, where the grid is seen well, and a grid painted into a
   scene's picture.
+- **D338 — Every screen and the pages GitHub shows say the family Kydux belongs to.**
+  Decided 2026-11-24 by the owner (*añadir un enlace en la web de Kydux a kidux (como
+  parte de la familia Kidux) en el pie o en la cabecera, para que salga más o menos
+  siempre. Y igual en las páginas Markdown que se ven en github*). The game's foot,
+  which lies under every screen (`chrome`, `main.ts`), says *Part of the Kidux family*
+  beside the version and the build: a link to Kidux's website in the page's language
+  (`app.family`, and `app.kidux_url`, the address the welcome page's own link leads to).
+  It opens in a window of its own, so that a level being played stays as it is. It is
+  the foot's and not the header's, which holds what a player uses. The pages GitHub
+  shows say it under their title: `README.md` and `README.es.md`, each with the website
+  in its language, and `docs/dev/README.md`. `e2e/about.spec.ts` holds the foot's link
+  on a screen of each kind and through a change of language, and `test_readmes.py` the
+  pages' line and that its addresses are the game's. Rules out a family named on the
+  welcome page alone, which a player sees once, and a link that takes a child out of a
+  level.

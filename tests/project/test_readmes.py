@@ -1,5 +1,11 @@
-"""README.md and README.es.md say the same things: one is the other's translation."""
+"""README.md and README.es.md say the same things: one is the other's translation.
 
+Each says under its title the family Kydux belongs to, with the address the game's
+own link has in that language, and so does the developer documentation's first page
+(D338).
+"""
+
+import json
 import re
 from collections import Counter
 from urllib.parse import urlparse
@@ -39,3 +45,21 @@ def _link_places(text):
 def test_links_to_the_same_places(repo_root):
     en, es = (_read(repo_root, name) for name in ("README.md", "README.es.md"))
     assert _link_places(en) == _link_places(es)
+
+
+def _kidux(repo_root, language):
+    texts = json.loads(_read(repo_root, f"i18n/{language}.json"))
+    return texts["app"]["kidux_url"]
+
+
+def test_each_page_says_the_family_under_its_title(repo_root):
+    pages = {
+        "README.md": ("en", "Part of the [Kidux]({}) family"),
+        "README.es.md": ("es", "De la familia [Kidux]({})"),
+        "docs/dev/README.md": ("en", "Kydux is part of the [Kidux]({}) family."),
+    }
+    for name, (language, line) in pages.items():
+        top = _read(repo_root, name).split("\n")[:4]
+        assert top[0].startswith("# "), name
+        said = line.format(_kidux(repo_root, language))
+        assert any(said in text for text in top[1:]), name

@@ -2,7 +2,8 @@
 // painting, the school's people on it (D294), for whom, its three pictures of the game in
 // their order and Play; the start screen before a wizard is made leads to it from the
 // header; a button is drawn in the look's moss green; the header has the mark and the
-// link; the map's chapters have their cards, a locked one greyed.
+// link; the foot of every screen has the family's link (D338); the map's chapters have
+// their cards, a locked one greyed.
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -82,6 +83,29 @@ test.describe('the look', () => {
     await expect(page.locator('#home svg.mark')).toBeVisible();
     await expect(page.locator('#about-link')).toHaveAttribute('href', '#about');
     await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', /favicon\.svg$/);
+  });
+
+  test('the foot of every screen leads to Kidux, in the language chosen (D338)', async ({ page }) => {
+    await seedWizard(page, MARTA);
+    for (const screen of ['#start', '#map', '#about', '#settings', '#lesson/how-much', '#story/at-the-gate', '#level/the-gate']) {
+      await page.goto(`/${screen}`);
+      const family = page.locator('footer #family');
+      await expect(family, screen).toHaveText('De la familia Kidux');
+      await expect(family, screen).toHaveAttribute('href', 'https://kidux.org/es/');
+      // A window of its own: the screen left stays as it is.
+      await expect(family, screen).toHaveAttribute('target', '_blank');
+      await expect(family, screen).toHaveAttribute('rel', 'noopener');
+    }
+    await page.goto('/#map');
+    await page.locator('#language').selectOption('en');
+    await expect(page.locator('footer #family')).toHaveText('Part of the Kidux family');
+    await expect(page.locator('footer #family')).toHaveAttribute('href', 'https://kidux.org');
+    // The foot is one line: the version and the build at its left, the family at its right.
+    const [build, family] = await Promise.all(
+      ['footer #build', 'footer #family'].map((part) => page.locator(part).boundingBox()),
+    );
+    expect(family!.x).toBeGreaterThan(build!.x + build!.width);
+    expect(Math.abs(family!.y - build!.y)).toBeLessThan(6);
   });
 
   test("the map's chapters have their cards, a chapter not reached greyed", async ({ page }) => {

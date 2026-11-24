@@ -412,6 +412,17 @@ function settingsGear(): HTMLElement[] {
   return [gear];
 }
 
+/** The foot's link to Kidux's website, in the page's language: the family Kydux
+ * belongs to, under every screen. It opens in a window of its own, so that a level
+ * being played stays as it is (D338). */
+function familyLink(): HTMLElement {
+  return element(
+    'a',
+    { id: 'family', href: t('app.kidux_url'), target: '_blank', rel: 'noopener' },
+    [t('app.family')],
+  );
+}
+
 function chrome(root: HTMLElement, content: HTMLElement): void {
   root.replaceChildren(
     element('header', { className: 'top' }, [
@@ -430,6 +441,7 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
     element('footer', {}, [
       element('span', {}, [t('app.version', { version })]),
       element('span', { id: 'build', className: 'build' }, [__BUILD__]),
+      familyLink(),
     ]),
   );
 }

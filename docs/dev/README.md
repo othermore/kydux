@@ -1,5 +1,7 @@
 # Developer documentation
 
+Kydux is part of the [Kidux](https://kidux.org) family.
+
 | Document | What it is |
 |---|---|
 | `draft.md` | The game as first sketched: what it is, how a level plays, the course, the art. |

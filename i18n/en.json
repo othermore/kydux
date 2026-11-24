@@ -5,7 +5,9 @@
     "title": "Kydux",
     "tagline": "A game for learning Python",
     "language": "Language",
-    "version": "Version {version}"
+    "version": "Version {version}",
+    "family": "Part of the Kidux family",
+    "kidux_url": "https://kidux.org"
   },
   "language": {
     "en": "English",
@@ -721,8 +723,7 @@
     "level_alt": "A level: the scene on the left and the program on the right",
     "free_title": "Free, and of the Kidux family",
     "free_text": "Kydux is free software, under the GNU General Public License. It is in English and in Spanish, and it is played in a web browser. It belongs to the Kidux family, a system for a child's first computer.",
-    "kidux_link": "Meet Kidux",
-    "kidux_url": "https://kidux.org"
+    "kidux_link": "Meet Kidux"
   },
   "waiting": {
     "loading": "Loading…"

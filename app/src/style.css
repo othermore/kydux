@@ -337,6 +337,11 @@ footer .build {
   font-family: var(--mono);
 }
 
+/* The family's link is written as the foot is, in its colour. */
+footer a {
+  color: inherit;
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;

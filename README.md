@@ -1,6 +1,6 @@
 # Kydux
 
-[Versión en español](README.es.md)
+[Versión en español](README.es.md) · Part of the [Kidux](https://kidux.org) family
 
 **Kydux is a game for learning to program in Python.** A young wizard, just
 arrived at a school of magic, has to find a wand, learn spells, earn a broom and
@@ -8,8 +8,9 @@ find a way through the castle's corridors and secret passages, and every step
 needs a little real Python to take. Each lesson explains one idea of programming,
 and the level after it asks the player to use it.
 
-It is part of the [Kidux](https://kidux.org) family, and like Kidux it is free
-software under the GNU General Public License, version 3 or later.
+[Kidux](https://kidux.org) is a system for a child's first computer, and Kydux
+is of its family. Like Kidux, it is free software under the GNU General Public
+License, version 3 or later.
 
 ## Playing
 
@@ -23,7 +24,8 @@ whatever you answer, and the settings change the answer later.
 The first time, the game opens on its welcome page. It tells what the game
 is, who it is for and how it is played, with pictures of the game. Its big
 *Start playing* button begins the game. The *About* link, at the top of
-every screen, opens the welcome page again later.
+every screen, opens the welcome page again later. At the foot of every
+screen, a link opens Kidux's website.
 
 The game begins with a story. A letter invites you to
 Arvelia, a school of magic, and you travel to its gate. Then you make your

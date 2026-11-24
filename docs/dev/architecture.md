@@ -5532,3 +5532,10 @@ one overturns stays, marked as superseded.
   the header's link on a screen of each kind, in the header's line after the welcome
   page's, through a change of language, and the welcome page's own in its window.
   Rules out a link in the header of the welcome page alone, which a player sees once.
+- **D340 — A donation to Kydux is made where one to Kidux is.** Decided 2026-11-24 by
+  the owner (*poner iconos similares de sponsorship y demás en el readme de kydux*).
+  `README.md` and `README.es.md` have, under the line of the family, the button
+  Kidux's READMEs have, *Donate, GitHub Sponsors*, each in its language, and that line
+  begins with the game's address. `.github/FUNDING.yml` names the same account, which
+  gives the repository its own Sponsor button. `test_readmes.py` holds that each README
+  has the button and that it leads to the account the file names.

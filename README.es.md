@@ -1,6 +1,8 @@
 # Kydux
 
-[English version](README.md) · De la familia [Kidux](https://kidux.org/es/)
+**[kydux.kidux.org](https://kydux.kidux.org)** · [English version](README.md) · De la familia [Kidux](https://kidux.org/es/)
+
+<a href="https://github.com/sponsors/othermore"><img src="https://img.shields.io/badge/Donar-GitHub%20Sponsors-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Donar con GitHub Sponsors"></a>
 
 **Kydux es un juego para aprender a programar en Python.** Un joven mago, recién
 llegado a un colegio de magia, tiene que encontrar su varita, aprender hechizos,

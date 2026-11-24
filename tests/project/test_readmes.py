@@ -2,7 +2,8 @@
 
 Each says under its title the family Kydux belongs to, with the address the game's
 own link has in that language, and so does the developer documentation's first page
-(D338).
+(D338). Each has, under that line, the button of a donation, which leads where the
+repository's own Sponsor button does (D340).
 """
 
 import json
@@ -63,3 +64,14 @@ def test_each_page_says_the_family_under_its_title(repo_root):
         assert top[0].startswith("# "), name
         said = line.format(_kidux(repo_root, language))
         assert any(said in text for text in top[1:]), name
+
+
+def test_each_readme_has_the_donation_button_of_the_repository(repo_root):
+    funding = _read(repo_root, ".github/FUNDING.yml")
+    account = re.search(r"^github: (\S+)$", funding, re.MULTILINE).group(1)
+    button = (
+        f'<a href="https://github.com/sponsors/{account}"><img src="https://img.shields.io/badge/'
+    )
+    for name in sorted(READMES):
+        top = _read(repo_root, name).split("\n")[:6]
+        assert any(text.startswith(button) for text in top), name

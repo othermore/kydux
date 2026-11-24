@@ -254,7 +254,11 @@ test.describe('the letter held before the castle (D257)', () => {
         const [fw, fh] = [frame.clientWidth, frame.clientHeight];
         const scale = Math.max(fw / still.naturalWidth, fh / still.naturalHeight);
         const [pw, ph] = [still.naturalWidth * scale, still.naturalHeight * scale];
-        const [ox, oy] = [(fw - pw) / 2, (fh - ph) / 2];
+        // The painting lies where the page put it: centred, or moved left under the
+        // sheet where the frame is narrower than it.
+        const across = getComputedStyle(still).objectPosition.split(' ')[0] as string;
+        const ox = across.endsWith('px') ? Number.parseFloat(across) : ((fw - pw) * Number.parseFloat(across)) / 100;
+        const oy = (fh - ph) / 2;
         // The castle's outline on the frame, cut to what the frame shows of it.
         let outline = castle.map(([x, y]) => ({ x: ox + x * pw, y: oy + y * ph }));
         const edges: [(p: { x: number; y: number }) => number, 'x' | 'y', number][] = [
@@ -302,6 +306,7 @@ test.describe('the letter held before the castle (D257)', () => {
         const textBox = { left, top, right: left + text.offsetWidth, bottom: top + text.offsetHeight };
         return {
           frame: { width: fw, height: fh },
+          painting: { left: ox, right: ox + pw },
           covers,
           corners: [onFrame(0, 0), onFrame(w, 0), onFrame(0, h), onFrame(w, h)],
           drawing: [onFrame(0, drawn * h), onFrame(w, drawn * h)],
@@ -340,6 +345,9 @@ test.describe('the letter held before the castle (D257)', () => {
     await page.waitForTimeout(700);
     const place = await letterPlace(page);
     expect(place.covers, 'the sheet covers the painted castle').toBe(true);
+    // The painting fills the frame from side to side, wherever it lies.
+    expect(place.painting.left).toBeLessThanOrEqual(0.5);
+    expect(place.painting.right).toBeGreaterThanOrEqual(place.frame.width - 0.5);
     expect(Math.abs(place.turned)).toBeGreaterThanOrEqual(3);
     expect(Math.abs(place.turned)).toBeLessThanOrEqual(4);
     // No edge of the sheet passes the frame but its upper margin, over the drawing.
@@ -373,6 +381,8 @@ test.describe('the letter held before the castle (D257)', () => {
     for (const [name, size] of [
       ['wide', { width: 1280, height: 800 }],
       ['narrow', { width: 900, height: 700 }],
+      // A frame of 4:3, narrower than the painting: the painting goes left with the sheet.
+      ['small', { width: 800, height: 700 }],
     ] as const) {
       test.describe(`${lang}, ${name}`, () => {
         test.use({ locale, viewport: size });

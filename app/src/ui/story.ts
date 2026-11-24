@@ -133,12 +133,15 @@ const LETTER_PAD = 8;
  * centred; the sheet placed on it by LETTER, then held whole in the frame, turned,
  * LETTER_PAD from its edges, but for its upper margin, which may pass the frame's upper
  * edge up to its drawing where the frame cuts the painting at the castle's tip; made
- * smaller only where the frame cannot hold it. */
+ * smaller only where the frame cannot hold it. Where a frame narrower than the
+ * painting would hold the sheet to the left of the castle, the painting goes left
+ * with it, as far as its own right edge allows, so that the sheet still covers the
+ * castle whole: `painting` is where the painting's left edge lies in the frame. */
 function letterBox(
   frame: { width: number; height: number },
   painting: { width: number; height: number },
   sheet: { width: number; height: number },
-): { left: number; top: number; width: number; height: number } {
+): { left: number; top: number; width: number; height: number; painting: number } {
   const scale = Math.max(frame.width / painting.width, frame.height / painting.height);
   const shownWidth = painting.width * scale;
   const offset = { x: (frame.width - shownWidth) / 2, y: (frame.height - painting.height * scale) / 2 };
@@ -160,12 +163,14 @@ function letterBox(
   while (width > 40 && !fits(width)) width *= 0.97;
   const t = turned(width);
   const height = width * ratio;
+  const over = offset.x + LETTER.middle * shownWidth - (frame.width - LETTER_PAD - t.across / 2);
+  if (over > 0) offset.x = Math.max(frame.width - shownWidth, offset.x - over);
   let middleX = offset.x + LETTER.middle * shownWidth;
   let middleY = offset.y + LETTER.top * painting.height * scale + height / 2;
   middleX = Math.min(Math.max(middleX, LETTER_PAD + t.across / 2), frame.width - LETTER_PAD - t.across / 2);
   middleY = Math.max(middleY, t.drawn);
   middleY = Math.min(middleY, frame.height - LETTER_PAD - t.down / 2);
-  return { left: middleX - width / 2, top: middleY - height / 2, width, height };
+  return { left: middleX - width / 2, top: middleY - height / 2, width, height, painting: offset.x };
 }
 
 /** The place framed at a step (D199), or the figure the camera goes with (D327): the
@@ -391,9 +396,10 @@ export function storyScreen(first: StoryScreenParts): Screen {
       .catch(() => {});
   };
 
-  /** The sheet placed on the painting as the frame now shows it (D257). */
+  /** The sheet placed on the painting as the frame now shows it (D257), while the
+   * page's story is the letter's own: a story gone on to in place has its own still. */
   const placeLetter = () => {
-    if (!letter || !letterPicture) return;
+    if (!letter || !letterPicture || !parts.letter) return;
     const box = frame.getBoundingClientRect();
     if (box.width === 0 || box.height === 0) return;
     const painting =
@@ -405,6 +411,7 @@ export function storyScreen(first: StoryScreenParts): Screen {
         ? { width: letterPicture.naturalWidth, height: letterPicture.naturalHeight }
         : { width: 1000, height: 727 };
     const place = letterBox({ width: box.width, height: box.height }, painting, sheet);
+    if (still instanceof HTMLImageElement) still.style.objectPosition = `${place.painting}px 50%`;
     letter.style.left = `${place.left}px`;
     letter.style.top = `${place.top}px`;
     letter.style.width = `${place.width}px`;

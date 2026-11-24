@@ -4057,7 +4057,9 @@ one overturns stays, marked as superseded.
   column's edge and stands on the fold, as if the letter went on behind it. While the
   step shown holds it, the letter lies over the painted castle and covers it whole,
   turned a little as a sheet held in a hand is, the lake and the village in sight round
-  it, placed on the painting whatever part of it the frame shows; at the first step
+  it, placed on the painting whatever part of it the frame shows, and in a frame too
+  narrow to hold the sheet over the castle the painting goes left under it, so that no
+  tower shows beside the sheet; at the first step
   without it the letter is lowered out of the picture, over its lower edge, and the
   painted castle is there; *Back* raises it again. The painting, the letter and its hand
   come into sight together, and with motion reduced the letter is there or gone at once.

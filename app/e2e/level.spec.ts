@@ -42,12 +42,12 @@ test.describe('in English', () => {
     await expect(page.locator('.goal').first()).toHaveText(LONG.en.goals[0] ?? '');
   });
 
-  test('one step right, and the goal is not met', async ({ page }) => {
+  test('one step right, and the mark is not reached', async ({ page }) => {
     await setCode(page, 'wizard.move_right()');
     await run(page);
     await expect(scene(page)).toHaveAttribute('data-wizard', '5,25');
     await expect(scene(page)).toHaveAttribute('data-tick', '1');
-    await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.');
+    await expect(outcome(page)).toHaveText('Not yet: 1 of 2 goals met. Try again.');
     await expect(page.locator('.goal').first()).toHaveAttribute('data-mark', 'open');
   });
 
@@ -132,13 +132,13 @@ test('in Spanish, and switching to English keeps the code typed', async ({ brows
 
   await setCode(page, 'wizard.move_right(2)');
   await page.locator('#run').click();
-  await expect(outcome(page)).toHaveText('Not yet: 0 of 1 goals met. Try again.', {
+  await expect(outcome(page)).toHaveText('Not yet: 1 of 2 goals met. Try again.', {
     timeout: ciTimes(30_000),
   });
   await page.locator('#language').selectOption('es');
   await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(2)');
   await expect(outcome(page)).toHaveText(
-    'Todavía no: 0 de 1 objetivos cumplidos. Inténtalo otra vez.',
+    'Todavía no: 1 de 2 objetivos cumplidos. Inténtalo otra vez.',
   );
   await context.close();
 });

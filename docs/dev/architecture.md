@@ -5461,3 +5461,13 @@ one overturns stays, marked as superseded.
   `e2e/published.spec.ts` opens the map and a level with `?debug` under the published
   name. Rules out a map opened whole, a solution or a scene's layers on the published
   game, and a second build without the mode.
+- **D336 — The long walk is won in one or two lines.** Decided 2026-11-23 by the owner
+  (*si lo haces en tres líneas te lo da por bueno sin las 3 estrellas. No debería darlo
+  por bueno salvo que lo hagas en una o dos líneas, como dice Nuri. Y la estrella sería
+  si es solo en una linea*). The practice that follows the lesson of the argument
+  (`the-long-corridor`) is there for the argument: eight steps to the right, which a
+  program of three lines or more walks a step or a few at a time, as before the lesson.
+  Its goals are the mark reached, two lines at most (`lines_under` 3, a goal of the
+  win) and one line alone (`lines_under` 2, the bonus, and so a star of D57). A program
+  of three lines reaches the mark and is told that a goal is not met yet
+  (`wrong/in_three_lines.py`). Rules out the practice of an idea won without the idea.

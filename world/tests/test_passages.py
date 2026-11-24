@@ -777,6 +777,26 @@ def test_the_three_doors_given_program_wins_the_walk_and_fails_its_lines():
     assert goals == {"reach": True, "lines_under": False}
 
 
+@pytest.mark.parametrize(
+    ("code", "status", "met"),
+    [
+        ("wizard.move_right(8)\n", "won", [True, True, True]),
+        ("wizard.move_right(4)\nwizard.move_right(4)\n", "won", [True, True, False]),
+        (
+            "wizard.move_right(6)\nwizard.move_right()\nwizard.move_right()\n",
+            "incomplete",
+            [True, False, False],
+        ),
+    ],
+)
+def test_the_long_walk_is_won_in_one_or_two_lines_and_one_earns_the_bonus(code, status, met):
+    """D336: the mark, two lines at most, and one line alone for the bonus."""
+    result = run_code(real("the-long-corridor"), code)
+    assert result.status == status
+    assert [goal.met for goal in result.goals] == met
+    assert [goal.bonus for goal in result.goals] == [False, False, True]
+
+
 def test_a_position_is_printed_as_the_child_reads_it():
     result = run_code(real("the-dark-tunnel"), "print(wizard.position)\n")
     assert result.stdout == "(14, 2)\n"

@@ -2,7 +2,8 @@
   "title": "The long walk",
   "goals": [
     "Reach the mark.",
-    "In fewer than 2 lines."
+    "In one or two lines.",
+    "In just one line."
   ],
   "starting_code": "# Walk to the little fence pen in one instruction.\n",
   "hints": [

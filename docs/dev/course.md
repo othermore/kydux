@@ -145,7 +145,7 @@ password opens it and stays open after; the wand is picked up once, in
 | `lesson:notes` | Lesson 3 | A note in a program, a comment, is for a person, and the computer skips it; programs may come with notes saying what to do. | `concept:comments` |
 | `level:the-dark-note` | Fix 1 | *Fixing the program*: the friend's program with one wrong move, its first, which walks into the grassy bank; its note says one move is wrong. | |
 | `lesson:how-much` | Lesson 4 | *How far we move*: the number in the brackets, an argument, says how many steps to take. | `concept:arguments` |
-| `level:the-long-corridor` | Practice 3 | Across the meadow to the fence pen: one line with a number. Bonus: fewer than 2 lines. | |
+| `level:the-long-corridor` | Practice 3 | Across the meadow to the fence pen: a number in the brackets, in one or two lines. Bonus: in one line. | |
 | `level:the-stairs` | Improve 1 | *Back to the gate*: the friend's program walks back to the gate but bumps into it, to make clean (`no_bumps`). Bonus: fewer than 3 lines. | |
 | `lesson:words` | Lesson 5 | Words in quotes, a string; `say` takes what to say as its argument, as a move takes how much. Two pages and no *Try it* (D174). | `wizard.say`, `concept:strings` |
 | `level:the-password` | Practice 4 | Back at the gate: its word, said beside it, and through, up the path; the code's comment gives the word. | |

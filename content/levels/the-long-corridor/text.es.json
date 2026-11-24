@@ -2,7 +2,8 @@
   "title": "El paseo largo",
   "goals": [
     "Llega a la marca.",
-    "En menos de 2 líneas."
+    "En una o dos líneas.",
+    "En una sola línea."
   ],
   "starting_code": "# Camina hasta el pequeño corral en una instrucción.\n",
   "hints": [

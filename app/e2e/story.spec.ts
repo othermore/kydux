@@ -165,6 +165,20 @@ test('Again plays a step once more, as R does; Skip goes to the end (14.4)', asy
   await expect(page.locator('#story-step')).toHaveText(/^(\d+) of \1$/);
 });
 
+test('a change of language says the whole page again: its number, its title and its buttons', async ({ page }) => {
+  await page.goto('/#story/at-the-gate');
+  await expect(page.locator('#story-number')).toHaveText('Chapter 1 · Story 2');
+  await expect(page.locator('#story-map')).toHaveText('Map');
+  await page.locator('#language').selectOption('es');
+  await expect(page.locator('#story-title')).toHaveText('Ante la puerta');
+  await expect(page.locator('#story-number')).toHaveText('Capítulo 1 · Historia 2');
+  await expect(page.locator('#story-map')).toHaveText('Mapa');
+  await expect(page.locator('#story-skip')).toHaveText('Saltar al final');
+  await expect(page.locator('#story-back')).toHaveText('Atrás');
+  await expect(page.locator('#story-again')).toHaveText('Otra vez');
+  await expect(page.locator('#story-next')).toHaveText('Siguiente');
+});
+
 test.describe('the opening told over the painting of the castle (D251)', () => {
   test.use({ locale: 'es-ES' });
 

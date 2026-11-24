@@ -57,8 +57,9 @@ export interface LevelScreenParts {
   /** The course's item after this level, `lesson:<id>` or `level:<id>`, or null after
    * the last. */
   next: string | null;
-  /** The level's number in its chapter, in words (*Practice 4*, D56), or none. */
-  label?: string;
+  /** The level's number in its chapter, in words and in the language now set
+   * (*Practice 4*, D56), or none. */
+  label?: () => string | undefined;
   /** What the child can type, for the notebook and the editor's completion. */
   table: ApiTable;
   /** Made by the caller, so that Phaser and CodeMirror load on their own. */
@@ -109,8 +110,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         t('level.lesson'),
       )]
     : [];
-  const number = parts.label
-    ? [element('span', { id: 'level-number', className: 'item-number' }, [parts.label])]
+  const number = parts.label?.()
+    ? [labelled(element('span', { id: 'level-number', className: 'item-number' }), () => parts.label?.() ?? '')]
     : [];
   const heading = element('div', { className: 'level-heading' }, [
     ...number,
@@ -407,7 +408,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         {
           title: text.title,
           again: startAgain,
-          label: parts.label,
+          label: parts.label?.(),
           task: task(),
           goals: goalTexts(),
           said: said(text.intro),

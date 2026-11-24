@@ -18,8 +18,9 @@ import type { Screen } from './screen';
 
 export interface LessonScreenParts {
   lesson: Lesson;
-  /** The lesson's number in its chapter, in words (*Lesson 3*), or none. */
-  label?: string;
+  /** The lesson's number in its chapter, in words and in the language now set
+   * (*Lesson 3*), or none. */
+  label?: () => string | undefined;
   /** The course's item after this lesson, or null after the last. */
   next: string | null;
   /** A lesson read again from a level: where Back to the level goes (D71). */
@@ -110,9 +111,10 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
         draw();
       }
     });
+    const label = parts.label?.();
     node.replaceChildren(
       element('div', { className: 'lesson-top' }, [
-        ...(parts.label ? [element('span', { id: 'lesson-number', className: 'item-number' }, [parts.label])] : []),
+        ...(label ? [element('span', { id: 'lesson-number', className: 'item-number' }, [label])] : []),
         ...(parts.backTo
           ? [
               element('a', { id: 'lesson-to-level', className: 'quiet-button small', href: parts.backTo }, [

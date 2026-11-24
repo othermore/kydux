@@ -44,8 +44,8 @@ import { zoomBox } from './zoom';
 
 export interface StoryScreenParts {
   story: Story;
-  /** Its chapter and number (D78): *Chapter 1 · Story 1*. */
-  label?: string;
+  /** Its chapter and number (D78), in the language now set: *Chapter 1 · Story 1*. */
+  label?: () => string | undefined;
   /** The course's item after this story, or null after the last. */
   next: string | null;
   /** Where Go on leads when it is not to the course's next item: from the game's
@@ -276,23 +276,28 @@ export function storyScreen(first: StoryScreenParts): Screen {
   const heard = element('p', { id: 'story-heard', className: 'visually-hidden', ariaLive: 'polite' });
   // Who speaks in a bubble: their portrait and name in the band, which is silent then.
   const speaking = element('div', { id: 'story-speaker', className: 'story-speaker' });
-  const back = element('button', { id: 'story-back', type: 'button', className: 'quiet-button' }, [
-    t('lesson.previous'),
-  ]);
+  const back = element('button', { id: 'story-back', type: 'button', className: 'quiet-button' });
   const count = element('span', { id: 'story-step', className: 'lesson-count' });
-  const again = element('button', { id: 'story-again', type: 'button', className: 'quiet-button small' }, [
-    t('story.again'),
-  ]);
-  const skip = element('button', { id: 'story-skip', type: 'button', className: 'link-button' }, [
-    t('story.skip'),
-  ]);
+  const again = element('button', { id: 'story-again', type: 'button', className: 'quiet-button small' });
+  const skip = element('button', { id: 'story-skip', type: 'button', className: 'link-button' });
   const forward = element('button', { id: 'story-next', type: 'button', className: 'big-button' });
-  const number = parts.label ? element('span', { id: 'story-number', className: 'item-number' }, [parts.label]) : null;
+  const number = parts.label?.() ? element('span', { id: 'story-number', className: 'item-number' }) : null;
+  const toMap = element('a', { id: 'story-map', className: 'quiet-button small', href: '#map' });
+  /** The page's own words, in the language now set: the story's number and the
+   * buttons that every step keeps. */
+  const sayPage = () => {
+    if (number) number.textContent = parts.label?.() ?? '';
+    back.textContent = t('lesson.previous');
+    again.textContent = t('story.again');
+    skip.textContent = t('story.skip');
+    toMap.textContent = t('map.open_map');
+  };
+  sayPage();
   const node = element('div', { className: 'story-screen' }, [
     element('div', { className: 'lesson-top' }, [
       ...(number ? [number] : []),
       element('h2', { id: 'story-title', className: 'story-title' }),
-      element('a', { id: 'story-map', className: 'quiet-button small', href: '#map' }, [t('map.open_map')]),
+      toMap,
     ]),
     frame,
     element('div', { className: 'story-said' }, [voice, heard, skip]),
@@ -649,7 +654,7 @@ export function storyScreen(first: StoryScreenParts): Screen {
     next.hidden = true;
     still.replaceWith(next);
     still = next;
-    if (number) number.textContent = parts.label ?? '';
+    sayPage();
     hear();
     words();
     wait(true);
@@ -714,6 +719,7 @@ export function storyScreen(first: StoryScreenParts): Screen {
     },
     async relabel() {
       story = await parts.reload();
+      sayPage();
       zoom.relabel();
       sayLetter();
       placeLetter();

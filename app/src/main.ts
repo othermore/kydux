@@ -276,7 +276,7 @@ async function showLesson(content: HTMLElement, id: string, key: string, from?: 
       content,
       lessonScreen({
         lesson,
-        label: itemLabel(course, `lesson:${id}`),
+        label: () => itemLabel(course, `lesson:${id}`),
         next: next(course, `lesson:${id}`),
         // Read again from a level, the lesson goes back to it (D71).
         ...(from ? { backTo: `#level/${from}` } : {}),
@@ -307,7 +307,7 @@ function storyParts(
     ...(story.opening
       ? { onward: progress.wizard() ? itemHash(next(course, `story:${id}`) ?? courseStart(course)) : '#wizard' }
       : {}),
-    label: itemLabel(course, `story:${id}`),
+    label: () => itemLabel(course, `story:${id}`),
     // The theme the story opens to, and the music asked for the theme in force at
     // each step shown (D314); how long it takes to turn to it (D320).
     theme: themeOf(course, `story:${id}`),
@@ -653,7 +653,7 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         runtime,
         loaded,
         next: next(course, `level:${id}`),
-        label: itemLabel(course, `level:${id}`),
+        label: () => itemLabel(course, `level:${id}`),
         table,
         createEditor,
         startScene,

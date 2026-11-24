@@ -809,7 +809,7 @@ class LevelScene extends Phaser.Scene {
       this.grounds = paintGrounds(this, this.art);
       // A scene painted whole by morning is the morning itself: no light over it (D126).
       if (this.art.scene.hours?.morning) this.light.morning = WHOLE_MORNING;
-      drawGrid(this, [this.map.width, this.map.height]);
+      drawGrid(this, [this.map.width, this.map.height], this.art.scene.grid);
     } else {
       const tilemap = this.make.tilemap({ data, tileWidth: TILE, tileHeight: TILE });
       const tileset = tilemap.addTilesetImage(TILES_KEY, TILES_KEY, TILE, TILE, 0, 0);

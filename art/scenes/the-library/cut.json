@@ -3327,5 +3327,10 @@
       ],
       "by": -0.35
     }
-  ]
+  ],
+  "grid": {
+    "about": "The grid's own pencil (D337): the common dark brown is lost on the reading room's wood and on its red carpet, so the cells' lines are drawn in the pale yellow of the candles' light, at twice the common pencil's strength.",
+    "colour": "#fff1cf",
+    "strength": 2
+  }
 }

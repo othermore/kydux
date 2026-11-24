@@ -10,6 +10,7 @@
 import Phaser from 'phaser';
 import type { LevelJson } from '../runtime/protocol';
 import type { PlanPictures } from './layout';
+import { type Pencil, pencilOf } from './pencil';
 import { dormitoryMate, friendSheet, type Look, teacherFriend } from './looks';
 import { type Facing, TILE } from './placeholders';
 import { coverDepth, type Lowered, type Nudged, nudgedBy, overDepth, rowDepth, type Shifted, thingDepth } from './depth';
@@ -106,6 +107,9 @@ export interface SceneArt {
   beds?: Record<string, { head: [number, number]; toward: 'left' | 'right'; row: number }>;
   /** The dark passages a figure is drawn darker in, the deeper it goes (shade.ts). */
   dark?: Dark;
+  /** The pencil the scene's grid is drawn with, where the floor hides the common
+   * one (pencil.ts, D337). */
+  grid?: Pencil;
 }
 
 /** The figures drawn for the characters (D76): one sheet each of four rows (down,
@@ -655,8 +659,10 @@ export function breakSeal(scene: Phaser.Scene, glow: Phaser.GameObjects.Containe
 }
 
 /** The pencil grid over a painted scene, for counting steps (D76): thin lines a
- * little crooked, as drawn by hand, the same every time, breathing slowly. */
-export function drawGrid(scene: Phaser.Scene, [columns, rows]: Tile): void {
+ * little crooked, as drawn by hand, the same every time, breathing slowly, in the
+ * common pencil or in the scene's own (D337). */
+export function drawGrid(scene: Phaser.Scene, [columns, rows]: Tile, pencil?: Pencil): void {
+  const { colour, breath } = pencilOf(pencil);
   const grid = scene.add.graphics().setDepth(0.5);
   let seed = 11;
   const wobble = () => {
@@ -666,7 +672,7 @@ export function drawGrid(scene: Phaser.Scene, [columns, rows]: Tile): void {
   const width = columns * TILE;
   const height = rows * TILE;
   const line = (x0: number, y0: number, x1: number, y1: number) => {
-    grid.lineStyle(1, 0x3b2f1e, 0.55 + wobble() * 0.2);
+    grid.lineStyle(1, colour, 0.55 + wobble() * 0.2);
     grid.beginPath();
     grid.moveTo(x0 + wobble(), y0 + wobble());
     const steps = 6;
@@ -678,8 +684,8 @@ export function drawGrid(scene: Phaser.Scene, [columns, rows]: Tile): void {
   };
   for (let x = 0; x <= columns; x += 1) line(x * TILE, 0, x * TILE, height);
   for (let y = 0; y <= rows; y += 1) line(0, y * TILE, width, y * TILE);
-  grid.setAlpha(0.18);
-  scene.tweens.add({ targets: grid, alpha: 0.32, duration: 1750, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  grid.setAlpha(breath[0]);
+  scene.tweens.add({ targets: grid, alpha: breath[1], duration: 1750, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 }
 
 /** A colour part of the way, t from 0 to 1, from one colour to another. */

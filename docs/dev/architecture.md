@@ -74,7 +74,8 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 chapters' music, played from its notes, and how long it takes to
                 turn to a movement asked for (music.ts, D192, D320), and a
                 familiar's trial drawn in light from its sheet, frame by frame
-                (trial.ts, D263)
+                (trial.ts, D263), and the pencil a scene's grid is drawn with,
+                the common one or the scene's own (pencil.ts, D337)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
                 under the line's own indentation (D223)
   src/fonts/    the code's letter, Inconsolata (D238), and the hand the
@@ -1384,7 +1385,8 @@ one overturns stays, marked as superseded.
   wizard (`silhouette.ts`, the owner's choice). The page draws the ground, the rows
   and the figures sorted by their feet, so that a thing covers who stands
   behind it and is covered by who stands in front, and a pencil grid that
-  breathes over the ground for counting steps; a scene without art is
+  breathes over the ground for counting steps, in a pencil of the scene's own
+  where its floor hides the common one (D337); a scene without art is
   drawn with placeholders. The figures are `content/art/figures/`, four
   ways of three walking frames each. A door may be both sealed and keyed
   by a word, as the castle's is: it hears no word while its seal holds,
@@ -5471,3 +5473,20 @@ one overturns stays, marked as superseded.
   win) and one line alone (`lines_under` 2, the bonus, and so a star of D57). A program
   of three lines reaches the mark and is told that a goal is not met yet
   (`wrong/in_three_lines.py`). Rules out the practice of an idea won without the idea.
+- **D337 — A scene may draw its grid with a pencil of its own.** Decided 2026-11-24
+  from the owner's comment on chapter 2 (*En el capítulo de la biblioteca no se ven las
+  líneas de las casillas lo suficiente. Podemos ponerlas un poco más marcadas?*). The
+  grid's common pencil is a dark brown: it is seen on grass, on sand and on pale stone,
+  and lost on wood, whose hue and whose boards' own lines it shares. On the library's
+  boards and carpet and on the dormitory's floor it is hardly seen even at three times
+  its strength, so the lines there take another colour and not only more weight. A
+  scene's settings may say `grid`, a colour and a strength, which `art.json` carries
+  (`export_scene.py`); the game draws the scene's grid in that colour, and its breath
+  is the common one times the strength (`engine/pencil.ts`). Chapter 2's two scenes,
+  the library and the dormitory, draw theirs in the pale yellow of their candles' light
+  (`#fff1cf`) at twice the strength. A scene that names none keeps the common pencil.
+  `pencil.test.ts` holds what a pencil gives, and `test_art_content.py` that a scene's
+  own pencil is its settings' and lies at least twice as far from its floor, in
+  lightness, as the common one. Rules out one stronger pencil for every scene, which
+  would weigh on the grass, where the grid is seen well, and a grid painted into a
+  scene's picture.

@@ -403,3 +403,53 @@ def test_the_three_doors_top_arch_is_its_stones_and_not_its_opening():
     x = round((10.5 + nudge) * cell)
     middle = round(0.5 * cell) - row["top"]
     assert (alpha[middle : middle + round(0.25 * cell), x] <= 127).all()
+
+
+#: The common pencil of a painted scene's grid, as the game has it (pencil.ts).
+COMMON_PENCIL = "#3b2f1e"
+
+
+def luma(colour: np.ndarray) -> np.ndarray:
+    return colour @ np.array([0.2126, 0.7152, 0.0722])
+
+
+def own_pencils() -> list[str]:
+    return [
+        scene
+        for scene in SCENES
+        if "grid" in json.loads((CONTENT / "art" / "scenes" / scene / "art.json").read_text())
+    ]
+
+
+def test_the_common_pencil_is_the_game_s():
+    source = (REPO / "app" / "src" / "engine" / "pencil.ts").read_text(encoding="utf-8")
+    assert f"const COMMON = 0x{COMMON_PENCIL[1:]};" in source
+
+
+@pytest.mark.parametrize("scene", own_pencils())
+def test_a_scene_s_own_pencil_is_its_settings_and_stands_out_from_its_floor(scene):
+    """D337: a scene names a pencil of its own where the common one is lost on its
+    floor, so its colour lies farther from the ground under the grid's lines, twice as
+    far or more, than the common pencil's does."""
+    folder = CONTENT / "art" / "scenes" / scene
+    art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
+    settings = json.loads((REPO / "art" / "scenes" / scene / "cut.json").read_text())["grid"]
+    pencil = art["grid"]
+    assert pencil == {key: settings[key] for key in ("colour", "strength")}
+    assert len(pencil["colour"]) == 7 and int(pencil["colour"][1:], 16) >= 0
+    assert 1 <= pencil["strength"] <= 4
+
+    cell = art["cell"]
+    columns, rows = art["size"]
+    left, top = art.get("origin", [0, 0])
+    ground = np.array(Image.open(folder / art["ground"]).convert("RGB"), dtype=float)
+    ground = ground[top : top + rows * cell, left : left + columns * cell]
+    across = ground[[min(y * cell, rows * cell - 1) for y in range(rows + 1)]]
+    down = ground[:, [min(x * cell, columns * cell - 1) for x in range(columns + 1)]]
+    floor = np.median(luma(np.concatenate([across.reshape(-1, 3), down.reshape(-1, 3)])))
+
+    def far(colour: str) -> float:
+        rgb = np.array([int(colour[at : at + 2], 16) for at in (1, 3, 5)], dtype=float)
+        return abs(float(luma(rgb)) - floor)
+
+    assert far(pencil["colour"]) >= 2 * far(COMMON_PENCIL)

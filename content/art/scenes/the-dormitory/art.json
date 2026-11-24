@@ -8,6 +8,10 @@
   "hours": {
     "morning": "ground-morning.webp"
   },
+  "grid": {
+    "colour": "#fff1cf",
+    "strength": 2
+  },
   "rows": [
     {
       "row": 6,

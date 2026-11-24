@@ -1138,6 +1138,12 @@ def scene(settings: Settings) -> Path:
         # The cells of the painting's edges the view never shows, left, top, right and
         # bottom (D323).
         **({"unseen": settings.data["unseen"]["cells"]} if settings.data.get("unseen") else {}),
+        # The scene's own pencil for its grid, where the floor hides the common one (D337).
+        **(
+            {"grid": {key: settings.data["grid"][key] for key in ("colour", "strength")}}
+            if settings.data.get("grid")
+            else {}
+        ),
         "rows": rows_out,
         "things": things,
         **({"beds": beds_of(settings)} if settings.data.get("beds") else {}),

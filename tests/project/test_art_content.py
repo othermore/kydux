@@ -429,15 +429,19 @@ def test_the_common_pencil_is_the_game_s():
 @pytest.mark.parametrize("scene", own_pencils())
 def test_a_scene_s_own_pencil_is_its_settings_and_stands_out_from_its_floor(scene):
     """D337: a scene names a pencil of its own where the common one is lost on its
-    floor, so its colour lies farther from the ground under the grid's lines, twice as
-    far or more, than the common pencil's does."""
+    floor. It is the common colour drawn stronger, or a colour of its own, which lies
+    farther from the ground under the grid's lines, twice as far or more, than the
+    common pencil's does."""
     folder = CONTENT / "art" / "scenes" / scene
     art = json.loads((folder / "art.json").read_text(encoding="utf-8"))
     settings = json.loads((REPO / "art" / "scenes" / scene / "cut.json").read_text())["grid"]
     pencil = art["grid"]
-    assert pencil == {key: settings[key] for key in ("colour", "strength")}
+    assert pencil == {key: settings[key] for key in ("colour", "strength") if key in settings}
+    assert 1 <= pencil.get("strength", 1) <= 4
+    if "colour" not in pencil:
+        assert pencil["strength"] > 1
+        return
     assert len(pencil["colour"]) == 7 and int(pencil["colour"][1:], 16) >= 0
-    assert 1 <= pencil["strength"] <= 4
 
     cell = art["cell"]
     columns, rows = art["size"]

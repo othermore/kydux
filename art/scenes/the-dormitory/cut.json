@@ -1735,8 +1735,7 @@
     ]
   ],
   "grid": {
-    "about": "The grid's own pencil (D337): the common dark brown is lost on the floorboards, so the cells' lines are drawn in the pale yellow of the candles' light, at twice the common pencil's strength.",
-    "colour": "#fff1cf",
-    "strength": 2
+    "about": "The grid's own pencil (D337): the common dark brown, a little stronger, since the floorboards share its hue.",
+    "strength": 1.3
   }
 }

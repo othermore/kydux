@@ -5,6 +5,10 @@
     15
   ],
   "ground": "ground.webp",
+  "grid": {
+    "colour": "#fff1cf",
+    "strength": 1.3
+  },
   "rows": [
     {
       "row": 4,

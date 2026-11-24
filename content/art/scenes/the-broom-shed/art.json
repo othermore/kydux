@@ -5,6 +5,9 @@
     15
   ],
   "ground": "ground.webp",
+  "grid": {
+    "strength": 2.5
+  },
   "rows": [
     {
       "row": 5,

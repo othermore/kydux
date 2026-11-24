@@ -9,8 +9,7 @@
     "morning": "ground-morning.webp"
   },
   "grid": {
-    "colour": "#fff1cf",
-    "strength": 2
+    "strength": 1.3
   },
   "rows": [
     {

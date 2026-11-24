@@ -5476,19 +5476,32 @@ one overturns stays, marked as superseded.
   of three lines reaches the mark and is told that a goal is not met yet
   (`wrong/in_three_lines.py`). Rules out the practice of an idea won without the idea.
 - **D337 — A scene may draw its grid with a pencil of its own.** Decided 2026-11-24
-  from the owner's comment on chapter 2 (*En el capítulo de la biblioteca no se ven las
-  líneas de las casillas lo suficiente. Podemos ponerlas un poco más marcadas?*). The
-  grid's common pencil is a dark brown: it is seen on grass, on sand and on pale stone,
-  and lost on wood, whose hue and whose boards' own lines it shares. On the library's
-  boards and carpet and on the dormitory's floor it is hardly seen even at three times
-  its strength, so the lines there take another colour and not only more weight. A
-  scene's settings may say `grid`, a colour and a strength, which `art.json` carries
-  (`export_scene.py`); the game draws the scene's grid in that colour, and its breath
-  is the common one times the strength (`engine/pencil.ts`). Chapter 2's two scenes,
-  the library and the dormitory, draw theirs in the pale yellow of their candles' light
-  (`#fff1cf`) at twice the strength. A scene that names none keeps the common pencil.
-  `pencil.test.ts` holds what a pencil gives, and `test_art_content.py` that a scene's
-  own pencil is its settings' and lies at least twice as far from its floor, in
+  from the owner's comments on the cells' lines (*En el capítulo de la biblioteca no se
+  ven las líneas de las casillas lo suficiente. Podemos ponerlas un poco más marcadas?*;
+  *Si las lineas de las casillas se ven poco en las otras también, pues hazlas algo más
+  visibles*). The grid's common pencil is a dark brown: it is seen on grass, on sand and
+  on pale stone, and lost on wood, whose hue and whose boards' own lines it shares, and
+  on dark stone. A scene's settings may say `grid`, a colour, a strength or both, which
+  `art.json` carries (`export_scene.py`); the game draws the scene's grid in that
+  colour, and its breath is the common one times the strength (`engine/pencil.ts`). A
+  scene that names none keeps the common pencil. Four scenes name one:
+
+  - The library, whose boards and carpet hide the dark brown even at three times its
+    strength, takes the pale yellow of its candles' light (`#fff1cf`) at 1.2 times the
+    strength: lines that are seen and do not weigh (*en la biblioteca pueden ser un poco
+    menos marcadas, un punto medio entre lo de antes y lo de ahora*).
+  - The dormitory keeps the common colour, at 1.3 times the strength (*En el dormitorio
+    no había que cambiarlas, déjalas como estaban que creo que se veían bien (o si acaso,
+    solo un pelín)*).
+  - The broom shed keeps the common colour, at 2.5 times the strength, for its
+    floorboards; the grass round it has the lines' colour of the chapter's other scenes.
+  - The tower's passage, of dark stone, takes the pale yellow at 1.3 times the strength.
+
+  Chapter 3's scenes keep the common pencil, faint on their stone: there the child
+  finds the way on the map (*No es necesario en el capítulo en el que enseñamos el mapa
+  del niño travieso, porque ahí la idea es que usen el mapa*). `pencil.test.ts` holds
+  what a pencil gives, and `test_art_content.py` that a scene's own pencil is its
+  settings', and that a colour of its own lies at least twice as far from its floor, in
   lightness, as the common one. Rules out one stronger pencil for every scene, which
   would weigh on the grass, where the grid is seen well, and a grid painted into a
   scene's picture.

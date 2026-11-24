@@ -55,6 +55,10 @@
     },
     {
       "kind": "lines_under",
+      "lines": 3
+    },
+    {
+      "kind": "lines_under",
       "lines": 2,
       "bonus": true
     }

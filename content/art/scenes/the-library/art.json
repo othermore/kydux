@@ -15,6 +15,10 @@
     288,
     0
   ],
+  "grid": {
+    "colour": "#fff1cf",
+    "strength": 1.2
+  },
   "rows": [
     {
       "row": 5,

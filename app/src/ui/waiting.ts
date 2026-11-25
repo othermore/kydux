@@ -1,21 +1,21 @@
-// What a screen shows while it loads (D214, D221): Kydux's mark and "Loading…" in one
-// row, the words large, and under them a bar that moves (D249): a band that sweeps
-// while the screen loads, and a fill over the time a tip still holds a ready screen;
-// and, for a child who has begun, a tip about the game with its picture. No screen waits
-// for Python, which loads in its worker from the moment the page opens; a screen waits
-// for its own code, texts and pictures. A tip is due at once at the visit's first wait
-// and at a screen of a scene other than the one last shown; any other wait shows no
-// tip inside the grace and holds nothing, and after it a tip comes up. The next tip
-// comes every TIP_TIME. When the screen is ready with a tip up, it opens by itself once
-// the tip has had its reading time (D175), never more than TIP_TIME; there is no
-// button. The tips are shown in their order, from the one after the last shown, which
-// the browser keeps; after the last comes the first. A tip comes up with its picture
-// (D246): the picture is loaded and decoded first, as an element, and the view shows
-// that element under no second request; a tip due waits for it, a screen ready meanwhile
-// opens with no tip and that tip stays the next one, and a picture that fails shows the
-// words alone. The page asks for the next tip's picture as it opens (main.ts), and, as
-// each tip comes up, for the one after it. The browser tests turn the tips off with a
-// key no setting shows, read once as the page opens.
+// What a screen shows while it loads (D214, D221): Kydux's mark and "Loading…" in one row,
+// the words large, and under them a bar that moves (D249): a band that sweeps while the
+// screen loads, and a fill over the time a tip still holds a ready screen; and, for a
+// child who has begun, a tip about the game with its picture. No screen waits for Python,
+// which loads in its worker behind the screens (main.ts); a screen waits for its own code,
+// texts and pictures. A tip is due at once at the visit's first wait and at a screen of a
+// scene other than the one last shown; any other wait shows no tip inside the grace and
+// holds nothing, and after it a tip comes up. The start screen and the welcome page are
+// given no tips (D341). The next tip comes every TIP_TIME. When the screen is ready with a
+// tip up, it opens by itself once the tip has had its reading time (D175), never more than
+// TIP_TIME; there is no button. The tips are shown in their order, from the one after the
+// last shown, which the browser keeps; after the last comes the first. A tip comes up with
+// its picture (D246): the picture is loaded and decoded first, as an element, and the view
+// shows that element under no second request; a tip due waits for it, a screen ready
+// meanwhile opens with no tip and that tip stays the next one, and a picture that fails
+// shows the words alone. The page asks for the next tip's picture when it makes Python
+// (main.ts), and, as each tip comes up, for the one after it. The browser tests turn the
+// tips off with a key no setting shows, read once as the page opens.
 
 import { readingMs } from '../engine/bubble';
 import { currentLanguage, t } from '../i18n';
@@ -234,7 +234,8 @@ export function tipPictureLoaded(key: string, language = currentLanguage()): Pro
   return loaded;
 }
 
-/** The picture of the tip due next asked for ahead, as the page opens (D246). */
+/** The picture of the tip due next asked for ahead, when the page makes Python (D246,
+ * D341). */
 export function askNextTip(): void {
   if (turnedOff) return;
   const key = TIPS[nextTip(browserStorage(), TIPS.length)] ?? TIPS[0];

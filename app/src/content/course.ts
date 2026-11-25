@@ -75,13 +75,24 @@ export function itemHash(item: string): string {
   return parsed ? `#${parsed.kind}/${parsed.id}` : '#map';
 }
 
-export async function loadCourse(): Promise<Course> {
+async function fetchCourse(): Promise<Course> {
   const response = await fetch(contentUrl('course.json'));
   if (!response.ok || !response.headers.get('content-type')?.includes('json')) {
     return { chapters: [] };
   }
   const course = (await response.json()) as Course;
   return Array.isArray(course.chapters) ? course : { chapters: [] };
+}
+
+/** The course file on its way: those who ask for it meanwhile share the one request. */
+let fetching: Promise<Course> | null = null;
+
+/** The course file, fetched once for all who ask at the same moment (D341). */
+export function loadCourse(): Promise<Course> {
+  fetching ??= fetchCourse().finally(() => {
+    fetching = null;
+  });
+  return fetching;
 }
 
 /** Every item of the course, in order. */

@@ -50,6 +50,7 @@ import type { LessonRunner } from './ui/lessonrun';
 import type { MapScreenParts } from './ui/map';
 import { aboutScreen } from './ui/about';
 import { showCookieNotice } from './ui/cookies';
+import { pictured } from './ui/pictured';
 import type { Screen } from './ui/screen';
 import type { StoryJoin, StoryScreenParts } from './ui/story';
 import { askNextTip, type Wait, waitingView } from './ui/waiting';
@@ -64,22 +65,32 @@ import { themesScreen } from './ui/themes';
 import { wizardScreen } from './ui/wizard';
 import { contentUrl } from './content/address';
 
-const runtime = new Runtime();
 let screen: Screen | null = null;
 /** The address of the screen shown, so that a hash change to it again is ignored. */
 let shownRoute: string | null = null;
 /** Where the screen shown is, for a stale world's message to take its place. */
 let shownContent: HTMLElement | null = null;
 
-// The page's world, and the world running once it has loaded, on the root element
-// for the `?debug` corner (debug.ts); a world that is not the page's runs no level:
-// the level shown gives way to the message to reload.
+// The page's world, on the root element for the `?debug` corner (debug.ts).
 document.documentElement.dataset.pageStamp = __WORLD_STAMP__;
-runtime.onStatus((status) => {
-  const running = runtime.info?.worldStamp;
-  if (running !== undefined) document.documentElement.dataset.worldStamp = running || 'none';
-  if (status === 'stale' && shownContent && shownRoute?.startsWith('level/')) stale(shownContent);
-});
+
+/** Python, which loads in its worker from the moment it is made (D214): made when the
+ * first screen that is neither the start screen nor the welcome page is asked for, and
+ * behind those two once their pictures are in (D341). The world running, once it has
+ * loaded, is on the root element beside the page's; a world that is not the page's runs
+ * no level: the level shown gives way to the message to reload. */
+let runtime: Runtime | null = null;
+function python(): Runtime {
+  if (runtime) return runtime;
+  const made = new Runtime();
+  runtime = made;
+  made.onStatus((status) => {
+    const running = made.info?.worldStamp;
+    if (running !== undefined) document.documentElement.dataset.worldStamp = running || 'none';
+    if (status === 'stale' && shownContent && shownRoute?.startsWith('level/')) stale(shownContent);
+  });
+  return made;
+}
 /** The last address shown that was not the settings, where their Back goes. */
 let beforeSettings = '#start';
 
@@ -187,7 +198,7 @@ function lessonRunner(
   let world: Promise<LevelJson> | null = null;
   return {
     runner: {
-      runtime,
+      runtime: python(),
       level: () => (world ??= loadLevel(tried, currentLanguage()).then((loaded) => loaded.level)),
       createEditor,
       openPlan: async (level, onClose) => {
@@ -475,21 +486,40 @@ function sceneOfRoute(course: Course | null, wanted: Route): string | null {
 }
 
 /** Puts a screen in the page in place of the one before: at once, or, where a tip is
- * up while it loaded, once the tip has had its reading time (D214, D221). */
+ * up while it loaded, once the tip has had its reading time (D214, D221). The start
+ * screen and the welcome page shown, what the page fetches for the screens after them
+ * waits for their pictures (D341). */
 function show(content: HTMLElement, next: Screen): void {
   const scene = waiting?.content === content ? waiting.scene : null;
+  const first = shownRoute === 'start' || shownRoute === 'about';
   const open = () => {
     screen?.destroy();
     screen = next;
     content.replaceChildren(next.node);
     next.mount?.();
     if (scene) lastScene = scene;
-    warmUp();
+    if (!first) warmUp();
+    else
+      void pictured(document.images).then(() => {
+        fetchBehind();
+        warmUp();
+      });
   };
   const held = waiting?.content === content ? waiting.wait : null;
   waiting = null;
   if (held) held.ready(open);
   else open();
+}
+
+/** What the page fetches behind a screen for the screens after it, once: Python in its
+ * worker (D214), and, for a child who will read tips, the picture of the tip due next
+ * (D246). */
+let fetchedBehind = false;
+function fetchBehind(): void {
+  if (fetchedBehind) return;
+  fetchedBehind = true;
+  python();
+  if (!newcomer()) askNextTip();
 }
 
 /** The code the other screens need, fetched in idle time once the first screen shows,
@@ -602,15 +632,11 @@ function lessonBefore(course: Course, levelId: string): string | null {
 const OPENING = '#story/the-letter';
 
 async function showStart(content: HTMLElement): Promise<void> {
-  // A first visit, with no wizard, no saved game and no address, opens on the
-  // welcome page, whose Start playing begins the story (D61, D193); with saved
-  // games, the start screen offers them (D70).
-  if (!progress.wizard() && progress.savedGames().length === 0 && location.hash === '') {
-    location.replace('#about');
-    return;
-  }
   document.title = t('app.title');
+  // The course file is all the start screen waits for (D341): its titles name where
+  // each saved game is.
   const course = await loadCourse();
+  courseForTitles ??= course;
   const continueTo = continueTarget(course);
   // Where each saved game is: its item's number and title, or the course's start.
   const places = new Map(
@@ -652,7 +678,7 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
         import('./engine/scene'),
       ]);
     if (shownRoute !== key) return;
-    if (runtime.status === 'stale') {
+    if (python().status === 'stale') {
       stale(content);
       return;
     }
@@ -674,7 +700,7 @@ async function showLevel(content: HTMLElement, id: string, key: string): Promise
     show(
       content,
       levelScreen({
-        runtime,
+        runtime: python(),
         loaded,
         next: next(course, `level:${id}`),
         label: () => itemLabel(course, `level:${id}`),
@@ -745,6 +771,10 @@ function playMusicFor(wanted: Route): void {
 
 function route(): void {
   if (!root) return;
+  // A first visit, with no wizard, no saved game and no address, opens on the welcome
+  // page, whose Start playing begins the story (D61, D193), with nothing of the start
+  // screen drawn before it (D341); with saved games, the start screen offers them (D70).
+  if (location.hash === '' && newcomer()) location.replace('#about');
   const wanted = parseRoute(location.hash);
   const key =
     wanted.name === 'level' || wanted.name === 'lesson' || wanted.name === 'story'
@@ -762,12 +792,18 @@ function route(): void {
   playMusicFor(wanted);
   screen?.destroy();
   screen = null;
+  // The start screen and the welcome page come first (D341): no tip is put up over
+  // them, and Python and the next tip's picture are fetched behind them once their own
+  // pictures are in; any other screen has both on their way from here.
+  const first = wanted.name === 'start' || wanted.name === 'about';
+  if (!first) fetchBehind();
   // While the screen loads, the waiting view, with a tip for a child who has begun
   // (D214): at once at the visit's first wait and at a scene other than the last shown
   // (D221); a wait dropped by a new route opens nothing.
   waiting?.wait.dispose();
   const scene = sceneOfRoute(courseKnown, wanted);
-  const view = waitingView(!newcomer(), !waitedBefore || (scene !== null && scene !== lastScene));
+  const tipDue = !waitedBefore || (scene !== null && scene !== lastScene);
+  const view = waitingView(!first && !newcomer(), !first && tipDue);
   waitedBefore = true;
   const content = element('main', { className: 'content' }, [view.node]);
   const waited = { content, wait: view.wait, scene };
@@ -876,9 +912,6 @@ function begin(page: HTMLElement): void {
     }
     void screen?.relabel();
   });
-  // The picture of the tip due next, asked for before the first screen loads, for a
-  // child who will read tips (D246).
-  if (!newcomer()) askNextTip();
   route();
   // The published game counts its screens from here on (D328).
   analytics.start(currentLanguage, newcomer);

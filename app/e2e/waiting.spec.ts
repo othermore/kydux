@@ -5,7 +5,9 @@
 // last shown, at once, and the screen opens by itself once the tip has been read; a
 // screen of the same scene that loads quickly shows none; a newcomer reads the letter
 // over the castle's painting, with the music playing, while the field loads; and a level
-// shows while Python is still loading, its card read and its program written.
+// shows while Python is still loading, its card read and its program written. The start
+// screen and the welcome page come first (D341): no tip over them, and nothing fetched
+// for the screens after them until their own pictures are in.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -268,4 +270,151 @@ test('a level shows while Python is still loading: its card is read and its prog
   await expect(page.locator('.cm-content')).toContainText('wizard.move_left(2)');
   await page.screenshot({ path: `${SHOTS}level-before-python.png` });
   await expect(page.locator('#status')).toHaveAttribute('data-status', 'ready', { timeout: ciTimes(60_000) });
+});
+
+test.describe('the start screen and the welcome page come first (D341)', () => {
+  // The tips on, as for a child, where every other spec turns them off.
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  /** What the page fetches for the screens after the one shown: Python and its world,
+   * the tips' pictures, and the other screens' code. */
+  const BEHIND = /\/pyodide\/|\/world\.zip|\/content\/tips\/|\/assets\/(worker|scene|painted|editor|level|lesson|story|map)-/;
+
+  /** The addresses asked for so far that are fetched behind a screen, each with its
+   * moment. */
+  function askedBehind(page: Page): { path: string; at: number }[] {
+    const asked: { path: string; at: number }[] = [];
+    page.on('request', (request) => {
+      const path = new URL(request.url()).pathname;
+      if (BEHIND.test(path)) asked.push({ path, at: Date.now() });
+    });
+    return asked;
+  }
+
+  /** A picture held back `ms`; the moment it is let go, once it is. */
+  async function holdPicture(page: Page, pattern: string, ms: number): Promise<{ at: number | null }> {
+    const released: { at: number | null } = { at: null };
+    await page.route(pattern, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, ms));
+      released.at = Date.now();
+      await route.continue();
+    });
+    return released;
+  }
+
+  /** Whether a tip has been up at any moment since the page opened. */
+  async function watchTips(page: Page): Promise<() => Promise<boolean>> {
+    await page.addInitScript(() => {
+      const kept = window as unknown as { kyduxTipSeen: boolean };
+      kept.kyduxTipSeen = false;
+      new MutationObserver(() => {
+        if (document.querySelector('#waiting[data-tip], .waiting-tip-box:not([hidden])')) kept.kyduxTipSeen = true;
+      }).observe(document, { childList: true, subtree: true, attributes: true });
+    });
+    return () => page.evaluate(() => (window as unknown as { kyduxTipSeen: boolean }).kyduxTipSeen);
+  }
+
+  test('the start screen shows with no tip, however long its one file takes, asked for once', async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    const tipSeen = await watchTips(page);
+    // The course file on its way for longer than the grace: a level's wait would tip.
+    await delay(page, '**/content/course.json*', 3000);
+    let course = 0;
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname.endsWith('/content/course.json')) course += 1;
+    });
+    await page.goto('/');
+    await expect(page.locator('#waiting .waiting-loading')).toHaveText('Cargando…');
+    await expect(page.locator('#continue')).toBeVisible({ timeout: ciTimes(5_000) });
+    expect(await tipSeen()).toBe(false);
+    expect(course).toBe(1);
+    await expect(page.locator('#waiting')).toHaveCount(0);
+  });
+
+  test('the start screen comes at once with its file there, where a level reads a tip first', async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    const tipSeen = await watchTips(page);
+    await page.goto('/');
+    // A tip due at once would hold the screen for its reading time, some seconds.
+    await expect(page.locator('#continue')).toBeVisible({ timeout: ciTimes(1_500) });
+    expect(await tipSeen()).toBe(false);
+    await page.screenshot({ path: `${SHOTS}start-at-once.png` });
+    // The level from it is a new scene: its tip, as ever (D221).
+    await page.evaluate(() => {
+      location.hash = '#level/the-moving-key';
+    });
+    await expect(page.locator('#waiting')).toHaveAttribute('data-tip', /./, { timeout: ciTimes(5_000) });
+  });
+
+  test('the welcome page shows with no waiting view and no tip, for a child who has begun and for a newcomer', async ({
+    page,
+    browser,
+  }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    const tipSeen = await watchTips(page);
+    await page.goto('/#about');
+    await expect(page.locator('.about-screen')).toBeVisible({ timeout: ciTimes(1_500) });
+    await expect(page.locator('#waiting')).toHaveCount(0);
+    expect(await tipSeen()).toBe(false);
+    // A first visit, with no address: the welcome page with no start screen before it.
+    const context = await browser.newContext({ locale: 'es-ES', storageState: { cookies: [], origins: [] } });
+    const first = await context.newPage();
+    await first.addInitScript(() => {
+      const kept = window as unknown as { kyduxWaited: boolean };
+      kept.kyduxWaited = false;
+      new MutationObserver((changes) => {
+        for (const change of changes)
+          for (const node of change.addedNodes)
+            if (node instanceof Element && (node.id === 'waiting' || node.querySelector('#waiting'))) kept.kyduxWaited = true;
+      }).observe(document, { childList: true, subtree: true });
+    });
+    await first.goto('/');
+    await expect(first.locator('.about-screen')).toBeVisible({ timeout: ciTimes(1_500) });
+    await expect(first).toHaveURL(/#about$/);
+    expect(await first.evaluate(() => (window as unknown as { kyduxWaited: boolean }).kyduxWaited)).toBe(false);
+    await context.close();
+  });
+
+  test("Python, the tips' pictures and the other screens' code wait for the start screen's pictures", async ({
+    page,
+  }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    const asked = askedBehind(page);
+    const painting = await holdPicture(page, '**/decor/backdrop.webp', 2500);
+    await page.goto('/', { waitUntil: 'commit' });
+    await expect(page.locator('#continue')).toBeVisible({ timeout: ciTimes(2_000) });
+    // The painting in: all of it on its way, and none of it before.
+    const has = (wanted: RegExp) => asked.some((one) => wanted.test(one.path));
+    await expect.poll(() => has(/\/pyodide\//), { timeout: ciTimes(8_000) }).toBe(true);
+    await expect.poll(() => has(/\/content\/tips\//)).toBe(true);
+    await expect.poll(() => has(/\/assets\/(scene|painted)-/), { timeout: ciTimes(5_000) }).toBe(true);
+    expect(painting.at).not.toBeNull();
+    expect(Math.min(...asked.map((one) => one.at))).toBeGreaterThanOrEqual(painting.at ?? 0);
+  });
+
+  test("they wait for the welcome page's pictures too, and no longer once another screen is asked for", async ({
+    page,
+  }) => {
+    const asked = askedBehind(page);
+    const castle = await holdPicture(page, '**/about/welcome-castle.webp', ciTimes(4_000));
+    await page.goto('/', { waitUntil: 'commit' });
+    await expect(page.locator('#about-play')).toBeVisible({ timeout: ciTimes(2_000) });
+    await page.waitForTimeout(1000);
+    expect(asked).toEqual([]);
+    // Start playing: the story is asked for, and Python is on its way with it, the
+    // castle's painting still to come.
+    await page.locator('#about-play').click();
+    await expect.poll(() => asked.some((one) => one.path.includes('/pyodide/')), { timeout: ciTimes(2_000) }).toBe(true);
+    expect(castle.at).toBeNull();
+  });
+
+  test('a level asked for by its address has Python on its way from the first moment', async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    const asked = askedBehind(page);
+    // The level's own code held back: Python does not wait for the screen.
+    await delay(page, '**/assets/scene-*.js', ciTimes(4_000));
+    await page.goto('/#level/the-moving-key', { waitUntil: 'commit' });
+    await expect.poll(() => asked.some((one) => one.path.includes('/pyodide/')), { timeout: ciTimes(2_000) }).toBe(true);
+    await expect(page.locator('#waiting')).toBeVisible();
+  });
 });

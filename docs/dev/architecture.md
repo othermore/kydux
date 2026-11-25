@@ -101,21 +101,25 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 people at a page's sides (decor.ts, D294), what a screen shows while
                 it loads, the mark, Loading… and a tip with its picture and its
                 clock, the tip put up once its picture is loaded and decoded
-                (waiting.ts, D214, D221, D246), and under ?debug the page
+                (waiting.ts, D214, D221, D246), when the pictures of the screen
+                shown are in (pictured.ts, D341), and under ?debug the page
                 that plays any of the music's themes, each voice of the one
                 playing to turn off or set by hand, its time on a slider to
                 move in, and its movements each on a button (themes.ts, #music,
                 D192, D203, D312, D316).
                 main.ts shows a screen: it shows the waiting view at once, a tip
                 due with no grace at the visit's first wait and at a screen whose
-                scene, named in the course file, is not the one last shown, loads
-                the screen's own code, texts and pictures (a story needs no scene
+                scene, named in the course file, is not the one last shown, and
+                no tip over the start screen and the welcome page, loads the
+                screen's own code, texts and pictures (a story needs no scene
                 code to show its words), puts the screen in when it is ready or,
                 with a tip up, by itself once the tip has had its reading time,
                 and once the first screen shows fetches the other screens' code
-                in idle time; it asks for the next tip's picture as the page
-                opens, before the first screen loads (D214, D221, D246); before
-                any of it, a page that is not isolated isolates itself
+                in idle time; it makes Python and asks for the next tip's
+                picture when a screen is asked for, and for the start screen and
+                the welcome page once their pictures are in (D214, D221, D246,
+                D341); before any of it, a page that is not isolated isolates
+                itself
                 (isolation.ts, with public/isolate.js, D329), and the published
                 game asks about the cookies (ui/cookies.ts, D328)
   src/analytics/ the published game's counting of its use (D328): where it is
@@ -3385,8 +3389,9 @@ one overturns stays, marked as superseded.
 - **D214 — While a screen loads there is something to read: a story's words first, and a
   tip for a child who has begun.** Decided 2026-11-13 by the owner (*A veces tarda un poco
   en cargar python, sobre todo la primera vez. Estaría bien, mientras eso se carga,
-  mostrar algo*). Python loads in its worker from the moment the page opens, behind
-  everything, and no screen waits for it: a story and a lesson's pages need none, and a
+  mostrar algo*). Python loads in its worker behind everything, from the moment a screen
+  is asked for, the start screen and the welcome page shown first (D341), and no screen
+  waits for it: a story and a lesson's pages need none, and a
   level shows as soon as its own files are there, its status line saying *Preparando
   Python…* (`level.loading`) until a run can start. What a screen waits for is its own
   code, texts and pictures, and while it waits the page shows the waiting view
@@ -3408,7 +3413,8 @@ one overturns stays, marked as superseded.
   tip due at once, shows no tip and holds nothing. The tips are the
   page's words (`tips.*`, the same keys in every language), each true of the page as it
   is; they are shown in order from where the last wait stopped, kept in `localStorage`,
-  and none comes back until all have been seen. Once its first screen shows, the page
+  and none comes back until all have been seen. Once its first screen shows, with its
+  pictures where D341 has them come first, the page
   fetches in idle time the code the other screens need, so that a later screen waits only
   for its own files. The browser tests turn the tips off with a key of `localStorage` that
   no setting shows. Rules out a screen that waits for Python, *Preparando Python…* said of
@@ -3511,7 +3517,8 @@ one overturns stays, marked as superseded.
   debería tener una imagen o captura de pantalla*). The waiting view has no button. For a
   child who has begun, a tip is up from the wait's first moment at the first wait of a
   visit and at every screen whose scene is not the scene last shown; any other wait keeps
-  D214's grace. When the screen is ready the tip stays until it has had its reading time
+  D214's grace, and the start screen and the welcome page show no tip (D341). When the
+  screen is ready the tip stays until it has had its reading time
   by D175, counted from the moment it was put up and never more than ten seconds, and the
   screen then shows by itself. Every tip has a picture, made from the game's own page in
   each language, over its words, and comes up with it loaded (D246). Rules out a button
@@ -3869,8 +3876,9 @@ one overturns stays, marked as superseded.
   carga el tip sin la imagen. Podemos pre-cargarlo antes de mostrar el tip*). A tip's words
   and its picture come up together: the picture is loaded and decoded first, and the element
   the view shows is the one that was loaded, with no second request. The page asks for the
-  picture of the tip due next as it opens, not in idle time, and, as each tip comes up, for
-  the picture of the one after it. A tip due whose picture has not come waits for it, the
+  picture of the tip due next when it makes Python (D341), not in idle time, and, as each
+  tip comes up, for the picture of the one after it. A tip due whose picture has not
+  come waits for it, the
   view as in the grace (D214); a screen ready meanwhile opens with no tip, and that tip
   stays the next one due. A picture that fails shows the tip's words alone, with no empty
   room over them. The pictures keep their size (D239). Rules out words over an empty frame,
@@ -5539,3 +5547,27 @@ one overturns stays, marked as superseded.
   begins with the game's address. `.github/FUNDING.yml` names the same account, which
   gives the repository its own Sponsor button. `test_readmes.py` holds that each README
   has the button and that it leads to the account the file names.
+- **D341 — The start screen and the welcome page come first: no tip over them, and
+  nothing fetched ahead of their own files.** Decided 2026-11-25 by the owner (*La
+  página inicial del juego y la página de about no deberían de tener carga con tip, esas
+  dos deberían cargar lo más rápido posible*). No tip is put up while either loads,
+  whoever the child is and however long the wait. The welcome page is the page's own
+  code and shows with no waiting view; the start screen waits for one file, the
+  course's, which says where each saved game is, under the mark and *Cargando…* alone
+  (D249), and that file is asked for once, whoever asks for it at the same moment
+  (`loadCourse`). A first visit with no address is at the welcome page (D193) before
+  anything of the start screen is drawn. What the page fetches for the screens after
+  them waits for their pictures (`ui/pictured.ts`): Python in its worker, with its world
+  (D214), the picture of the tip due next (D246) and the other screens' code start once
+  every picture of the screen shown has come or failed, one the browser fetches only
+  when it is scrolled to left aside, and 5 seconds after the screen shows at the
+  latest. Another screen asked for meanwhile has Python and the tip's picture on their
+  way from that moment, and so has a visit that opens on another screen, whose first
+  wait shows its tip (D221). A visit that opens on these two reads its first tip at the
+  first scene it loads (D221). `pictured.test.ts` holds the wait for the pictures, and
+  `e2e/waiting.spec.ts` the start screen with no tip while its file is slow and at once
+  when it is there, the file asked for once, the welcome page with no waiting view for a
+  child who has begun and for a newcomer, nothing of the later screens asked for before
+  the painting of each of the two has come, and Python on its way at once from *Start
+  playing* and at a level opened by its address. Rules out a tip over the start screen
+  or the welcome page, and a file of a later screen fetched ahead of theirs.

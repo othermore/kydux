@@ -4,7 +4,7 @@
     "Recoge la llave.",
     "No escribas ningún número."
   ],
-  "starting_code": "# ¡Este es el programa de ayer, pero la llave se ha movido!\nkey = wizard.find_nearest(\"key\")\nwizard.move_left(4)\nwizard.pick_up()\n",
+  "starting_code": "# ¡Este es el programa de ayer, pero la llave se ha movido!\nllave_de_eldra = wizard.find_nearest(\"key\")\nwizard.move_left(4)\nwizard.pick_up()\n",
   "hints": [
     "Usa el método `distance_to` de la llave para saber los pasos hasta ti, y guarda ese número en una variable.",
     "Pon esa variable dentro de los paréntesis del método `move_left`.",

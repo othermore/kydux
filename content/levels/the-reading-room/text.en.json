@@ -1,0 +1,22 @@
+{
+  "title": "The reading room",
+  "goals": [
+    "Reach the door.",
+    "Keep the number of steps in a variable and walk with it.",
+    "Write the number only once in the whole program."
+  ],
+  "goals_short": [
+    "",
+    "Use a variable for the steps.",
+    "Write the number only once."
+  ],
+  "starting_code": "# Comments like this one tell you what to write under them. Read them all!\n\n# Keep the number 2 in a variable. The name is yours to choose.\n\n# Walk left with `move_left` and your variable between the brackets.\n\n# Go up with `move_up` and the same variable.\n\n# Go right with `move_right` and the same variable, to the door.\n",
+  "hints": [
+    "A line that keeps a number is written with the variable's name, then `=`, and then the number.",
+    "The variable goes where the number went, between the brackets of each move.",
+    "The three stretches are two steps each. With `steps = 2` you can define a variable `steps`, and then use it in the three moves, as in `wizard.move_left(steps)`."
+  ],
+  "intro": "The door is beyond the tables. Because I set my tables in order, the way is three stretches of the same length, two steps each: left, up and right. I do not want you to write the number `2` three times: keep it in a variable and use that variable as many times as you need.",
+  "outro": "Well done! We have reached the door.",
+  "learned": "Now you know what a variable is and that it can be the argument of a method."
+}

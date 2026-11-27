@@ -5,6 +5,11 @@
     "En menos de 12 líneas.",
     "Pasa por los ocho aros en orden: en cada pareja, el primero hacia arriba y el segundo hacia abajo."
   ],
+  "goals_short": [
+    "",
+    "",
+    "Pasa por los ocho aros en orden."
+  ],
   "starting_code": "# Define la función two_rings con dos argumentos:\n\n    # Muévete hacia arriba dos casillas\n    \n    # Muévete a la derecha hasta el segundo aro\n    \n    # Muévete hacia abajo dos casillas\n    \n    # Muévete a la derecha hasta el siguiente aro\n    \n# Lanza la palabra mágica con cast\n\n# Muévete a la derecha hasta el primer aro\n\n# Llama a two_rings para la primera pareja\n\n# Llama a two_rings para la segunda pareja\n\n# Llama a two_rings para la tercera pareja\n\n# Llama a two_rings para la cuarta pareja\n\n",
   "hints": [
     "El zigzag de la función `two_rings(to_second, to_next)` es el mismo en las cuatro parejas: arriba 2, derecha `to_second`, abajo 2, derecha `to_next`.",

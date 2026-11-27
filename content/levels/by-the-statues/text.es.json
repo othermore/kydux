@@ -5,6 +5,11 @@
     "Que Dask no te vea.",
     "Termina justo sobre la marca, con un segundo `if`."
   ],
+  "goals_short": [
+    "Llega a la marca.",
+    "",
+    "Termina en la marca."
+  ],
   "starting_code": "# Si Dask mira hacia arriba, baja dos casillas con `move_down`.\n\n# Camina a la derecha con `move_right`.\n\n# Baja con `move_down`.\n",
   "hints": [
     "¡Podemos comprobar hacia dónde mira Dask con `facing`!",

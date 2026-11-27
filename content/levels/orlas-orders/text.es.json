@@ -13,7 +13,7 @@
   ],
   "intro": "Los familiares nacen sabiendo andar, pero si quieres que vaya solo a un sitio concreto, tienes que enseñarle a hacerlo.\n\nEn Arvelia, eso se llama `go_to`. Enséñaselo y luego llévalo al plato del sol.",
   "outro": "Voy a copiar tu `go_to` en el libro. Así, cuando le digas que vaya a un sitio, siempre sabrá cómo hacerlo.",
-  "learned": "Ahora sabes que un método es una acción de una clase, escrita con `def` dentro de ella y con `self`, que se usa con el punto, y que quien sabe su nombre puede mandar al objeto sin saber cómo está hecho por dentro.",
+  "learned": "Ahora sabes que un método es una función de una clase, escrita con `def` dentro de ella y con `self`, que se usa con el punto, y que quien sabe su nombre puede mandar al objeto sin saber cómo está hecho por dentro.",
   "told": {
     "order_star": "Ahora, déjame probar a mí para ver que lo has enseñado bien.\n\n{familiar}: ¡A la estrella!",
     "order_wizard": "{familiar}: ¡Con tu {mago|maga}!"

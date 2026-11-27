@@ -4,6 +4,10 @@
     "Sal por la salida del túnel: búscala en el mapa.",
     "Comprueba en qué casilla estás con `position`."
   ],
+  "goals_short": [
+    "Encuentra la salida del túnel.",
+    "Mira en qué casilla estás."
+  ],
   "starting_code": "# Abre el mapa con su hechizo y busca la salida.\n\n# Imprime dónde estás con `position` y `print`.\n\n# Sube hasta la fila de la salida con `move_up`.\n\n# Camina a la derecha hasta la salida con `move_right`.\n",
   "hints": [
     "¡Lanza *orvim* para ver la salida en el mapa!",

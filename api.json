@@ -64,7 +64,7 @@
       {
         "name": "give",
         "kind": "action",
-        "example": "wizard.give(book)"
+        "example": "wizard.give(eldras_book)"
       },
       {
         "name": "cast",
@@ -79,7 +79,7 @@
       {
         "name": "distance_to",
         "kind": "action",
-        "example": "wizard.distance_to(key)"
+        "example": "wizard.distance_to(my_key)"
       },
       {
         "name": "position",

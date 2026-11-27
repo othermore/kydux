@@ -1,8 +1,8 @@
 # For each one
 
-If we have a list of brooms, how do we use them? We can write `for broom in brooms:` to run the lines moved in under it once for each element of the list. In each turn, `broom` is the next one!
+If we have a list of brooms, how do we use them? We can write `for each_broom in brooms:` to run the lines moved in under it once for each element of the list. In each turn, `each_broom` is the next one!
 
-It's exactly the `for` loop you already know, but going through things instead of counting. The lines inside, moved in by four spaces, can use `broom` to do something with it. For example, if you stand under a hanging broom, `broom.untie()` unties its knot.
+It's exactly the `for` loop you already know, but going through things instead of counting. The lines inside, moved in by four spaces, can use `each_broom` to do something with it. For example, if you stand under a hanging broom, `each_broom.untie()` unties its knot.
 
 ```python try
 names = ["Teku", "Nuri", "Bimo"]

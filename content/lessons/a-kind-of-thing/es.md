@@ -17,17 +17,17 @@ class Crow:
 ---
 ## El objeto
 
-Para hacer cosas de una clase, tenemos que construirlas, como conjurar a una criatura. Una cosa hecha con la clase es un **objeto**. Se hace escribiendo el nombre de la clase con paréntesis, y se guarda con un nombre, como cualquier valor.
+Para hacer cosas de una clase, tenemos que construirlas, como conjurar a una criatura. Una cosa hecha con la clase es un **objeto**. Se hace escribiendo el nombre de la clase con paréntesis, y se guarda en una variable, como cualquier valor.
 
 ```python try
 class Crow:
     pass
 
-one = Crow()
-other = Crow()
-print(one)
-print(other)
-print(one == other)
+uno = Crow()
+otro = Crow()
+print(uno)
+print(otro)
+print(uno == otro)
 ```
 
 Al imprimir un objeto, Python dice que es un `Crow` y añade un número largo, que es su sitio en la memoria. Los dos números son distintos, y la última línea da `False`: de una misma clase han salido dos objetos, y no son el mismo.

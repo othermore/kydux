@@ -140,6 +140,9 @@
     "wizard.find_nearest",
     "broom.untie"
   ],
+  "to_find": [
+    "broom"
+  ],
   "goals": [
     {
       "kind": "untied",

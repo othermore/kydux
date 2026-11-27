@@ -13,7 +13,7 @@
   ],
   "intro": "Familiars are born knowing how to walk, but if you want yours to go to one given place by itself, you have to teach it how.\n\nIn Arvelia, that is called `go_to`. Teach it, and then take it to the sun's plate.",
   "outro": "I am going to copy your `go_to` into the book. Then, when you tell it to go somewhere, it will always know how.",
-  "learned": "Now you know that a method is an action of a class, written with `def` inside it and with `self`, used with the dot, and that whoever knows its name can send the object without knowing how it is made inside.",
+  "learned": "Now you know that a method is a function of a class, written with `def` inside it and with `self`, used with the dot, and that whoever knows its name can send the object without knowing how it is made inside.",
   "told": {
     "order_star": "Now, let me try it myself, to see that you have taught it well.\n\n{familiar}: To the star!",
     "order_wizard": "{familiar}: Back to your wizard!"

@@ -14,5 +14,8 @@
   ],
   "intro": "El camino sigue por esa puerta cerrada. Su llave cayó bajo la gran estantería hace mucho tiempo, donde nadie puede verla. El libro de Eldra ha vuelto con ella y ya no hay ningún libro en el pasillo; esta vez es la llave la que no está a la vista. Encuéntrala, muestra dónde está, recógela, abre la puerta y pasa.",
   "outro": "¡Bien hecho! La puerta está abierta, y el pasillo superior está justo delante.",
-  "learned": "Ahora sabes que una cosa que no está a la vista sigue ahí para un programa, y cómo una puerta se abre con su llave."
+  "learned": "Ahora sabes que una cosa que no está a la vista sigue ahí para un programa, y cómo una puerta se abre con su llave.",
+  "told": {
+    "revealed": "¡Mira! La llave está detrás de esa estantería. Habrá que entrar entre las dos estanterías."
+  }
 }

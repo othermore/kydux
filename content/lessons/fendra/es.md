@@ -2,7 +2,7 @@
 
 ¡Un hechizo puede cruzar el espacio vacío! El hechizo *fendra*, lanzado con la varita, atrae una cosa a la propia casilla de tu {mago|maga}.
 
-Como los estantes altos de la biblioteca están llenos de libros, el hechizo necesita saber exactamente cuál quieres. Debes darle la variable en la que tu programa guarda la cosa, como su segundo argumento: `wizard.cast("fendra", book)`.
+Como los estantes altos de la biblioteca están llenos de libros, el hechizo necesita saber exactamente cuál quieres. Debes darle la variable en la que tu programa guarda la cosa, como su segundo argumento: `wizard.cast("fendra", otro_libro)`.
 
 ---
 ## Volar sobre las cosas

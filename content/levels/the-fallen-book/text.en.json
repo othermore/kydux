@@ -1,0 +1,16 @@
+{
+  "title": "The fallen book",
+  "goals": [
+    "Make the book glow with `reveal`.",
+    "Pick up the book."
+  ],
+  "starting_code": "# This line is already written: it finds the book and keeps it in the variable `treasure`.\ntreasure = wizard.find_nearest(\"book\")\n\n# Make it glow with `reveal`. It is a method of the book, so you must use it\n# by putting a dot right after the variable in which we kept the book.\n\n# Walk left to the book.\n\n# Pick it up with `pick_up`.\n",
+  "hints": [
+    "`reveal` is the book's method, so the variable, the object you want to reveal, goes before the dot, as with `door`.",
+    "The book lies four steps to the left.",
+    "`pick_up` is your wizard's method and needs nothing between its brackets."
+  ],
+  "intro": "A book on the floor again... The first line, which I have already written, finds it and keeps it in `treasure`. Make it glow, walk to it and pick it up. Read the comments in the program: they tell you what to do on each line. And if you get stuck, ask for a hint.",
+  "outro": "Let me take it; I will put it back on its shelf.",
+  "learned": "Now you know that a method can give something back, that a variable keeps it, and that the thing kept has its own methods."
+}

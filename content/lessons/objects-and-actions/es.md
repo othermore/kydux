@@ -1,4 +1,4 @@
-# Objetos y acciones
+# Objetos y métodos
 
 En un programa, todo es un objeto. Los personajes, las cosas que encuentras, una puerta, un libro... todos son objetos. Tu {mago|maga} también es un objeto, el que llamamos `wizard`.
 

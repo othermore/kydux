@@ -4,6 +4,10 @@
     "Say how many brooms are on the floor, with `say`.",
     "Print a list with `print`."
   ],
+  "goals_short": [
+    "Say how many brooms there are.",
+    ""
+  ],
   "starting_code": "# Find the brooms on the floor with `find_all`.\n# Print the list with `print`.\n# Say how many there are with `say` and `len`.\n",
   "hints": [
     "The hanging brooms are easy to see, so we only need to count the ones on the floor!",

@@ -18,7 +18,7 @@
     },
     "notebook": {
       "title": "The notebook",
-      "text": "This button opens the *Notebook*. It lists what the wizard can do, each with an example, and clicking an example puts it right in the editor."
+      "text": "This button opens the *Notebook*. It lists what the wizard can do, each method with an example, and clicking an example puts it right in the editor."
     },
     "hint": {
       "title": "The Hint button",

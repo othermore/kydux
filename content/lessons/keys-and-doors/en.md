@@ -1,8 +1,6 @@
 # Keys and doors
 
-A door is an object, and it has a method of its own: `door.open()`.
-
-But a door only opens for a wizard standing right beside it. And if the door is locked, it will only open when its key is carried!
+You already know that a door is an object with its own method, `door.open()`, and that it only opens for a wizard right beside it. But some doors are locked with a key, and a locked door will only open when you carry its key!
 
 ---
 ## Hidden things

@@ -1,0 +1,16 @@
+{
+  "title": "Wenna's door",
+  "goals": [
+    "Open the door.",
+    "Go through it into the corridor."
+  ],
+  "starting_code": "# Open the door with its `open` method. The door's variable goes before the dot.\n\n# Go up two steps to pass through.\n",
+  "hints": [
+    "Remember whose method `open` is, and what is written before the dot.",
+    "A method needs its brackets, even with nothing between them.",
+    "The object is called `door` and its method `open`: it is written `door.open()`. Once it is open, go up two steps."
+  ],
+  "intro": "The doors of my library are opened by those who come to learn. As this door is not locked, you can open it simply by using its `open` method. Open it and go through into the corridor. And if it does not work the first time, remember that you can ask for a hint.",
+  "outro": "We are in the corridor.",
+  "learned": "Now you know that an object other than your wizard has its own methods, and that they are written after the variable that keeps it."
+}

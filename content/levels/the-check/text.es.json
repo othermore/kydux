@@ -5,11 +5,11 @@
     "El programa termina sin error.",
     "Usa `knotted`."
   ],
-  "starting_code": "# ¡El programa que usamos para la pared se para en la primera escoba sin nudo!\nwizard.move_up(3)\nwizard.move_right(4)\nbrooms = wizard.find_all(\"broom\")\nfor broom in brooms:\n    steps = broom.distance_to(wizard)\n    wizard.move_left(steps)\n    broom.untie()\n",
+  "starting_code": "# ¡El programa que usamos para la pared se para en la primera escoba sin nudo!\nwizard.move_up(3)\nwizard.move_right(4)\nescobas = wizard.find_all(\"broom\")\nfor escoba in escobas:\n    pasos = escoba.distance_to(wizard)\n    wizard.move_left(pasos)\n    escoba.untie()\n",
   "hints": [
     "El programa intenta quitarles el nudo a todas las escobas, ¡pero quitar un nudo que no existe es un error!",
     "Solo queremos quitar el nudo si la escoba realmente lo tiene. Mira su atributo para ver si está anudada antes de usar el método.",
-    "¡Pon un `if` dentro del bucle para mirar `broom.knotted`, justo antes de quitar el nudo, y no olvides añadir cuatro espacios más antes del método para que esté dentro del `if`!"
+    "¡Pon un `if` dentro del bucle para mirar `escoba.knotted`, justo antes de quitar el nudo, y no olvides añadir cuatro espacios más antes del método para que esté dentro del `if`!"
   ],
   "intro": "{mate} se ha dado cuenta de que algunas escobas todavía tienen un nudo encantado. Quizás tenían dos, o quizás se nos escaparon al intentar quitárselos, así que hay que repasarlas. He puesto el programa que usamos para recorrer las escobas en la pared, para ir una por una desatando el nudo. ¡Pero se para en la primera escoba sin nudo, cuelgue donde cuelgue, porque quitar un nudo que no existe es un error! ¿Puedes arreglar el programa con un `if`? Para ver si una escoba tiene nudo, se puede usar su atributo `knotted`.",
   "outro": "¡Todas las escobas de la pared están sin nudos! Ahora tenemos que ocuparnos de las que están tiradas por la paja, que son las siguientes.",

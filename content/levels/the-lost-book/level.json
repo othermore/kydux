@@ -14,7 +14,8 @@
         16
       ],
       "open": true,
-      "art": "wenna_door"
+      "art": "wenna_door",
+      "variable": false
     },
     {
       "kind": "book",
@@ -32,7 +33,8 @@
       "at": [
         5,
         17
-      ]
+      ],
+      "facing": "right"
     },
     {
       "kind": "friend",
@@ -40,7 +42,8 @@
       "at": [
         9,
         17
-      ]
+      ],
+      "facing": "left"
     }
   ],
   "api": [
@@ -48,16 +51,26 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.items",
-    "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
     "thing.reveal"
+  ],
+  "to_find": [
+    "book"
   ],
   "goals": [
     {
       "kind": "collect",
       "id": "old_book"
+    },
+    {
+      "kind": "own_name",
+      "find": "book",
+      "not": [
+        "book",
+        "tesoro",
+        "treasure"
+      ]
     },
     {
       "kind": "uses",
@@ -82,9 +95,9 @@
     "#.=========.###",
     "#=..........###",
     "#==========.###",
-    "#...........###",
+    "#..S........###",
     "#====##.##====#",
-    "#=.....S..====#",
+    "#=........====#",
     "#====.===.====#",
     "##...........##",
     "##....###....##",

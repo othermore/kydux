@@ -4,7 +4,7 @@
     "Pick up the key.",
     "Write no number at all."
   ],
-  "starting_code": "# This is yesterday's program, but the key has moved!\nkey = wizard.find_nearest(\"key\")\nwizard.move_left(4)\nwizard.pick_up()\n",
+  "starting_code": "# This is yesterday's program, but the key has moved!\neldras_key = wizard.find_nearest(\"key\")\nwizard.move_left(4)\nwizard.pick_up()\n",
   "hints": [
     "Use the key's method `distance_to` to learn the steps to you, and keep that number in a variable.",
     "Put that variable inside the brackets of the `move_left` method.",

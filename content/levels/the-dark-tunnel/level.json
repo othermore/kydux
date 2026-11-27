@@ -32,6 +32,8 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
+    "wizard.items",
+    "door.locked",
     "wizard.position",
     "thing.position"
   ],

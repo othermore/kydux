@@ -4,6 +4,10 @@
     "Reach the white stone.",
     "Land on the white stone before the program ends."
   ],
+  "goals_short": [
+    "",
+    "Land on the white stone."
+  ],
   "starting_code": "# Walk to the end of the jetty with `move_right`.\n\n# Cast the word that lifts the broom with `cast`.\n\n# Fly to the stone with `move_right`.\n",
   "hints": [
     "It is 8 steps to the end of the jetty. Walk there first!",

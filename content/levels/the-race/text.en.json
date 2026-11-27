@@ -5,6 +5,11 @@
     "In fewer than 12 lines.",
     "Fly through the eight rings in order: in each pair, the first upward and the second downward."
   ],
+  "goals_short": [
+    "",
+    "",
+    "Fly through the eight rings in order."
+  ],
   "starting_code": "# Define the function two_rings with two arguments:\n\n    # Move up two cells\n    \n    # Move right to the second ring\n    \n    # Move down two cells\n    \n    # Move right to the next ring\n    \n# Cast the magic word\n\n# Move right to the first ring\n\n# Call two_rings for the first pair\n\n# Call two_rings for the second pair\n\n# Call two_rings for the third pair\n\n# Call two_rings for the fourth pair\n\n",
   "hints": [
     "The zigzag of the function `two_rings(to_second, to_next)` is the same for the four pairs: up 2, right `to_second`, down 2, right `to_next`.",

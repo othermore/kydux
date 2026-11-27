@@ -157,6 +157,9 @@
     "position.x",
     "position.y"
   ],
+  "to_find": [
+    "broom"
+  ],
   "goals": [
     {
       "kind": "untied",

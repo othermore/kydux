@@ -4,6 +4,10 @@
     "Your familiar in the forgotten room, on (13, 3).",
     "It bumps into nothing."
   ],
+  "goals_short": [
+    "Take your familiar to the room.",
+    ""
+  ],
   "starting_code": "# Send {familiar} with `go_to` to the passage's first corner: 10, 8.\n\n# With `go_to`, along the passage to 13, 8.\n\n# With `go_to`, up into the room: 13, 3.\n\n",
   "hints": [
     "The passage goes up, turns right and goes up again: it has two corners before the room.",

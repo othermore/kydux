@@ -11,7 +11,7 @@ In this game, the computer does everything for you. You just give it the instruc
 
 Your wizard is you in the game. In every level the game shows a round mark on the ground, which beats softly: it is the place your wizard must get to.
 
-Our first instruction will be `wizard.move_right()`. This tells your wizard to take one step to the right. I will show you what each part of that instruction means very soon!
+Our first instruction will be `wizard.move_right()`. It asks your wizard for an action (a method; I will explain that word soon): to take one step to the right. I will show you what each part of that instruction means very soon!
 
 ---
 ## Try it

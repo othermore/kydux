@@ -30,7 +30,7 @@ Ahora el objeto se hace dándole sus datos entre los paréntesis: `Crow("Vesso",
 
 Aquí nacen dos cuervos, cada uno con sus datos. Cuando lo hayas probado, quita un dato de entre los paréntesis y mira qué dice Python.
 
-```python try
+```python try change
 class Crow:
     def __init__(self, name, color):
         self.name = name

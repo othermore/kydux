@@ -11,7 +11,7 @@ The first line is the condition. The line under it, moved in by four spaces, run
 
 Dask looks up right now, so this program prints both lines. Change `"up"` to `"down"` and run it again, and only the cell is printed, because the condition is no longer `True`.
 
-```python try
+```python try change
 if dask.facing == "up":
     print("Looking up")
 print("Position:", wizard.position)
@@ -30,7 +30,7 @@ The Backspace key, which is above Enter and often has an arrow that points left,
 
 You can try it yourself. Put the cursor at the start of the last line and press Tab. You will see that the line moves inside the `if`, and if you run it, it will not be printed any more. If you delete the spaces and run it again, the line will be printed.
 
-```python try
+```python try change
 if dask.facing == "down":
     print("Dask looks down")
 print("This line is outside the if")

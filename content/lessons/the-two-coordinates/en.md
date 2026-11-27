@@ -5,17 +5,17 @@ Do you remember how the naughty child's map works? We count the x from the left 
 ---
 ## The two numbers
 
-A position holds two numbers, and they are its two attributes: `key.position.x` is the first and `key.position.y` the second. Ours are `wizard.position.x` and `wizard.position.y`. The steps from one cell to another are just the difference of those numbers! The steps to the right are the key's `x` less ours, and the steps down are the key's `y` less ours.
+A position holds two numbers, and they are its two attributes: `my_key.position.x` is the first and `my_key.position.y` the second. Ours are `wizard.position.x` and `wizard.position.y`. The steps from one cell to another are just the difference of those numbers! The steps to the right are the key's `x` less ours, and the steps down are the key's `y` less ours.
 
 For example, if we are at (5, 7) and the key is at (9, 8): 9 - 5 = 4 steps to the right, and 8 - 7 = 1 step down. Those two numbers can be kept in two variables, like `right` and `down`, and given to the moves. In this room the key always lies to our right and never higher than we are, so the two subtractions are never below zero. And do not worry, a move of zero steps walks nothing at all!
 
 ---
 ## Try it
 
-The program keeps your wizard's position in a variable, `position`, and then prints its two numbers, its attribute `x` first and its attribute `y` second, each on its own line. This way you can see the two numbers of the cell where you stand!
+The program keeps your wizard's position in a variable, `my_cell`, and then prints its two numbers, its attribute `x` first and its attribute `y` second, each on its own line. This way you can see the two numbers of the cell where you stand!
 
 ```python try
-position = wizard.position
-print(position.x)
-print(position.y)
+my_cell = wizard.position
+print(my_cell.x)
+print(my_cell.y)
 ```

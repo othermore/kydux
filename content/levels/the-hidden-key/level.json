@@ -51,8 +51,6 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.items",
-    "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
     "wizard.find_item",
@@ -60,6 +58,17 @@
     "door.open",
     "thing.reveal"
   ],
+  "to_find": [
+    "key"
+  ],
+  "told": {
+    "revealed": [
+      [
+        "mate",
+        "revealed"
+      ]
+    ]
+  },
   "goals": [
     {
       "kind": "collect",

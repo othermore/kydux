@@ -89,6 +89,9 @@
     "position.y",
     "wizard.position"
   ],
+  "to_find": [
+    "key"
+  ],
   "goals": [
     {
       "kind": "collect",

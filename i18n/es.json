@@ -79,7 +79,11 @@
     "kind_improve": "Este programa funciona, pero puede ser mejor. Mejóralo.",
     "continue": "Continuar",
     "starting_again": "Empezando el nivel otra vez…",
-    "find_wizard": "Buscar a {mi mago|mi maga}"
+    "find_wizard": "Buscar a {mi mago|mi maga}",
+    "have": "Tienes",
+    "to_find": "Por encontrar",
+    "scroll_left": "Ver las anteriores",
+    "scroll_right": "Ver las siguientes"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

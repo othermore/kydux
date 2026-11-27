@@ -903,6 +903,181 @@ footer a {
   min-height: 0;
 }
 
+/* The two lists over the editor (D346): Tienes in a solid box, Por encontrar in a dashed
+   one, side by side, one row of long chips each; with their titles they take the height
+   of two lines of the editor, in a letter smaller than the code's. */
+
+.program-lists {
+  --chip-size: calc(var(--editor-font-size, 16px) * 0.78);
+  display: flex;
+  gap: 8px;
+  height: calc(var(--editor-font-size, 16px) * 2.8);
+  margin-bottom: 6px;
+}
+
+.program-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.program-list[hidden] {
+  display: none;
+}
+
+.program-list.to-find {
+  flex: 0 1 34%;
+}
+
+.program-list-title {
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-left: 4px;
+}
+
+.chips-strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  padding: 0 2px;
+}
+
+.program-list.to-find .chips-strip {
+  border-style: dashed;
+  background: transparent;
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0 2px;
+  list-style: none;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chips-strip.fade-before .chips {
+  mask-image: linear-gradient(to right, transparent 0, #000 18px);
+}
+
+.chips-strip.fade-after .chips {
+  mask-image: linear-gradient(to left, transparent 0, #000 18px);
+}
+
+.chips-strip.fade-before.fade-after .chips {
+  mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+.chips > li {
+  flex: none;
+  max-width: 50%;
+  display: flex;
+}
+
+.chips-scroll {
+  flex: none;
+  width: 18px;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chips-scroll:disabled {
+  color: var(--ink-line);
+  cursor: default;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+  height: calc(var(--chip-size) * 1.7);
+  padding: 0 8px 0 5px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: var(--chip-size);
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chip.given {
+  background: #e3f0da;
+  border-color: #9cc086;
+  color: var(--moss-deep);
+}
+
+.chip.own {
+  background: var(--gold-soft);
+  border-color: #e3bf6b;
+  color: var(--gold-deep);
+}
+
+.chip.to-find {
+  background: #ece9e3;
+  border-color: #c9c3b8;
+  color: var(--ink-soft);
+}
+
+.chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.chip-value {
+  flex: none;
+  color: var(--ink);
+}
+
+.chip-value::before {
+  content: '= ';
+  color: var(--muted);
+}
+
+.chip-picture {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--chip-size) * 1.35);
+}
+
+.chip-image {
+  height: 100%;
+  width: auto;
+  max-width: calc(var(--chip-size) * 2.6);
+  object-fit: contain;
+}
+
 /* The notebook, over the scene, beside the editor. */
 
 .notebook {

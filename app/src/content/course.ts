@@ -162,6 +162,19 @@ export function isDone(item: string, progress: Progress, course?: Course): boole
   }
 }
 
+/** The first level whose editor has the lists of what the program has and what is to
+ * find over it (D346). */
+export const LISTS_FROM = 'level:the-reading-room';
+
+/** Whether a level's editor has the two lists over it (D346): every level from the
+ * reading room on in the course, none before it. */
+export function showsLists(course: Course, levelId: string): boolean {
+  const all = items(course);
+  const from = all.indexOf(LISTS_FROM);
+  const at = all.indexOf(`level:${levelId}`);
+  return from >= 0 && at >= from;
+}
+
 /** The concepts known on reaching a level (D60). */
 export function conceptsAt(course: Course, levelId: string): string[] {
   return course.concepts?.[levelId] ?? [];

@@ -30,7 +30,8 @@ import { zoomBox } from './zoom';
 import { element } from './dom';
 import { type GoalsPanel, type GoalsShape, goalsPanel, takeShape } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
-import { type ApiTable, describe, notebookEntries, notebookPanel } from './notebook';
+import { type GivenChip, programLists, type ProgramLists } from './lists';
+import { type ApiTable, describe, familiarVar, heldObjects, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
 import { openPlan, type PlanWindow } from './plan';
 import { portraitOf } from './portraits';
@@ -79,6 +80,33 @@ export interface LevelScreenParts {
    * start card opens the guide when closed the first time, and once the guide has been
    * seen offers it again (D248). */
   loadGuide?: () => Promise<GuideText>;
+  /** Whether the editor has the lists of what the program has and what is to find over
+   * it (D346): every level from the reading room on. */
+  lists?: boolean;
+}
+
+/** The variables a level gives, green in Tienes (D346): `wizard`; each other variable of
+ * the program's start with an entry of the notebook, a door's with its kind; each actor
+ * a give goal names; the living familiar. */
+export function givenChips(loaded: LoadedLevel, table: ApiTable): GivenChip[] {
+  const level = loaded.level;
+  const entries = new Set(notebookEntries(level, table, loaded.course).map((entry) => entry.object));
+  const kinds = new Map(((level.things as { id: string; kind: string }[] | undefined) ?? []).map((t) => [t.id, t.kind]));
+  const chips: GivenChip[] = [{ name: 'wizard' }];
+  const add = (chip: GivenChip) => {
+    if (!chips.some((one) => one.name === chip.name)) chips.push(chip);
+  };
+  for (const object of heldObjects(level, table)) {
+    if (object.name === 'wizard' || object.role === 'familiar' || !entries.has(object.name)) continue;
+    const kind = kinds.get(object.name);
+    add(kind ? { name: object.name, thing: kind } : { name: object.name });
+  }
+  for (const goal of (level.goals as { kind?: string; to?: unknown }[] | undefined) ?? []) {
+    if (goal.kind === 'give' && typeof goal.to === 'string') add({ name: goal.to });
+  }
+  const block = level.familiar as { stage?: string; living?: unknown } | undefined;
+  if (block?.stage === 'living' && block.living) add({ name: familiarVar(level) });
+  return chips;
 }
 
 export function levelScreen(parts: LevelScreenParts): LevelScreen {
@@ -253,6 +281,21 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   handle.setAttribute('aria-orientation', 'vertical');
   handle.setAttribute('aria-valuemin', String(Math.round(SPLIT_MIN * 100)));
   handle.setAttribute('aria-valuemax', String(Math.round(SPLIT_MAX * 100)));
+  // The lists of what the program has and what is to find, over the editor (D346); a
+  // chip opens the notebook.
+  const openNotebook = () => {
+    if (!notebook.open) notebook.toggle();
+    notebookButton.setAttribute('aria-expanded', String(notebook.open));
+    notebook.node.scrollTop = 0;
+  };
+  const lists: ProgramLists | null = parts.lists
+    ? programLists({
+        level: loaded.level,
+        given: givenChips(loaded, parts.table),
+        onHave: () => openNotebook(),
+        onFind: () => openNotebook(),
+      })
+    : null;
   const node = element('div', { className: 'level-screen' }, [
     element('section', { className: 'stage' }, [
       heading,
@@ -263,6 +306,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     ]),
     handle,
     element('section', { className: 'workbench' }, [
+      ...(lists ? [lists.node] : []),
       editorParent,
       element('div', { className: 'buttons' }, [
         run,
@@ -307,8 +351,10 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     onRun: () => runCode(),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
+      lists?.changed(doc);
     },
   });
+  lists?.show(editor.getDoc());
 
   const statusLine = (s: RuntimeStatus): string => {
     switch (s) {
@@ -817,6 +863,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       text = await loadLevelText(loaded.id, currentLanguage());
       if (!typed && editor.getDoc() === before.starting_code) editor.setDoc(text.starting_code);
       for (const [labelNode, say] of labels) labelNode.textContent = say();
+      lists?.relabel();
+      lists?.show(editor.getDoc());
       zoom.relabel();
       goals = goalsPanel(goalTexts());
       goalsSlot.replaceChildren(goals.node);
@@ -848,6 +896,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       stopped = [];
       controller.destroy();
       scene?.destroy();
+      lists?.destroy();
       editor.destroy();
     },
   };

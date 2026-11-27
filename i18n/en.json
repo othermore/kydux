@@ -79,7 +79,11 @@
     "kind_improve": "This program works, but it can be better. Make it better.",
     "continue": "Continue",
     "starting_again": "Starting the level again…",
-    "find_wizard": "Find my wizard"
+    "find_wizard": "Find my wizard",
+    "have": "You have",
+    "to_find": "To find",
+    "scroll_left": "See the ones before",
+    "scroll_right": "See the next ones"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

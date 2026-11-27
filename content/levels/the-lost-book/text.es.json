@@ -5,7 +5,12 @@
     "Guarda el libro en una variable con un nombre tuyo, que no sea `book` ni `tesoro`.",
     "Haz que el libro brille con `reveal`."
   ],
-  "starting_code": "# Encuentra el libro con `find_nearest` y la palabra \"book\", y guárdalo en una variable con un nombre que inventes.\n\n# Haz que brille con `reveal`.\n\n# Camina hacia él: ve a la derecha por el pasillo hasta el paso del lado, sube a la sala, recórrela hacia la izquierda hasta el final y baja un paso, junto a la pila.\n\n# Recógelo con `pick_up`.\n",
+  "goals_short": [
+    "",
+    "Guarda el libro en una variable con un nombre tuyo.",
+    ""
+  ],
+  "starting_code": "# Encuentra el libro con `find_nearest` y la palabra \"book\", y guárdalo en una variable con un nombre que inventes, que no sea `book` ni `tesoro`.\n\n# Haz que brille con `reveal`.\n\n# Camina hacia él: ve a la derecha por el pasillo hasta el paso del lado, sube a la sala, recórrela hacia la izquierda hasta el final y baja un paso, junto a la pila.\n\n# Recógelo con `pick_up`.\n",
   "hints": [
     "La línea tiene la forma de mi línea con `tesoro`, pero con tu propia variable en su lugar.",
     "`reveal` es un método del libro: delante del punto va esa misma variable tuya.",

@@ -3,6 +3,9 @@
   "goals": [
     "Conjure two familiars of different colours, one for you and one for {mate}, who has copied your very description."
   ],
+  "goals_short": [
+    "Conjure two familiars of different colours."
+  ],
   "starting_code": "class {familiar_class}(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\n{mate_var} = {familiar_class}(\"{mate_familiar}\", \"{mate_color}\")\nwizard.cast(\"minka\", {familiar_var})\nwizard.cast(\"minka\", {mate_var})\n",
   "hints": [
     "The first thing `__init__` takes is always the object being born.",

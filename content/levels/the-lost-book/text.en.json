@@ -5,7 +5,12 @@
     "Keep the book in a variable with a name of your own, neither `book` nor `treasure`.",
     "Make the book glow with `reveal`."
   ],
-  "starting_code": "# Find the book with `find_nearest` and the word \"book\", and keep it in a variable with a name you invent.\n\n# Make it glow with `reveal`.\n\n# Walk to it: go right along the corridor to the side passage, up into the hall, left along it to its end, and one step down, beside the pile.\n\n# Pick it up with `pick_up`.\n",
+  "goals_short": [
+    "",
+    "Keep the book in a variable with a name of your own.",
+    ""
+  ],
+  "starting_code": "# Find the book with `find_nearest` and the word \"book\", and keep it in a variable with a name you invent, neither `book` nor `treasure`.\n\n# Make it glow with `reveal`.\n\n# Walk to it: go right along the corridor to the side passage, up into the hall, left along it to its end, and one step down, beside the pile.\n\n# Pick it up with `pick_up`.\n",
   "hints": [
     "The line has the shape of my line with `treasure`, but with your own variable in its place.",
     "`reveal` is a method of the book: that same variable of yours goes before the dot.",

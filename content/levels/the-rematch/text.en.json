@@ -4,6 +4,10 @@
     "Win the race against Zarek.",
     "Fly through the eight rings in order: in each pair, the first upward and the second downward."
   ],
+  "goals_short": [
+    "",
+    "Fly through the eight rings in order."
+  ],
   "starting_code": "# This is the program that won the race, and Zarek has moved the rings.\ndef two_rings(to_second, to_next):\n    wizard.move_up(2)\n    wizard.move_right(to_second)\n    wizard.move_down(2)\n    wizard.move_right(to_next)\n\nwizard.cast(\"drevo\")\nwizard.move_right(1)\ntwo_rings(2, 4)\ntwo_rings(3, 5)\ntwo_rings(2, 4)\ntwo_rings(3, 2)\n",
   "hints": [
     "Look at the rings closely. They are no longer in the same places!",

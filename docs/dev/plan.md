@@ -156,7 +156,8 @@ content/
                                           (`told`, `won` and `revealed`, D264, D355)
     text.en.json  text.es.json            title, goals, hints, starting code's
                                           comments and strings, intro, outro and what
-                                          was learned (D45, D62)
+                                          was learned (D45, D62); a goal's short form
+                                          for the goals box (`goals_short`, D362)
     solution.py                           wins the level
     wrong/*.py                            each must not win (the naive mistakes)
 ```

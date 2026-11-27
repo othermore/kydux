@@ -5917,3 +5917,21 @@ one overturns stays, marked as superseded.
   or higher as a figure on its cell is drawn. The wall still covers the figures' feet there,
   and the art test keeps the row among the cells seen over what is in front of them. Rules
   out the corridor's cells moved, which the levels' texts walk, and a repainted wall.
+- **D362 — A goal may say less in the goals box than on the start card.** Decided
+  2026-11-26 by the owner (*El objetivo guarda el libro en una variable necesita un texto
+  más corto. Lo de que no sea ni book ni tesoro se puede poner en la versión expandida de
+  los objetivos que se muestra al principio y en los comentarios del código, y en el panel
+  de objetivos se deja más corto*; *quizás algunos textos de objetivos se pueden acortar
+  también, ese que has puesto por ejemplo, se podría dejar solo en vuela por los 6 anillos
+  y explicar los detalles en comentarios en el código y/o en la "tarjeta" inicial del
+  nivel*). A level's texts may give `goals_short`, one for each
+  goal in the same order, an empty one for a goal said as it is: the goals box over the
+  scene (D227) says the short form, and the start card says every goal whole. The i18n
+  check holds that a level's `goals_short`, when given, has one for each goal in every
+  language. A short form is the goal's first clause, cut at its colon or comma: *Pasa por
+  los seis aros en orden.* in the box, and on the card how each pair is flown. Five goals
+  have one (`the-slate`, `the-rings`, `the-rematch`, `the-race`, `the-lost-book`), and
+  `the-lost-book`'s starting code's first comment says the rest of its goal, *que no sea
+  `book` ni `tesoro`*, in the goal's own words. Which goals are said shorter is the
+  designer's and the owner's to say. Rules out a goals box that takes half the scene for
+  one goal, and a rule the child reads only on the card.

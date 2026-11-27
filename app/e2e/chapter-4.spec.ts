@@ -997,7 +997,7 @@ test.describe('the rings and the race', () => {
     await page.screenshot({ path: `${SHOTS}ring-rim-card.png` });
   });
 
-  test("the rim's thought comes half a second after the bump, beside the head clear of the goals box, and the card once it is read (D237, D240, D245)", async ({
+  test("the rim's thought comes half a second after the bump, clear of the goals box, and the card once it is read (D237, D240, D245)", async ({
     page,
   }) => {
     await open(page, 'the-rings', '1');
@@ -1018,11 +1018,12 @@ test.describe('the rings and the race', () => {
     await expect(scene(page)).toHaveAttribute('data-thought', 'Oh, giré demasiado pronto y rocé el aro.', {
       timeout: ciTimes(10_000),
     });
-    // Beside the head: over the hat the goals box, open along the top, would cover it
-    // (D240, D245).
+    // Clear of the goals box, open along the top: over the hat where the box leaves room,
+    // as its short goal does (D362), and beside the head where it would cover it (D240,
+    // D245).
     await expect(page.locator('.goals')).toHaveAttribute('data-shape', 'strip');
     await expect(page.locator('.goals')).toHaveAttribute('data-folded', 'false');
-    await expect(scene(page)).toHaveAttribute('data-words-place', /^(left|right)$/);
+    await expect(scene(page)).toHaveAttribute('data-words-place', /^(above|left|right)$/);
     await expect(scene(page)).toHaveAttribute('data-words-over', /^-?\d+\.\d\d$/);
     const [left, top, right, bottom] = ((await scene(page).getAttribute('data-thought-box')) ?? '').split(',').map(Number);
     const goals = await page.locator('.goals').boundingBox();

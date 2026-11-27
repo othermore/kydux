@@ -332,6 +332,18 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}s26-key-glow.png` });
   });
 
+  test('the lost book: the start card says the second goal whole, the goals box its short form (D362)', async ({ page }) => {
+    await page.goto('/#start');
+    await page.goto('/#level/the-lost-book');
+    const whole = 'Keep the book in a variable with a name of your own, neither book nor treasure.';
+    const short = 'Keep the book in a variable with a name of your own.';
+    await expect(page.locator('.start-card .start-goals li').nth(1)).toHaveText(whole);
+    await page.locator('#start').click();
+    await expect(page.locator('.goals .goal').nth(1)).toHaveText(short);
+    // The code's first comment says the rest of the rule.
+    await expect(page.locator('.cm-content')).toContainText('neither `book` nor `treasure`');
+  });
+
   test('the old book by the pile glows in its own shape, nothing of the pile with it', async ({ page }) => {
     await open(page, 'the-lost-book');
     await page.locator('#speed').selectOption('1');

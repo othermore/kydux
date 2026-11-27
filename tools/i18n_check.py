@@ -113,6 +113,12 @@ def check_levels(languages: list[str]) -> list[str]:
                 findings.append(
                     f"{name}/text.{lang}.json: {goals} goals in level.json, not as many here"
                 )
+            # A goal's short form for the goals box, one for each goal when given (D362).
+            short = text.get("goals_short")
+            if short is not None and (not isinstance(short, list) or len(short) != goals):
+                findings.append(
+                    f"{name}/text.{lang}.json: goals_short is not one for each of {goals} goals"
+                )
             # The child is told what may differ at each run, never of ways (D204).
             for key in ("changes", "changed"):
                 if level.get("ways") and not text.get(key):

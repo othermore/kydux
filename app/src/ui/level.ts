@@ -174,7 +174,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     (goal) => goal.bonus === true,
   );
   const goalTexts = () => text.goals.map((g, index) => ({ text: g, bonus: bonus[index] }));
-  let goals: GoalsPanel = goalsPanel(goalTexts());
+  // The goals box says a goal's short form where the level gives one (D362).
+  const boxGoals = () => text.goals.map((g, index) => ({ text: text.goals_short?.[index] || g, bonus: bonus[index] }));
+  let goals: GoalsPanel = goalsPanel(boxGoals());
   goalsSlot.append(goals.node);
   // The goals box's shape, taken once in the level's visit, and whether it is to fold, or
   // was folded, by itself (D227).
@@ -926,7 +928,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       lists?.relabel();
       lists?.show(editor.getDoc());
       zoom.relabel();
-      goals = goalsPanel(goalTexts());
+      goals = goalsPanel(boxGoals());
       goalsSlot.replaceChildren(goals.node);
       if (goalsShape) {
         goals.shape(goalsShape);

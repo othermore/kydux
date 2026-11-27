@@ -5,6 +5,11 @@
     "Llega a la piedra blanca.",
     "En menos de 16 líneas."
   ],
+  "goals_short": [
+    "Pasa por los seis aros en orden.",
+    "",
+    ""
+  ],
   "starting_code": "# Las instrucciones para pasar por una pareja de aros se repiten tres veces igual. ¡Crea una función para no repetirlo!\nwizard.cast(\"drevo\")\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_up(6)\nwizard.move_right(8)\nwizard.move_down(6)\nwizard.move_right(1)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\nwizard.move_right(11)\nwizard.move_up(2)\nwizard.move_right(2)\nwizard.move_down(2)\nwizard.move_right(2)\n",
   "hints": [
     "Busca las cuatro líneas que pasan por un par de aros: arriba, derecha, abajo y derecha.",

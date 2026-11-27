@@ -8,8 +8,11 @@ import { contentUrl } from './address';
 
 export interface LevelText {
   title: string;
-  /** One for each of level.json's goals, in the same order. */
+  /** One for each of level.json's goals, in the same order: said whole on the start card. */
   goals: string[];
+  /** A shorter form of a goal for the goals box over the scene, one for each goal, in the
+   * same order; an empty one, or none at all, is the goal as it is (D362). */
+  goals_short?: string[];
   starting_code: string;
   /** From the gentlest to the one that nearly says it; never the solution. */
   hints?: string[];

@@ -104,7 +104,7 @@ def test_fendra_is_told_which_thing_and_the_other_spells_none():
     world = World(LEVEL)
     with pytest.raises(ActionArguments) as told:
         world.wizard.cast("fendra")
-    assert told.value.example == 'wizard.cast("fendra", book)'
+    assert told.value.example == 'wizard.cast("fendra", other_book)'
     with pytest.raises(ActionArguments):
         world.wizard.cast("fendra", "book")
     with pytest.raises(ActionArguments) as told:

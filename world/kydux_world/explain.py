@@ -185,7 +185,29 @@ def _search_word(name: str, level: Level, code: str | None) -> Explanation | Non
     return Explanation("search_word", {"name": name})
 
 
+#: An example's thing given by a variable, which the child's own variable takes the place
+#: of when the code keeps a find (D345): `wizard.give(eldras_book)`.
+_THING_ARGUMENT = re.compile(
+    r"^(wizard\.(?:give|pick_up|distance_to)\(|wizard\.cast\(\"fendra\", )(\w+)\)$"
+)
+
+
+def _named(explanation: Explanation, code: str | None) -> Explanation:
+    """An `arguments` explanation whose example gives the wizard a thing, with the variable
+    the child's code keeps a found thing in where it keeps one."""
+    example = explanation.params.get("example")
+    kept = first_kept(code, FINDS_KEPT)
+    if explanation.kind != "arguments" or not isinstance(example, str) or kept is None:
+        return explanation
+    named = _THING_ARGUMENT.sub(lambda found: f"{found.group(1)}{kept})", example)
+    return Explanation(explanation.kind, {**explanation.params, "example": named})
+
+
 def explain(error: BaseException, level: Level, code: str | None = None) -> Explanation:
+    return _named(_explain(error, level, code), code)
+
+
+def _explain(error: BaseException, level: Level, code: str | None = None) -> Explanation:
     if isinstance(error, IndexError):
         return index_explanation(error, code)
     if isinstance(error, NotCalled):

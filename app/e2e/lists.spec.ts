@@ -89,11 +89,21 @@ test('a number written by hand shows its value; a row with more chips than fit s
   await page.locator('.workbench').screenshot({ path: `${SHOTS}scrolled.png` });
 });
 
-test('a chip opens the notebook', async ({ page }) => {
+test("a chip opens the notebook at its object's page, written with its variable; one of Por encontrar at what is to find (D347)", async ({
+  page,
+}) => {
   await open(page, 'the-fallen-book');
   await expect(page.locator('#notebook')).toBeHidden();
   await have(page).nth(1).click();
-  await expect(page.locator('#notebook')).toBeVisible();
+  const notebook = page.locator('#notebook');
+  await expect(notebook).toBeVisible();
+  const kept = notebook.locator('.notebook-object[data-object="tesoro"]');
+  await expect(kept).toBeInViewport();
+  await expect(kept.locator('[data-example="tesoro.reveal()"]')).toBeVisible();
+  await page.locator('#notebook-close').click();
+  await open(page, 'the-lost-book');
+  await toFind(page).first().click();
+  await expect(notebook.locator('#notebook-to-find')).toBeInViewport();
 });
 
 test('no lists in chapter 1, nor in a lesson code box', async ({ page }) => {
@@ -102,6 +112,13 @@ test('no lists in chapter 1, nor in a lesson code box', async ({ page }) => {
   await page.goto('/#lesson/a-name-for-a-value');
   await expect(page.locator('.lesson-run')).toHaveCount(1);
   await expect(page.locator('#program-lists')).toHaveCount(0);
+});
+
+test('the check: its brooms to find, in Spanish', async ({ page }) => {
+  await open(page, 'the-check');
+  await expect(page.locator('#have-chips [data-name="escobas"]')).toHaveAttribute('data-thing', '[broom]');
+  await expect(page.locator('#have-chips [data-name="escoba"]')).toHaveAttribute('data-thing', 'broom');
+  await page.locator('.workbench').screenshot({ path: `${SHOTS}the-check.png` });
 });
 
 test('the lists at 900 by 600, in one row each', async ({ page }) => {

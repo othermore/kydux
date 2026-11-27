@@ -5,13 +5,17 @@ import {
   familiarsListed,
   familiarVar,
   heldObjects,
+  keptObjects,
   notebookEntries,
   notebookTabs,
   ownMethod,
   PYTHON,
   pythonBlocks,
   spellsAndWords,
+  toFindParts,
 } from './notebook';
+import { readVariables } from '../editor/variables';
+import { initLanguage } from '../i18n';
 import en from '../../../i18n/en.json';
 import es from '../../../i18n/es.json';
 
@@ -251,3 +255,77 @@ describe("the first year's familiars in the notebook (D298)", () => {
   });
 });
 
+
+describe("the notebook's two parts (D347)", () => {
+  const table: ApiTable = {
+    ...TABLE,
+    roles: {
+      ...TABLE.roles,
+      thing: [
+        { name: 'reveal', kind: 'action', example: 'key.reveal()' },
+        { name: 'position', kind: 'attribute', example: 'key.position' },
+      ],
+    },
+  };
+  const fallen = {
+    id: 'the-fallen-book',
+    things: [
+      { kind: 'door', id: 'door', variable: false },
+      { kind: 'book', id: 'fallen_book' },
+    ],
+    to_find: ['book'],
+    api: ['wizard.move_right', 'thing.reveal', 'thing.position'],
+  };
+
+  it('gives what is to find its line and its methods with a variable of your own, while nothing keeps it', () => {
+    initLanguage({ languages: ['es'], storage: null });
+    const parts = toFindParts(fallen, table, undefined, readVariables('', fallen));
+    expect(parts).toHaveLength(1);
+    expect(parts[0]).toMatchObject({ kind: 'book', feminine: false, line: 'tu_variable = wizard.find_nearest("book")' });
+    expect(parts[0]?.methods.map((entry) => entry.example)).toEqual(['tu_variable.reveal()']);
+  });
+
+  it("puts the book's page under the child's variable once the code keeps it, and nothing is left to find", () => {
+    initLanguage({ languages: ['es'], storage: null });
+    const program = readVariables('tesoro = wizard.find_nearest("book")', fallen);
+    expect(toFindParts(fallen, table, undefined, program)).toEqual([]);
+    expect(keptObjects(fallen, table, program)).toEqual([{ name: 'tesoro', role: 'thing', kind: 'book' }]);
+    const entries = notebookEntries(fallen, table, undefined, program).filter((entry) => entry.object === 'tesoro');
+    expect(entries.map((entry) => entry.example)).toEqual(['tesoro.reveal()', 'tesoro.position']);
+  });
+
+  it('gives a level with nothing to find no part of what is to find', () => {
+    expect(toFindParts({ id: 'room', things: [] }, table)).toEqual([]);
+  });
+
+  it('writes the line of a kind only carried with find_item, and a key, a broom, a door in the feminine', () => {
+    initLanguage({ languages: ['en'], storage: null });
+    const returned = { id: 'returned', carrying: [{ kind: 'book', art: 'old_book' }], to_find: ['book'], api: [] };
+    expect(toFindParts(returned, table)[0]?.line).toBe('your_variable = wizard.find_item("book")');
+    const keys = { id: 'keys', things: [{ kind: 'key', id: 'key' }], to_find: ['key'], api: [] };
+    expect(toFindParts(keys, table)[0]?.feminine).toBe(true);
+  });
+
+  it("names a thing given or counted to by the child's variable, never by a word to search with (D345)", () => {
+    initLanguage({ languages: ['es'], storage: null });
+    const giving: ApiTable = {
+      ...table,
+      roles: { ...table.roles, wizard: [{ name: 'give', kind: 'action', example: 'wizard.give(eldras_book)' }] },
+    };
+    const level = { id: 'returned', carrying: ['book'], to_find: ['book'], api: ['wizard.give'] };
+    const examples = (code: string) =>
+      notebookEntries(level, giving, undefined, readVariables(code, level)).map((entry) => entry.example);
+    expect(examples('')).toEqual(['wizard.give(tu_variable)']);
+    expect(examples('libro_de_eldra = wizard.find_item("book")')).toEqual(['wizard.give(libro_de_eldra)']);
+  });
+});
+
+describe('every kind a level asks to find has its words in the notebook (D347)', () => {
+  it('in each language', () => {
+    for (const catalog of [en, es]) {
+      for (const kind of ['book', 'key', 'broom', 'door', 'thread']) {
+        expect((catalog.notebook as unknown as { find: Record<string, string> }).find[kind]).toBeTruthy();
+      }
+    }
+  });
+});

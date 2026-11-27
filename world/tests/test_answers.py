@@ -92,3 +92,12 @@ def test_a_run_that_wins_carries_no_advice(level):
 def test_a_find_not_kept_is_no_advice_where_nothing_is_to_find():
     result = run("the-reading-room", 'wizard.find_nearest("door")\n')
     assert result.advice == []
+
+
+def test_an_example_gives_the_wizard_the_thing_the_code_keeps():
+    """D345: the example of how a method is used names the child's own variable that keeps
+    a found thing, or else a variable, never a word to search with."""
+    alone = run("eldras-room", 'wizard.cast("fendra")\n')
+    assert alone.error.explanation["params"]["example"] == 'wizard.cast("fendra", other_book)'
+    kept = run("eldras-room", 'mine = wizard.find_nearest("book")\nwizard.cast("fendra")\n')
+    assert kept.error.explanation["params"]["example"] == 'wizard.cast("fendra", mine)'

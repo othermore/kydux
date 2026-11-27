@@ -480,7 +480,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
 
   test('fendra with no thing named says how it is cast', async ({ page }) => {
     const said = await run(page, 'wizard.cast("fendra")');
-    expect(said).toContain('wizard.cast("fendra", book)');
+    expect(said).toContain('wizard.cast("fendra", other_book)');
   });
 
   test('reveal outlines the book among the others on the shelf', async ({ page }) => {

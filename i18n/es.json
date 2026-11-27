@@ -350,7 +350,21 @@
       "move_down": "Tu familiar camina hacia abajo, una casilla por paso. Se para donde no puede pasar.",
       "pick_up": "Tu familiar recoge lo que hay en su casilla y lo lleva encima. Te lo da cuando minka lo trae de vuelta.",
       "go_to": "El método que le enseñaste tú: va a la casilla que le digas, primero la columna y luego la fila."
-    }
+    },
+    "part_have": "Lo que tu programa ya tiene",
+    "part_to_find": "Lo que hay que encontrar antes de usarlo",
+    "your_variable": "tu_variable",
+    "find": {
+      "book": "un libro",
+      "key": "una llave",
+      "broom": "una escoba",
+      "door": "una puerta",
+      "thread": "un hilo"
+    },
+    "find_line": "Encuéntralo y guárdalo en una variable con un nombre tuyo:",
+    "find_methods": "Cuando lo tengas, sabrá hacer esto:",
+    "find_line_f": "Encuéntrala y guárdala en una variable con un nombre tuyo:",
+    "find_methods_f": "Cuando la tengas, sabrá hacer esto:"
   },
   "start": {
     "welcome": "Te damos la bienvenida al colegio de magia",

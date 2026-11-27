@@ -30,8 +30,9 @@ import { zoomBox } from './zoom';
 import { element } from './dom';
 import { type GoalsPanel, type GoalsShape, goalsPanel, takeShape } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
+import { offered } from './complete';
 import { type GivenChip, programLists, type ProgramLists } from './lists';
-import { type ApiTable, describe, familiarVar, heldObjects, notebookEntries, notebookPanel } from './notebook';
+import { type ApiTable, familiarVar, heldObjects, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
 import { openPlan, type PlanWindow } from './plan';
 import { portraitOf } from './portraits';
@@ -92,17 +93,26 @@ export function givenChips(loaded: LoadedLevel, table: ApiTable): GivenChip[] {
   const level = loaded.level;
   const entries = new Set(notebookEntries(level, table, loaded.course).map((entry) => entry.object));
   const kinds = new Map(((level.things as { id: string; kind: string }[] | undefined) ?? []).map((t) => [t.id, t.kind]));
-  const chips: GivenChip[] = [{ name: 'wizard' }];
+  const look = progress.wizard()?.look;
+  // Someone's chip shows their face: the wizard's as the child made it, an actor's own.
+  const face = (who: string) => portraitOf(who, look);
+  const wizard = face('wizard');
+  const chips: GivenChip[] = [wizard ? { name: 'wizard', figure: wizard } : { name: 'wizard' }];
   const add = (chip: GivenChip) => {
     if (!chips.some((one) => one.name === chip.name)) chips.push(chip);
+  };
+  const actors = new Set(((level.actors as { id: string }[] | undefined) ?? []).map((actor) => actor.id));
+  const person = (name: string): GivenChip => {
+    const figure = actors.has(name) ? face(name) : null;
+    return figure ? { name, figure } : { name };
   };
   for (const object of heldObjects(level, table)) {
     if (object.name === 'wizard' || object.role === 'familiar' || !entries.has(object.name)) continue;
     const kind = kinds.get(object.name);
-    add(kind ? { name: object.name, thing: kind } : { name: object.name });
+    add(kind ? { name: object.name, thing: kind } : person(object.name));
   }
   for (const goal of (level.goals as { kind?: string; to?: unknown }[] | undefined) ?? []) {
-    if (goal.kind === 'give' && typeof goal.to === 'string') add({ name: goal.to });
+    if (goal.kind === 'give' && typeof goal.to === 'string') add(person(goal.to));
   }
   const block = level.familiar as { stage?: string; living?: unknown } | undefined;
   if (block?.stage === 'living' && block.living) add({ name: familiarVar(level) });
@@ -227,6 +237,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const solution = debugging()
     ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
     : [];
+  // The lists over the editor, made after the notebook their chips open.
+  let listed: ProgramLists | null = null;
   const notebook = notebookPanel(
     loaded.level,
     parts.table,
@@ -234,6 +246,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       editor.insertLine(example);
     },
     loaded.course,
+    // What the code keeps, as the lists over the editor read it (D347), once they are made.
+    () => (listed ? { declared: listed.declared, toFind: listed.toFind } : undefined),
   );
   notebookButton.addEventListener('click', () => {
     notebook.toggle();
@@ -283,19 +297,22 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   handle.setAttribute('aria-valuemax', String(Math.round(SPLIT_MAX * 100)));
   // The lists of what the program has and what is to find, over the editor (D346); a
   // chip opens the notebook.
-  const openNotebook = () => {
-    if (!notebook.open) notebook.toggle();
-    notebookButton.setAttribute('aria-expanded', String(notebook.open));
-    notebook.node.scrollTop = 0;
-  };
   const lists: ProgramLists | null = parts.lists
     ? programLists({
         level: loaded.level,
         given: givenChips(loaded, parts.table),
-        onHave: () => openNotebook(),
-        onFind: () => openNotebook(),
+        onHave: (chip) => {
+          notebook.showObject(chip.name);
+          notebookButton.setAttribute('aria-expanded', 'true');
+        },
+        onFind: () => {
+          notebook.showToFind();
+          notebookButton.setAttribute('aria-expanded', 'true');
+        },
+        onRead: () => notebook.refresh(),
       })
     : null;
+  listed = lists;
   const node = element('div', { className: 'level-screen' }, [
     element('section', { className: 'stage' }, [
       heading,
@@ -326,27 +343,17 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // the child types is kept while the screen is open, through Run, Restart and Play
   // again, and the starting code, while untouched, follows the language.
   let typed = false;
-  // After the name of something the child's code holds and a dot, the editor
-  // offers what the level teaches of it, with the notebook's words.
-  const entries = notebookEntries(loaded.level, parts.table, loaded.course);
+  // After the name of something the child's code holds and a dot, the editor offers what
+  // the level teaches of it, with the notebook's words: a variable the level gives, a
+  // variable the code keeps a found thing in, the familiar by the variable it was born
+  // into (D348); nothing for a name alone, a list or a search word, nothing before a dot
+  // and nothing inside quotes or a comment.
   const editor = parts.createEditor(editorParent, {
     doc: text.starting_code,
     label: t('level.code_label'),
     complete: (context) => {
-      const before = context.matchBefore(/\b(\w+)\.\w*$/);
-      if (!before) return null;
-      const object = before.text.slice(0, before.text.indexOf('.'));
-      const own = entries.filter((entry) => entry.object === object);
-      if (own.length === 0) return null;
-      return {
-        from: before.from + object.length + 1,
-        options: own.map((entry) => ({
-          label: entry.member.name,
-          type: entry.member.kind === 'action' ? 'method' : 'property',
-          detail: describe(entry.role, entry.member.name, entry.simple),
-        })),
-        validFor: /^\w*$/,
-      };
+      const found = offered(context.state, context.pos, loaded.level, parts.table, loaded.course);
+      return found ? { ...found, validFor: /^\w*$/ } : null;
     },
     onRun: () => runCode(),
     onChange: (doc) => {

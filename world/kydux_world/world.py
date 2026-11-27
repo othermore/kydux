@@ -1310,7 +1310,8 @@ class Wizard(Child):
     def cast(self, spell: str, thing: Any = None) -> None:
         """Cast a spell with the wand, which the wizard must carry; it works where the
         wizard stands, fendra on the thing it is given and minka on the familiar:
-        `wizard.cast("zelim")`, `wizard.cast("fendra", book)`, `wizard.cast("minka", pimu)`"""
+        `wizard.cast("zelim")`, `wizard.cast("fendra", other_book)`,
+        `wizard.cast("minka", pimu)`"""
         if not isinstance(spell, str):
             raise ActionArguments("cast", "cast() takes a spell's name, in quotes")
         theirs = _child_s_own(thing)
@@ -1321,7 +1322,7 @@ class Wizard(Child):
             )
         if spell in AIMED and spell != "minka" and not isinstance(thing, Thing):
             raise ActionArguments(
-                "cast", f"{spell} takes the thing to bring", f'wizard.cast("{spell}", book)'
+                "cast", f"{spell} takes the thing to bring", f'wizard.cast("{spell}", other_book)'
             )
         if spell not in AIMED and thing is not None:
             raise ActionArguments("cast", f"{spell} takes no thing", f'wizard.cast("{spell}")')
@@ -1353,7 +1354,8 @@ class Wizard(Child):
             effect.after()
 
     def give(self, thing: Thing) -> None:
-        """Give a thing the wizard carries to whoever stands beside it: `wizard.give(book)`"""
+        """Give a thing the wizard carries to whoever stands beside it:
+        `wizard.give(eldras_book)`"""
         if not isinstance(thing, Thing):
             raise ActionArguments("give", "give() takes a thing the wizard carries")
         world: World = self._k_world
@@ -1384,7 +1386,7 @@ class Wizard(Child):
 
     def pick_up(self, thing: Thing | None = None) -> None:
         """Pick up a thing on the wizard's tile, or beside it, and carry it; with several in
-        reach, say which: `wizard.pick_up()`, `wizard.pick_up(key)`"""
+        reach, say which: `wizard.pick_up()`, `wizard.pick_up(my_key)`"""
         if thing is not None and not isinstance(thing, Thing):
             raise ActionArguments("pick_up", "pick_up() takes a thing by its name, with no quotes")
         world: World = self._k_world
@@ -1580,7 +1582,7 @@ class Wizard(Child):
 
     def distance_to(self, other: object) -> int | None:
         """How many steps lie between the wizard and a thing or someone, along the rows
-        and the columns: `wizard.distance_to(key)`"""
+        and the columns: `wizard.distance_to(my_key)`"""
         return steps_between(self, other)
 
     def _k_where(self) -> Position:

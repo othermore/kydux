@@ -306,3 +306,52 @@ test("where a familiar is described, the notebook lists the first year's six, wi
   await page.locator('#notebook-open').click();
   await expect(listed).toHaveCount(0);
 });
+
+test.describe('what the program has and what is to find (D347)', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('the tab Objetos, the heading Métodos, the part of what is to find with its dimmed methods', async ({ page }) => {
+    await open(page, 'the-lost-book');
+    await page.locator('#notebook-open').click();
+    const notebook = page.locator('#notebook');
+    await expect(page.locator('#notebook-tab-actions')).toHaveText('Objetos');
+    await expect(notebook.locator('#notebook-have .notebook-part-title')).toHaveText('Lo que tu programa ya tiene');
+    await expect(notebook.locator('#notebook-to-find .notebook-part-title')).toHaveText(
+      'Lo que hay que encontrar antes de usarlo',
+    );
+    await expect(notebook.locator('.notebook-object[data-object="wizard"] h4').first()).toHaveText('Métodos');
+    const book = notebook.locator('[data-find="book"]');
+    await expect(book).toContainText('"book" un libro');
+    await expect(book).toContainText('Encuéntralo y guárdalo en una variable con un nombre tuyo:');
+    await expect(book.locator('.dimmed', { hasText: 'tu_variable.reveal()' }).first()).toBeVisible();
+    // A dimmed method writes nothing; the line that finds writes itself into the program.
+    await book.locator('code.dimmed').first().click();
+    await expect(page.locator('.cm-content')).not.toContainText('tu_variable.reveal()');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+End');
+    await book.locator('[data-example^="tu_variable = wizard.find_nearest"]').click();
+    await expect(page.locator('.cm-content')).toContainText('tu_variable = wizard.find_nearest("book")');
+  });
+
+  test('once a line keeps the book, its page is under the variable and nothing is left to find', async ({ page }) => {
+    await open(page, 'the-lost-book');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+End');
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('librito = wizard.find_nearest("book")');
+    await expect(page.locator('#have-chips [data-name="librito"]')).toBeVisible();
+    await page.locator('#notebook-open').click();
+    const notebook = page.locator('#notebook');
+    await expect(notebook.locator('#notebook-to-find')).toHaveCount(0);
+    await expect(notebook.locator('[data-example="librito.reveal()"]')).toBeVisible();
+    // The editor offers the book's methods after its variable and a dot (D348).
+    await page.locator('#notebook-close').click();
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+End');
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('librito.');
+    const offered = page.locator('.cm-tooltip-autocomplete');
+    await expect(offered).toBeVisible();
+    expect(await offered.locator('.cm-completionLabel').allTextContents()).toContain('reveal');
+  });
+});

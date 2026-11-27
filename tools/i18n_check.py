@@ -342,13 +342,18 @@ def check_world_words(languages: dict[str, dict[str, str]]) -> list[str]:
             if (
                 key.split(".")[0] in ("notebook", "notebook_simple")
                 and key.count(".") == 2
-                # The notebook's list of the first year's familiars is no role's (D298).
-                and not key.startswith("notebook.familiars.")
+                # The notebook's list of the first year's familiars is no role's (D298),
+                # nor its words for a kind to find (D347).
+                and not key.startswith(("notebook.familiars.", "notebook.find."))
             )
             or key.startswith(("things.", "spells.", "words."))
         }
         for key in sorted(wanted - said):
             findings.append(f"i18n/{lang}.json: lacks {key}, the words for it")
+        # The notebook's words for a kind to find name a kind of thing (D347).
+        for key in sorted(k for k in catalog if k.startswith("notebook.find.")):
+            if key.removeprefix("notebook.find.") not in level.THING_KINDS:
+                findings.append(f"i18n/{lang}.json: {key} names no kind of thing")
         for key in sorted(said - wanted):
             findings.append(f"i18n/{lang}.json: {key} names nothing the world has")
     return findings

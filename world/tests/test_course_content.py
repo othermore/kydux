@@ -1107,3 +1107,12 @@ def test_the_levels_say_what_is_to_find():
     for path in sorted((CONTENT / "levels").glob("*/level.json")):
         said = json.loads(path.read_text(encoding="utf-8")).get("to_find")
         assert said == wanted.get(path.parent.name), f"{path.parent.name}: {said}"
+
+
+@pytest.mark.parametrize("lang", LANGUAGES)
+def test_every_kind_a_level_asks_to_find_has_its_words_in_the_notebook(lang):
+    """D347: the notebook's part of what is to find names each kind, `notebook.find.<kind>`."""
+    words = json.loads((ROOT / "i18n" / f"{lang}.json").read_text(encoding="utf-8"))
+    for path in sorted((CONTENT / "levels").glob("*/level.json")):
+        for kind in json.loads(path.read_text(encoding="utf-8")).get("to_find", []):
+            assert words["notebook"]["find"].get(kind), f"{path.parent.name}: {lang} lacks {kind}"

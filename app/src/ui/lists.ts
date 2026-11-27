@@ -12,14 +12,17 @@ import { t } from '../i18n';
 import type { LevelJson } from '../runtime/protocol';
 import { element } from './dom';
 import { kindPicture } from './pictures';
+import { portrait } from './portraits';
 
 /** How long after the last key the lists are read again (D346). */
 export const READ_AFTER = 500;
 
-/** A variable the level gives, green in Tienes: its name and, for a thing, its kind. */
+/** A variable the level gives, green in Tienes: its name and, for a thing, its kind; for
+ * someone, the portrait of their face. */
 export interface GivenChip {
   name: string;
   thing?: string;
+  figure?: string;
 }
 
 /** A chip of Tienes as it is drawn: given by the level or declared by the code. */
@@ -32,6 +35,8 @@ export interface ListsParts {
   onHave: (chip: HaveChip) => void;
   /** A kind of Por encontrar pressed: the notebook at what is to find. */
   onFind: (kind: string) => void;
+  /** The lists read again: what the code keeps has changed or may have. */
+  onRead?: () => void;
 }
 
 export interface ProgramLists {
@@ -157,7 +162,9 @@ export function programLists(parts: ListsParts): ProgramLists {
   const haveChip = (chip: HaveChip): HTMLElement => {
     const value = !chip.given && chip.value !== undefined ? chip.value : null;
     const whole = !chip.given && chip.whole !== undefined ? `${chip.name} = ${chip.whole}` : chip.given ? chip.name : chip.label;
+    const face = chip.given && chip.figure ? [element('span', { className: 'chip-picture chip-face' }, [portrait(chip.figure, 'chip-portrait')])] : [];
     const button = element('button', { type: 'button', className: chip.given ? 'chip given' : 'chip own' }, [
+      ...face,
       ...(chip.thing ? [picture(chip.thing, !chip.given && chip.list === true)] : []),
       element('span', { className: 'chip-name' }, [chip.given ? chip.name : chip.label]),
       ...(value !== null ? [element('span', { className: 'chip-value' }, [value])] : []),
@@ -213,6 +220,7 @@ export function programLists(parts: ListsParts): ProgramLists {
     declared = lists.declared;
     toFind = lists.toFind;
     draw();
+    parts.onRead?.();
   };
 
   const relabel = () => {

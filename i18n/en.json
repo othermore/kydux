@@ -350,7 +350,21 @@
       "move_down": "Your familiar walks down, one cell per step. It stops where it cannot go on.",
       "pick_up": "Your familiar picks up what lies on its cell and carries it. It gives it to you when minka brings it back.",
       "go_to": "The method you taught it yourself: it goes to the cell you tell it, first the column and then the row."
-    }
+    },
+    "part_have": "What your program already has",
+    "part_to_find": "What must be found before it is used",
+    "your_variable": "your_variable",
+    "find": {
+      "book": "a book",
+      "key": "a key",
+      "broom": "a broom",
+      "door": "a door",
+      "thread": "a thread"
+    },
+    "find_line": "Find it and keep it in a variable with a name of your own:",
+    "find_methods": "Once you have it, it will know how to do this:",
+    "find_line_f": "Find it and keep it in a variable with a name of your own:",
+    "find_methods_f": "Once you have it, it will know how to do this:"
   },
   "start": {
     "welcome": "Welcome to the school of magic",

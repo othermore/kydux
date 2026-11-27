@@ -77,7 +77,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 (trial.ts, D263), and the pencil a scene's grid is drawn with,
                 the common one or the scene's own (pencil.ts, D337)
   src/editor/   the child's editor, CodeMirror, a wrapped line's part hanging
-                under the line's own indentation (D223)
+                under the line's own indentation (D223), and a line brought into
+                its sight, the line that runs and the line an answer names
+                (D363, D366)
   src/fonts/    the code's letter, Inconsolata (D238), and the hand the
                 letter of admission is written in, Caveat (D257), bundled,
                 each with its SOURCE.md and licence
@@ -87,7 +89,9 @@ app/            the web app: Vite, TypeScript, plain DOM for the shell
                 and the one that goes on from it in place (story.ts, D74, D320),
                 the settings (settings.ts), and the level
                 screen, a view of the run controller (controller.ts), with its
-                goals panel, outcome card, start and win cards (cards.ts), the zoom box over the scene (zoom.ts), the
+                goals panel, outcome card, start and win cards (cards.ts), the
+                fold of the hints' box and of the answer (fold.ts, D363), the
+                zoom box over the scene (zoom.ts), the
                 wizard's notebook with its spells and words (notebook.ts, D80),
                 the naughty child's map open on the scene's plan, drawn in ink as the
                 scene draws it (plan.ts, D134, D143, D151), a lesson's code run on its page (lessonrun.ts, D142),
@@ -828,8 +832,10 @@ one overturns stays, marked as superseded.
   with no scrolling, the notebook fits inside the scene's frame and the
   start card inside the window, where it does not scroll (D228), and the
   heading wraps rather than overlap
-  (`app/e2e/screens.spec.ts`). Under 800 pixels the panes stack, for a
-  phone, which the game does not promise but does not break on. The goals
+  (`app/e2e/screens.spec.ts`). Under the hints and the answer the editor keeps five
+  lines or more, and the page stays the window's height (D363). Under 800 pixels
+  the panes stack, for a phone, which the game does not promise but does not break
+  on. The goals
   panel's heading folds it, since at 1024 the open panel covers the scene's
   first row, the wizard's start; it stays folded for the visit. The page takes the
   box's shape and may fold it by itself (D227). The keys: Tab and
@@ -1274,8 +1280,9 @@ one overturns stays, marked as superseded.
   game is being played, and lists the games in a box as soon as there is one
   (D293): each game by its name, its wizard's under it when the two differ,
   where it is, its play time and dates, with *Play*, *Export*, which keeps
-  that game as a file, and *Delete*, which asks with the game's name; the
-  game being played is marked as the open one and has no *Play*. *New game*
+  that game as a file, and *Delete*, which asks with the game's name, in the game's
+  own dialog (D364); the game being played is marked as the open one and has no
+  *Play*. *New game*
   and *Import a game* stand at the box's top; an imported file becomes one
   more game, whose name is asked first (D291). A first visit with no game
   opens the welcome page (D193), and with saved games and none being played
@@ -1292,7 +1299,8 @@ one overturns stays, marked as superseded.
   2026-10-22 by the owner's UAT (sprint-11.md), built the same day. From a
   level, *Map* opens the map over it (the run and the editor kept), the
   stop being played marked *You are here*; *Back to the level* or Escape
-  closes it, and choosing another stop while a run goes on asks first. On
+  closes it, and choosing another stop while a run goes on asks first, in the game's
+  own dialog over the map's window, the run going on meanwhile (D364). On
   every map, the locked stops after the first are unnamed: their kind and
   number show, not their title. A level's heading has *Lesson*, the last
   lesson before it in the course, at `#lesson/<id>/from/<level>`, which
@@ -5783,7 +5791,8 @@ one overturns stays, marked as superseded.
   it down to a 900×600 window. It has the heading *Mapa* and, at its top right, *✕
   Volver al nivel*; it closes by that button, by a click outside it and by Escape, onto
   the level as it was: its code, its scene and a run going on. Going to another stop
-  from it is D71's, the program kept first (D351). The map opened from the start screen
+  from it is D71's, the program kept first (D351), and while a run goes on the game's own
+  dialog asks first, over the window (D364). The map opened from the start screen
   is a whole screen. Rules out a map that looks like having left the level.
 - **D353 — No screen of the game is left by mistake.** Decided 2026-11-25 by the owner
   (*a mi hijo le pasaba que a veces se salía del nivel […] hacía clic con dos dedos

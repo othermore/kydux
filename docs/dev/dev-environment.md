@@ -1090,14 +1090,14 @@ make them again, so that they show the page as it is.
 
 A spec of the browser tests makes them. It opens the page at 1280 by 800, cuts
 the part each tip tells, takes it at twice the page's pixels, and writes the
-twenty pictures. It is skipped unless it is asked for by name. Run it from
+twenty-four pictures. It is skipped unless it is asked for by name. Run it from
 `app/`:
 
 ```sh
 KYDUX_TIP_PICTURES=1 npx playwright test e2e/tips-pictures.spec.ts
 ```
 
-It should say that 8 tests passed. Each picture is 960 by 540 pixels and
+It should say that 10 tests passed. Each picture is 960 by 540 pixels and
 weighs less than 90 KB. The waiting view shows it up to 800 pixels wide, and
 smaller where the window is too low for it. Look at them before you commit
 them: open

@@ -67,6 +67,32 @@ test('the heading keeps its parts apart with the longest title, at 1024', async 
   }
 });
 
+test('the heading in two lines held close, the longest title in Spanish at 1024 (D360)', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'es-ES', viewport: { width: 1024, height: 700 } });
+  const page = await context.newPage();
+  await seedWizard(page);
+  await page.goto('/#level/eldras-room');
+  await page.locator('#start').click();
+  await expect(page.locator('#level-number')).toHaveText('Cap. 2 · Práctica 8');
+  const label = await box(page, '#level-number');
+  const lesson = await box(page, '#level-lesson');
+  const map = await box(page, '#level-map');
+  const gear = await box(page, '#level-settings');
+  const title = await box(page, '.level-title');
+  const about = await box(page, '#about');
+  const stage = await box(page, '.stage');
+  const middle = (b: Box) => b.y + b.height / 2;
+  // The first line: the label, the lesson, the map, and the gear at the line's right end.
+  for (const one of [lesson, map, gear]) expect(Math.abs(middle(one) - middle(label))).toBeLessThan(6);
+  expect(gear.x + gear.width).toBeGreaterThan(stage.x + stage.width - 4);
+  // The second line, close under the first: the title and its ?, on one line.
+  expect(Math.abs(middle(about) - middle(title))).toBeLessThan(6);
+  expect(title.y).toBeGreaterThan(label.y + label.height - 4);
+  expect(title.y - (label.y + label.height)).toBeLessThan(14);
+  expect(title.height).toBeLessThan(32);
+  await context.close();
+});
+
 test('on a phone, the panes stack and nothing scrolls sideways', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#level/the-long-corridor');

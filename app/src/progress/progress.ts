@@ -181,7 +181,7 @@ export function keepProgram(levelId: string, code: string, starting: string): vo
   });
 }
 
-/** The kept program dropped, when it is that level's (D351): Original code. */
+/** The kept program dropped, when it is that level's (D351): Original. */
 export function dropProgram(levelId: string): void {
   if (store.load().program?.level !== levelId) return;
   change((progress) => {

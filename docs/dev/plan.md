@@ -170,7 +170,7 @@ Markdown, with no HTML in it, may hold one block to try a page, fenced `python t
 `python try change`, `python try rename` or `python try rename error`, the test the page
 asks before it is left (D142, D354); the last page's is the lesson's example, and the
 level after it starts with its own program (D33, D63). Within a chapter, every item is
-numbered by kind, stories too, and says its chapter: *Chapter 1 · Story 1*, *Chapter 1 · Practice 1*,
+numbered by kind, stories too, and says its chapter: *Ch. 1 · Story 1*, *Ch. 1 · Practice 1*,
 *Fix 1*, *Improve 1* (D56, D78). A text names the friend as `{friend}`, with the friend's gendered words
 in double braces (D77). `pack-world.mjs` writes the chapters, in the order of their
 directories, as `content/course.json`, the one order of the course (D32). A
@@ -789,7 +789,7 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     over the editor (D346), the notebook's two parts (D347), the completion after a
     dot from the variables the lists know (D348), the game's answers to a first
     variable's mistakes (D349), *variable* and *método* as the game's words (D350),
-    the kept program and *Original code* (D351), the map from a level as a window
+    the kept program and *Original* (D351), the map from a level as a window
     over it (D352), no screen left by mistake (D353), a lesson's page passed by trying
     it (D354), a figure's words when a thing lights (D355), a saved game on a course
     that has grown (D356), the tips of the comments and of the two lists (D357), and a

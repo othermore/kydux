@@ -1425,7 +1425,7 @@ one overturns stays, marked as superseded.
   first item, named by `course.json`'s `opening`, and is done once a
   wizard exists; the creator follows it, and *Continue game* never goes back to
   it. Every item's label carries its chapter and its number by kind,
-  stories too: *Chapter 1 · Story 1*, *Chapter 1 · Practice 4*. Rules out
+  stories too: *Ch. 1 · Story 1*, *Ch. 1 · Practice 4* (D360). Rules out
   an unnumbered story before the course.
 - **D79 — What stands on a cell is marked, and no painting hides a mark.**
   Decided 2026-10-24 (sprint 13, 13.3). Every cell a tree's trunk, a rock,
@@ -5755,8 +5755,8 @@ one overturns stays, marked as superseded.
   one for the first uses, then the proper one. The ids and file names of lessons and
   levels keep their words. Rules out *acción* for a method after its lesson, and
   *guardar bajo un nombre* where the course has said *variable*.
-- **D351 — A saved game keeps the program being written, one, and *Código original*
-  asks before it erases.** Decided 2026-11-25 by the owner (*estaría super bien que
+- **D351 — A saved game keeps the program being written, one, and *Original* asks before
+  it erases.** Decided 2026-11-25 by the owner (*estaría super bien que
   cuando un niño deja una partida a medias […] se quede guardado lo que tiene escrito*;
   *Creo que lo mejor es que solo guardemos un nivel […] un único "notepad" que sabe qué
   nivel es y el código que tiene […] Y si se presiona el reset del código, se borra el
@@ -5771,8 +5771,8 @@ one overturns stays, marked as superseded.
   otherwise. Code equal to the starting code is no program; another level's changed
   code takes the former's place; winning drops nothing; a lesson's code boxes are not
   kept. Under the editor the buttons are two rows, each with a small picture drawn in
-  code before its word: *Ejecutar*, *Reiniciar*, *Parar*, *Código original*; then
-  *Cuaderno*, *Pista* and the speed. *Código original* puts the starting code back and
+  code before its word: *Ejecutar*, *Reiniciar*, *Parar*, *Original* (D360); then
+  *Cuaderno*, *Pista* and the speed. *Original* puts the starting code back and
   drops the kept program: it is disabled while the editor holds the starting code, asks
   first in the game's own dialog (`ui/ask.ts`, never the browser's: *¿Borrar lo que has
   escrito y volver al código original?*, *Sí, borrar* / *No, seguir*, the focus on *No*,
@@ -5888,6 +5888,23 @@ one overturns stays, marked as superseded.
   leaves to the card (D228). Rules out a zoom of the whole page, which the scene's canvas
   does not follow; one step from full size to small, which a window a little low would not
   need; and a page drawn smaller at a size the game is made for.
+- **D360 — The level's heading is two lines held close, and the first row of buttons stands
+  in one line from 1024 by 700.** Decided 2026-11-26 by the owner (*Podemos acortar
+  capítulo X a cap. X*; *lección y mapa van arriba junto al capítulo y el interrogante junto
+  al título y los engranajes a la derecha, y hay que limitar el interlineado para que
+  capítulo y el título queden juntos*; *el título lo podemos hacer un poquito más pequeño de
+  fuente*; *Hasta 1024 debería entrar idealmente*; *Ok a original*). An item's label with
+  its chapter (D78) is *Cap. 2 · Práctica 5* / *Ch. 2 · Practice 5*, on the level's heading,
+  its start card, a lesson's and a story's page (`kinds.in_chapter`). The level's heading
+  is two lines with 2 px between them: on the first the label, *Lección* and *Mapa* in a
+  14 px letter, and the gear apart at the line's right end; on the second the title, in a
+  20 px letter, and its *?*. So every title stands on one line beside its *?* at 1024 by
+  700. The first row's fourth button says *Original* / *Original*, the buttons' sides and
+  gaps are a little tighter, and their letter is 15 px, 14 px in a window under 1240 px
+  wide, so that *Ejecutar*, *Reiniciar*, *Parar* and *Original* stand in one line down to
+  1024 by 700, the smallest window the game is made for (D38). Rules out a long title
+  carrying the map and the gear to a line of their own, and a wider editor that narrows the
+  scene.
 - **D361 — The library's corridor is drawn a quarter of a cell higher.** Decided
   2026-11-26 by the owner (*La fila 15 podemos hacer que esté elevada un poco, que los
   objetos y personajes estén subidos como 0.20 o 0.25 de una casilla para que no los tape

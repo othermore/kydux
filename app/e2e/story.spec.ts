@@ -167,11 +167,11 @@ test('Again plays a step once more, as R does; Skip goes to the end (14.4)', asy
 
 test('a change of language says the whole page again: its number, its title and its buttons', async ({ page }) => {
   await page.goto('/#story/at-the-gate');
-  await expect(page.locator('#story-number')).toHaveText('Chapter 1 · Story 2');
+  await expect(page.locator('#story-number')).toHaveText('Ch. 1 · Story 2');
   await expect(page.locator('#story-map')).toHaveText('Map');
   await page.locator('#language').selectOption('es');
   await expect(page.locator('#story-title')).toHaveText('Ante la puerta');
-  await expect(page.locator('#story-number')).toHaveText('Capítulo 1 · Historia 2');
+  await expect(page.locator('#story-number')).toHaveText('Cap. 1 · Historia 2');
   await expect(page.locator('#story-map')).toHaveText('Mapa');
   await expect(page.locator('#story-skip')).toHaveText('Saltar al final');
   await expect(page.locator('#story-back')).toHaveText('Atrás');

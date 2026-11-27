@@ -155,13 +155,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const number = parts.label?.()
     ? [labelled(element('span', { id: 'level-number', className: 'item-number' }), () => parts.label?.() ?? '')]
     : [];
+  // The heading in two lines held close (D360): the item's label, the lesson and the map,
+  // and the gear apart at the line's right end; under them the title and its ?.
   const heading = element('div', { className: 'level-heading' }, [
-    ...number,
-    title,
-    about,
-    ...toLesson,
-    toMap,
-    toSettings,
+    element('div', { className: 'level-heading-top' }, [...number, ...toLesson, toMap, toSettings]),
+    element('div', { className: 'level-heading-title' }, [title, about]),
   ]);
   // A fix or an improve level says on its start card what is to be done (D56).
   const kind = typeof loaded.level.kind === 'string' ? loaded.level.kind : 'practice';
@@ -332,7 +330,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     element('section', { className: 'workbench' }, [
       ...(lists ? [lists.node] : []),
       editorParent,
-      // Two rows (D351): the program's, Run, Restart, Stop and Original code; then the
+      // Two rows (D351): the program's, Run, Restart, Stop and Original; then the
       // notebook, the hint and the speed.
       element('div', { className: 'buttons' }, [
         element('div', { className: 'button-row', id: 'program-buttons' }, [run, restart, stop, original]),
@@ -388,7 +386,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   };
   addEventListener('pagehide', keep);
   document.addEventListener('visibilitychange', onHidden);
-  // Original code (D351): the starting code back, the kept program dropped, a run stopped
+  // Original (D351): the starting code back, the kept program dropped, a run stopped
   // and the scene as at the start, once the child says yes in the game's own dialog.
   let asked: Asked | null = null;
   original.addEventListener('click', () => {

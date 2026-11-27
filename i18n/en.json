@@ -84,7 +84,7 @@
     "to_find": "To find",
     "scroll_left": "See the ones before",
     "scroll_right": "See the next ones",
-    "original_code": "Original code",
+    "original_code": "Original",
     "original_confirm": "Delete what you have written and go back to the original code?",
     "original_yes": "Yes, delete",
     "original_no": "No, go on"
@@ -627,7 +627,7 @@
     "improve": "Improve {n}",
     "challenge": "Challenge {n}",
     "story": "Story {n}",
-    "in_chapter": "Chapter {chapter} · {item}"
+    "in_chapter": "Ch. {chapter} · {item}"
   },
   "stars": {
     "no_hints": "Solved without a hint",

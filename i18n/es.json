@@ -84,7 +84,7 @@
     "to_find": "Por encontrar",
     "scroll_left": "Ver las anteriores",
     "scroll_right": "Ver las siguientes",
-    "original_code": "Código original",
+    "original_code": "Original",
     "original_confirm": "¿Borrar lo que has escrito y volver al código original?",
     "original_yes": "Sí, borrar",
     "original_no": "No, seguir"
@@ -627,7 +627,7 @@
     "improve": "Mejora {n}",
     "challenge": "Reto {n}",
     "story": "Historia {n}",
-    "in_chapter": "Capítulo {chapter} · {item}"
+    "in_chapter": "Cap. {chapter} · {item}"
   },
   "stars": {
     "no_hints": "Sin pedir pistas",

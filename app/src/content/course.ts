@@ -13,7 +13,7 @@ export interface Chapter {
 }
 
 /** An item's kind, its number within its chapter and kind (D56), and its chapter's
- * number (D78): Chapter 1 · Lesson 3. */
+ * number (D78): Ch. 1 · Lesson 3. */
 export interface ItemNumber {
   kind: string;
   n: number;

@@ -44,7 +44,7 @@ import { zoomBox } from './zoom';
 
 export interface StoryScreenParts {
   story: Story;
-  /** Its chapter and number (D78), in the language now set: *Chapter 1 · Story 1*. */
+  /** Its chapter and number (D78), in the language now set: *Ch. 1 · Story 1*. */
   label?: () => string | undefined;
   /** The course's item after this story, or null after the last. */
   next: string | null;

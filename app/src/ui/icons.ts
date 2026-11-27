@@ -15,7 +15,7 @@ const GEAR_PATHS = [
 ];
 
 /** The pictures of the level's buttons (D351), each in a 24 by 24 box: Run's triangle,
- * Restart's turned arrow, Stop's square, Original code's page with a turned arrow, the
+ * Restart's turned arrow, Stop's square, Original's page with a turned arrow, the
  * notebook's open book, and the hint's lamp; Play, after a pause, Run's triangle. */
 const BUTTON_PATHS = {
   run: ['M7.5 4.8 L18.8 12 L7.5 19.2 Z'],

@@ -45,7 +45,7 @@ A chapter opens and closes with a story, told on the scene itself: the
 characters walk and talk in speech bubbles, and a narrator speaks under
 the picture. *Next*, or the Enter key, goes on. Between the stories come
 lessons and levels. Every story, lesson and level is numbered in its
-chapter: *Chapter 1 · Story 1*, *Chapter 1 · Lesson 1*, and so on. A lesson is a few short pages, taught
+chapter: *Ch. 1 · Story 1*, *Ch. 1 · Lesson 1*, and so on. A lesson is a few short pages, taught
 by a character of the story, who stands beside the words. Each page
 explains one idea, with an example. A page with code lets you run it, and
 the first time you read the lesson it goes on once you have tried what it
@@ -69,8 +69,8 @@ shows the things you must find and keep in a variable before you can use
 them. A chip of either list opens the notebook at its page. Your program
 is kept as you write it: leave the level and come back, and it is still
 there. Under the editor, the buttons stand in two rows: *Run*, *Restart*,
-*Stop* and *Original code*, then *Notebook* and *Hint*. *Original code*
-puts the level's own program back, once you say yes. In a window smaller
+*Stop* and *Original*, then *Notebook* and *Hint*. *Original* puts the
+level's own program back, once you say yes. In a window smaller
 than 1024 by 700, everything is drawn a little smaller, so that the whole
 level fits. *Run* starts the
 level again and makes the wizard do what your code says, on the left. A

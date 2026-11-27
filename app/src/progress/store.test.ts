@@ -160,7 +160,7 @@ describe('the helpers', () => {
     // Its own is dropped.
     progress.keepProgram('b', '', '');
     expect(progress.load().program).toBeUndefined();
-    // Winning drops nothing; Original code drops it.
+    // Winning drops nothing; Original drops it.
     progress.keepProgram('a', 'wizard.move_right(6)\n', '# Walk\n');
     progress.markWon('a', 3);
     expect(progress.keptProgram('a')).toBe('wizard.move_right(6)\n');

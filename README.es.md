@@ -46,7 +46,7 @@ Cada capítulo empieza y acaba con una historia, contada sobre la propia
 escena: los personajes caminan y hablan en bocadillos, y un narrador habla
 bajo la imagen. *Siguiente*, o la tecla Intro, sigue adelante. Entre las
 historias vienen lecciones y niveles. Cada historia, lección y nivel va
-numerado dentro de su capítulo: *Capítulo 1 · Historia 1*, *Capítulo 1 ·
+numerado dentro de su capítulo: *Cap. 1 · Historia 1*, *Cap. 1 ·
 Lección 1*, y así. Una lección son
 unas pocas páginas cortas, que enseña un personaje de la historia, de pie
 junto al texto. Cada página explica una idea, con un ejemplo. Una página
@@ -73,9 +73,9 @@ tú. *Por encontrar* enseña las cosas que tienes que encontrar y guardar en
 una variable antes de poder usarlas. Una ficha de cualquiera de las dos
 abre el cuaderno en su página. Tu programa se guarda mientras lo
 escribes: si sales del nivel y vuelves, sigue ahí. Debajo del editor, los
-botones están en dos filas: *Ejecutar*, *Reiniciar*, *Parar* y *Código
-original*, y luego *Cuaderno* y *Pista*. *Código original* vuelve a poner
-el programa del propio nivel, cuando dices que sí. En una ventana más
+botones están en dos filas: *Ejecutar*, *Reiniciar*, *Parar* y
+*Original*, y luego *Cuaderno* y *Pista*. *Original* vuelve a poner el
+programa del propio nivel, cuando dices que sí. En una ventana más
 pequeña que 1024 por 700, todo se dibuja un poco más pequeño, para que
 quepa el nivel entero. *Ejecutar* empieza
 el nivel otra vez y hace que tu personaje haga lo que dice tu código, a la

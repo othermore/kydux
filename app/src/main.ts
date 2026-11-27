@@ -169,7 +169,7 @@ function itemNumber(course: Course, item: string): string | undefined {
   return number ? t(`kinds.${number.kind}`, { n: number.n }) : undefined;
 }
 
-/** An item's label on its own screen, with its chapter (D78): *Chapter 1 · Story 1*. */
+/** An item's label on its own screen, with its chapter (D78, D360): *Ch. 1 · Story 1*. */
 function itemLabel(course: Course, item: string): string | undefined {
   const number = course.numbers?.[item];
   const short = itemNumber(course, item);

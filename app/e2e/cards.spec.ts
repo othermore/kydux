@@ -124,25 +124,25 @@ test('the stars say why: a hint and a bump each cost one (D57)', async ({ page }
 
 test('a level and a lesson say their number in the chapter (D56)', async ({ page }) => {
   await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-number')).toHaveText('Chapter 1 · Practice 2');
+  await expect(page.locator('#card-number')).toHaveText('Ch. 1 · Practice 2');
   await page.locator('#start').click();
-  await expect(page.locator('#level-number')).toHaveText('Chapter 1 · Practice 2');
+  await expect(page.locator('#level-number')).toHaveText('Ch. 1 · Practice 2');
   await page.goto('/#lesson/how-much');
-  await expect(page.locator('#lesson-number')).toHaveText('Chapter 1 · Lesson 4');
+  await expect(page.locator('#lesson-number')).toHaveText('Ch. 1 · Lesson 4');
   await page.goto('/#map');
   await expect(page.locator('.stop[data-item="level:the-gate"] .stop-number')).toHaveText('Practice 1');
 });
 
 test('a level and a lesson say their number again in the language chosen', async ({ page }) => {
   await page.goto('/#level/the-corridor');
-  await expect(page.locator('#card-number')).toHaveText('Chapter 1 · Practice 2');
+  await expect(page.locator('#card-number')).toHaveText('Ch. 1 · Practice 2');
   await page.locator('#language').selectOption('es');
-  await expect(page.locator('#card-number')).toHaveText('Capítulo 1 · Práctica 2');
-  await expect(page.locator('#level-number')).toHaveText('Capítulo 1 · Práctica 2');
+  await expect(page.locator('#card-number')).toHaveText('Cap. 1 · Práctica 2');
+  await expect(page.locator('#level-number')).toHaveText('Cap. 1 · Práctica 2');
   await page.goto('/#lesson/how-much');
-  await expect(page.locator('#lesson-number')).toHaveText('Capítulo 1 · Lección 4');
+  await expect(page.locator('#lesson-number')).toHaveText('Cap. 1 · Lección 4');
   await page.locator('#language').selectOption('en');
-  await expect(page.locator('#lesson-number')).toHaveText('Chapter 1 · Lesson 4');
+  await expect(page.locator('#lesson-number')).toHaveText('Ch. 1 · Lesson 4');
 });
 
 test('before arguments are taught, the notebook shows a move with no number (D60)', async ({ page }) => {

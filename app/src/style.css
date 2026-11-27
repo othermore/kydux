@@ -361,7 +361,19 @@ footer a {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+}
+
+/* The buttons' letter (D351): 15 px, and 14 px in a window under 1240 px wide, where the
+   first row stands in one line down to 1024 (D360). */
+:root {
+  --button-letter: 15px;
+}
+
+@media (max-width: 1239px) {
+  :root {
+    --button-letter: 14px;
+  }
 }
 
 .buttons button {
@@ -372,9 +384,9 @@ footer a {
 .buttons button.pictured {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px 5px 8px;
-  font-size: 15px;
+  gap: 5px;
+  padding: 5px 7px 5px 6px;
+  font-size: var(--button-letter);
 }
 
 .buttons button.pictured .icon {
@@ -732,7 +744,7 @@ footer a {
 
 .level-title {
   margin: 0 0 8px;
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .scene-frame {
@@ -1371,15 +1383,59 @@ footer a {
 
 /* The cards over the scene. */
 
+/* The heading in two lines held close (D360): the item's label, the lesson and the map,
+   and the gear apart at the line's right end; under them the title and its ?. */
 .level-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 6px;
+}
+
+.level-heading-top,
+.level-heading-title {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 10px;
   align-items: center;
 }
 
+.level-heading .gear {
+  margin-left: auto;
+}
+
 .level-heading .level-title {
-  margin-bottom: 8px;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.level-heading .item-number {
+  line-height: 1.3;
+}
+
+.level-heading .item-number,
+.level-heading .about,
+.level-heading .gear,
+.level-heading .quiet-button.small {
+  margin-bottom: 0;
+}
+
+.level-heading .quiet-button.small {
+  padding: 0 9px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.level-heading .about {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.level-heading .gear {
+  font-size: 20px;
 }
 
 .about {
@@ -2530,10 +2586,6 @@ a.stop-body:focus-visible {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.03em;
-}
-
-.level-heading .item-number {
-  margin-bottom: 8px;
 }
 
 .card .item-number {
@@ -3741,20 +3793,33 @@ a.stop-body:focus-visible {
   }
 
   .level-title {
-    font-size: calc(22px * var(--fit, 1));
+    font-size: calc(20px * var(--fit, 1));
   }
 
   /* The heading's gaps close faster than its words shrink: 10 px at full size, 4 px at
      the least. */
-  .level-heading {
+  .level-heading-top,
+  .level-heading-title {
     gap: calc(4px * var(--fit, 1)) calc(10px - (1 - var(--fit, 1)) * 30px);
   }
 
-  .level-heading .level-title,
-  .level-heading .item-number,
+  .level-heading {
+    margin-bottom: calc(6px * var(--fit, 1));
+  }
+
   .quiet-button.small,
   .about {
     margin-bottom: calc(8px * var(--fit, 1));
+  }
+
+  .level-heading .quiet-button.small {
+    padding: 0 calc(9px * var(--fit, 1));
+    font-size: calc(13px * var(--fit, 1));
+  }
+
+  .level-heading .about {
+    width: calc(22px * var(--fit, 1));
+    height: calc(22px * var(--fit, 1));
   }
 
   .item-number {
@@ -3800,14 +3865,14 @@ a.stop-body:focus-visible {
   }
 
   .button-row {
-    gap: calc(6px * var(--fit, 1));
+    gap: calc(4px * var(--fit, 1));
   }
 
   .buttons button.pictured {
-    gap: calc(6px * var(--fit, 1));
-    padding: calc(5px * var(--fit, 1)) calc(10px * var(--fit, 1)) calc(5px * var(--fit, 1))
-      calc(8px * var(--fit, 1));
-    font-size: calc(15px * var(--fit, 1));
+    gap: calc(5px * var(--fit, 1));
+    padding: calc(5px * var(--fit, 1)) calc(7px * var(--fit, 1)) calc(5px * var(--fit, 1))
+      calc(6px * var(--fit, 1));
+    font-size: calc(var(--button-letter) * var(--fit, 1));
   }
 
   .buttons button.pictured .icon {

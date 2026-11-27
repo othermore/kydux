@@ -1,5 +1,5 @@
 // The kept program and the buttons (D351): a saved game keeps the program being written,
-// one, which its level opens with by every way into it; Original code asks in the game's
+// one, which its level opens with by every way into it; Original asks in the game's
 // own dialog before it erases; the buttons stand in two rows, each with its picture.
 
 import { fileURLToPath } from 'node:url';
@@ -110,12 +110,12 @@ for (const [width, height] of [
     await expect(page.locator('#help-buttons > .speed')).toBeVisible();
     for (const id of ['run', 'restart', 'stop', 'original', 'notebook-open', 'hint']) {
       await expect(page.locator(`#${id} svg.icon`)).toHaveCount(1);
-      // A window under 1024 by 700 draws its letter smaller (D359): 15 px times 600 / 700 at
-      // 900 by 600.
+      // 15 px, 14 px under 1240 px wide (D360), and a window under 1024 by 700 draws it
+      // smaller (D359): 14 px times 600 / 700 at 900 by 600.
       const size = await page.locator(`#${id} .button-word`).evaluate((word) => parseFloat(getComputedStyle(word).fontSize));
-      expect(size).toBeCloseTo(width === 1280 ? 15 : (15 * 600) / 700, 1);
+      expect(size).toBeCloseTo(width === 1280 ? 15 : (14 * 600) / 700, 1);
     }
-    await expect(page.locator('#original')).toHaveText('Original code');
+    await expect(page.locator('#original')).toHaveText('Original');
     // The second row stands under the first.
     const top = async (selector: string) => (await page.locator(selector).boundingBox())?.y ?? 0;
     expect(await top('#notebook-open')).toBeGreaterThan(await top('#run'));
@@ -123,20 +123,27 @@ for (const [width, height] of [
   });
 }
 
-// The longest words of the first row are Spanish ones: at 1280 by 800 its four buttons still
-// stand on one line, and the second row under them (D351).
+// The longest words of the first row are Spanish ones: at 1280 by 800, and down to 1024 by
+// 700, the smallest window the game is made for (D38), its four buttons stand on one line,
+// and the second row under them (D351, D360).
 test.describe('in Spanish', () => {
   test.use({ locale: 'es-ES' });
-  test('at 1280 by 800, the first row is one line and the second stands under it', async ({ page }) => {
-    await open(page, 'the-long-corridor');
-    await expect(page.locator('#original')).toHaveText('Código original');
-    const top = async (selector: string) => (await page.locator(selector).boundingBox())?.y ?? 0;
-    for (const id of ['restart', 'stop', 'original']) expect(await top(`#${id}`)).toBe(await top('#run'));
-    expect(await top('#notebook-open')).toBeGreaterThan(await top('#run'));
-  });
+  for (const [width, height] of [
+    [1280, 800],
+    [1024, 700],
+  ] as const) {
+    test(`at ${width} by ${height}, the first row is one line and the second stands under it`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await open(page, 'the-long-corridor');
+      await expect(page.locator('#original')).toHaveText('Original');
+      const top = async (selector: string) => (await page.locator(selector).boundingBox())?.y ?? 0;
+      for (const id of ['restart', 'stop', 'original']) expect(await top(`#${id}`)).toBe(await top('#run'));
+      expect(await top('#notebook-open')).toBeGreaterThan(await top('#run'));
+    });
+  }
 });
 
-test('Original code asks first, in the game own dialog: No keeps the code, Escape is No, Yes puts the starting code', async ({
+test('Original asks first, in the game own dialog: No keeps the code, Escape is No, Yes puts the starting code', async ({
   page,
 }) => {
   await open(page, 'the-long-corridor');
@@ -178,6 +185,6 @@ test('in Spanish, the question and its two answers', async ({ browser }) => {
   await expect(page.locator('#ask-question')).toHaveText('¿Borrar lo que has escrito y volver al código original?');
   await expect(page.locator('#ask-yes')).toHaveText('Sí, borrar');
   await expect(page.locator('#ask-no')).toHaveText('No, seguir');
-  await expect(page.locator('#original')).toHaveText('Código original');
+  await expect(page.locator('#original')).toHaveText('Original');
   await context.close();
 });

@@ -223,6 +223,8 @@ class World:
         #: The classes of familiars the child's program has written (D297).
         self.classes_written = 0
         self._tree: ast.AST | None = None
+        #: Whether a thing has been lit by `reveal` in this run, its words told (D355).
+        self.told_revealed = False
         self._check_goals()
 
     def prepare(self) -> None:
@@ -564,6 +566,15 @@ class World:
         """Someone of the scene says something while the program runs (D264): a note in
         the tick going on, with the values its words take."""
         self.note(who, "told", {"who": who, "key": key, **values})
+
+    def revealed(self) -> None:
+        """A thing lit by `reveal`: in the tick of the run's first, the words the level
+        names for it are told, once in the run (D355)."""
+        if self.told_revealed:
+            return
+        self.told_revealed = True
+        for who, key in self.level.told_revealed:
+            self.tell(who, key)
 
     def warn(
         self, reason: str, by: str, at_line: int | None | object = CHILD, **detail: Any

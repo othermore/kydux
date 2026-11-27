@@ -2,7 +2,11 @@
 // content/lessons/<id>/ (D33, D56). Pages are separated by a line of `---`; a
 // fenced block marked `python try`, on any page, is code the child runs and changes
 // on the page itself (D142); the one on the last page is the lesson's example: the
-// level after it starts with its own program, never with it (D63).
+// level after it starts with its own program, never with it (D63). The fence says the
+// page's test (D354): `python try`, the block run; `python try change`, a code other
+// than the given one run; `python try rename`, the given variable renamed in a run with
+// no error; `python try rename error`, that and a run ended on an unknown name. A fence
+// with other words is plain code.
 
 import { fallbackLanguage, forWizard, type Language } from '../i18n';
 import { contentUrl } from './address';
@@ -26,7 +30,27 @@ export class LessonNotFound extends Error {
   }
 }
 
-const TRY_BLOCK = /```python try\n([\s\S]*?)```/;
+/** What a page asks of its block before the page is left (D354): a run, a change, a
+ * rename, a rename and the error of a name the program has not. */
+export type LessonTest = 'try' | 'change' | 'rename' | 'rename_error';
+
+/** A block to try, under any of its four fences: the fence's words and the code. */
+const TRY_BLOCK = /```python try( change| rename| rename error)?\n([\s\S]*?)```/;
+const TRY_BLOCKS = new RegExp(TRY_BLOCK.source, 'g');
+
+/** The test a fence's words after `python try` say. */
+function testOf(words: string | undefined): LessonTest {
+  switch (words) {
+    case ' change':
+      return 'change';
+    case ' rename':
+      return 'rename';
+    case ' rename error':
+      return 'rename_error';
+    default:
+      return 'try';
+  }
+}
 
 /** A lesson's Markdown taken apart: its title, its pages, the last page's block. */
 export function readLesson(markdown: string): Pick<Lesson, 'title' | 'pages' | 'tryCode'> {
@@ -35,18 +59,27 @@ export function readLesson(markdown: string): Pick<Lesson, 'title' | 'pages' | '
     .map((page) => page.trim())
     .filter((page) => page !== '');
   const tried = TRY_BLOCK.exec(pages[pages.length - 1] ?? '');
-  const tryCode = tried ? (tried[1] ?? '') : null;
+  const tryCode = tried ? (tried[2] ?? '') : null;
   const title = /^#\s+(.+)$/m.exec(pages[0] ?? '')?.[1]?.trim() ?? '';
   return { title, pages, tryCode };
 }
 
-/** A page cut at its blocks: its Markdown, and the code the child runs, in their order. */
-export function pageParts(page: string): ({ markdown: string } | { code: string })[] {
-  const parts = page.split(/```python try\n([\s\S]*?)```/);
-  return parts.flatMap((part, index): ({ markdown: string } | { code: string })[] => {
-    if (index % 2 === 1) return [{ code: part }];
-    return part.trim() === '' ? [] : [{ markdown: part }];
-  });
+/** A part of a page: its Markdown, or a block the child runs, with the page's test. */
+export type PagePart = { markdown: string } | { code: string; test: LessonTest };
+
+/** A page cut at its blocks: its Markdown, and the code the child runs with the test its
+ * fence says, in their order. */
+export function pageParts(page: string): PagePart[] {
+  const parts: PagePart[] = [];
+  let from = 0;
+  const words = (text: string) => (text.trim() === '' ? [] : [{ markdown: text }]);
+  for (const found of page.matchAll(TRY_BLOCKS)) {
+    parts.push(...words(page.slice(from, found.index)));
+    parts.push({ code: found[2] ?? '', test: testOf(found[1]) });
+    from = found.index + found[0].length;
+  }
+  parts.push(...words(page.slice(from)));
+  return parts;
 }
 
 async function fetched(url: string, kind: 'json' | 'text'): Promise<string | null> {

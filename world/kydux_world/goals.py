@@ -32,11 +32,14 @@ D267), born (the familiar has left the circle, D268), familiar_at (the familiar 
 program on a cell, `at`, or `on` a plate), orders (Orla's orders obeyed, D267),
 not_seen_by (an actor; failed when it catches the wizard), ticks_under (the
 run ends in fewer ticks than that, so that the shorter of two winning programs
-earns it, D133), and three read from the code before the run: lines_under
+earns it, D133), and five read from the code before the run: lines_under
 (fewer lines than that, not counting blank lines and comments), numbers_under
 (fewer numbers written in it than that, so that a value is named once, as a
-variable) and uses (the code names an action or an attribute: `{"kind":
-"uses", "member": "locked"}`).
+variable), uses (the code names an action or an attribute: `{"kind":
+"uses", "member": "locked"}`), move_by_variable (a move of the wizard's is given a
+variable that holds a number written by hand, D343) and own_name (a find of a kind kept
+in a variable whose name is none of those refused: `{"kind": "own_name", "find": "book",
+"not": ["book", "tesoro", "treasure"]}`, D345).
 A level may add its own in a goals.py beside its level.json, which says so
 with `"own_goals": true`: a module whose `GOALS` maps each kind to its class,
 in the same shape as these.
@@ -48,7 +51,7 @@ import types
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Protocol
 
-from .level import KNOWN_SPELLS, GoalSpec, Level, LevelError, Position
+from .level import KNOWN_SPELLS, THING_KINDS, GoalSpec, Level, LevelError, Position
 
 if TYPE_CHECKING:
     from .world import World
@@ -426,6 +429,113 @@ class NumbersUnderGoal:
         return len(numbers) < self.count
 
 
+#: The moves a move_by_variable goal looks at the first argument of (D343).
+MOVES = ("move_up", "move_down", "move_left", "move_right")
+
+
+def _hand_numbers(tree: ast.AST) -> set[str]:
+    """The names an assignment of the program gives a whole number written by hand:
+    `steps = 2`."""
+    return {
+        target.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, int)
+        and not isinstance(node.value.value, bool)
+        for target in node.targets
+        if isinstance(target, ast.Name)
+    }
+
+
+class MoveByVariableGoal:
+    """Met, before the run starts, when a move of the wizard's is given a variable: some
+    call of `wizard.move_up`, `move_down`, `move_left` or `move_right` has as its first
+    argument a name an assignment of the program gives a whole number written by hand
+    (D343): `steps = 2` and `wizard.move_left(steps)`."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        pass
+
+    def check(self, world: "World") -> bool:
+        tree = _code_tree(world.code)
+        if tree is None:
+            return False
+        numbers = _hand_numbers(tree)
+        return any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == "wizard"
+            and node.func.attr in MOVES
+            and node.args
+            and isinstance(node.args[0], ast.Name)
+            and node.args[0].id in numbers
+            for node in ast.walk(tree)
+        )
+
+
+#: The methods a find is kept from, which an own_name goal reads (D345).
+FINDS_KEPT = ("find_nearest", "find_item")
+
+
+def kept_finds(tree: ast.AST, finds: tuple[str, ...] = FINDS_KEPT) -> list[tuple[str, str, int]]:
+    """Each assignment to a single name of a find of the wizard's with a word in quotes,
+    in the program's order: the name, the word and the line (`tesoro =
+    wizard.find_nearest("book")`)."""
+    found = []
+    for node in ast.walk(tree):
+        if not (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+        ):
+            continue
+        call = node.value
+        if (
+            isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Attribute)
+            and isinstance(call.func.value, ast.Name)
+            and call.func.value.id == "wizard"
+            and call.func.attr in finds
+            and len(call.args) == 1
+            and isinstance(call.args[0], ast.Constant)
+            and isinstance(call.args[0].value, str)
+        ):
+            found.append((node.targets[0].id, call.args[0].value, node.lineno))
+    return sorted(found, key=lambda kept: kept[2])
+
+
+class OwnNameGoal:
+    """Met, before the run starts, when the program keeps a find of a kind in a variable
+    of the child's own naming (D345): `{"kind": "own_name", "find": "book", "not":
+    ["book", "tesoro", "treasure"]}`, at least one assignment of
+    `wizard.find_nearest("book")` or `wizard.find_item("book")` to a single name, and no
+    such assignment's name among those of `not`."""
+
+    def __init__(self, spec: GoalSpec, level: Level) -> None:
+        find, refused = spec.params.get("find"), spec.params.get("not", [])
+        if find not in THING_KINDS:
+            raise LevelError(f"{level.id}: an own_name goal finds a kind of thing, not {find}")
+        if not isinstance(refused, list) or not all(
+            isinstance(name, str) and name.isidentifier() for name in refused
+        ):
+            raise LevelError(f"{level.id}: an own_name goal's not is a list of Python names")
+        self.find = find
+        self.refused = set(refused)
+
+    def names(self, world: "World") -> list[str]:
+        """The names the program keeps a find of the goal's kind in, in its order."""
+        tree = _code_tree(world.code)
+        if tree is None:
+            return []
+        return [name for name, word, _ in kept_finds(tree) if word == self.find]
+
+    def check(self, world: "World") -> bool:
+        names = self.names(world)
+        return bool(names) and not any(name in self.refused for name in names)
+
+
 #: The words of Python a uses goal may name, by the kind of statement each makes.
 KEYWORDS = {"for": ast.For, "while": ast.While, "if": ast.If, "def": ast.FunctionDef}
 
@@ -671,6 +781,8 @@ GOALS: dict[str, type] = {
     "ticks_under": TicksUnderGoal,
     "numbers_under": NumbersUnderGoal,
     "uses": UsesGoal,
+    "move_by_variable": MoveByVariableGoal,
+    "own_name": OwnNameGoal,
     "trial": TrialGoal,
     "noted": NotedGoal,
     "born": BornGoal,

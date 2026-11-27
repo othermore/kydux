@@ -118,6 +118,7 @@ class Thing(Child):
             world.act("blocked", {**refused, "tried": False})
             return
         world.act("reveal", {"id": self.name, "at": list(where)})
+        world.revealed()
 
     def distance_to(self, other: Any) -> int | None:
         """How many steps lie between the thing and another, the wizard or someone,

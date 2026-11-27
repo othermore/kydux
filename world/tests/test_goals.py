@@ -282,3 +282,95 @@ def test_a_bonus_goal_that_fails_loses_its_star_and_not_the_level():
     bumped = run_code(level, "wizard.move_up()\n" + SOLVES_ROOMS)
     assert bumped.status == "won"
     assert [(g.met, g.failed) for g in bumped.goals] == [(True, False), (False, True)]
+
+
+#: A room with a walk of three stretches of two (D343): two left, two up, two right.
+ROUND = Level.from_dict(
+    {
+        "id": "round",
+        "map": ["#######", "#..E..#", "#.###.#", "#..S..#"],
+        "goals": [{"kind": "reach", "marker": "E"}, {"kind": "move_by_variable"}],
+    }
+)
+
+
+@pytest.mark.parametrize(
+    ("code", "met"),
+    [
+        (
+            "steps = 2\nwizard.move_left(steps)\nwizard.move_up(steps)\nwizard.move_right(steps)",
+            True,
+        ),
+        ("wizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(2)", False),
+        ("steps = 2\nwizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(2)", False),
+        (
+            "steps = 2\nprint(steps)\n"
+            "wizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(2)",
+            False,
+        ),
+        (
+            "steps = 1 + 1\n"
+            "wizard.move_left(steps)\nwizard.move_up(steps)\nwizard.move_right(steps)",
+            False,
+        ),
+        ("steps = 2\nwizard.say(steps)\nwizard.move_left(steps)", True),
+    ],
+)
+def test_move_by_variable_is_met_by_a_move_given_a_number_kept_by_hand(code, met):
+    """D343: some move of the wizard's has as its first argument a name an assignment
+    gives a whole number written by hand; the numbers typed, a variable never given to a
+    move, a number computed, are not."""
+    result = run_code(ROUND, code)
+    assert result.goals[1].met is met
+
+
+def own_name_level(refused=("book", "tesoro", "treasure")):
+    return Level.from_dict(
+        {
+            "id": "own",
+            "map": ["S.b"],
+            "things": [{"kind": "book", "id": "old_book", "marker": "b"}],
+            "goals": [
+                {"kind": "collect", "id": "old_book"},
+                {"kind": "own_name", "find": "book", "not": list(refused)},
+            ],
+        }
+    )
+
+
+@pytest.mark.parametrize(
+    ("code", "met"),
+    [
+        ('eldras_book = wizard.find_nearest("book")', True),
+        ('x = wizard.find_nearest("book")', True),
+        ('x = wizard.find_item("book")', True),
+        ('book = wizard.find_nearest("book")', False),
+        ('tesoro = wizard.find_nearest("book")', False),
+        ('treasure = wizard.find_nearest("book")', False),
+        ('wizard.find_nearest("book")', False),
+        ("", False),
+        ('book = wizard.find_nearest("book")\nmine = wizard.find_nearest("book")', False),
+        ('x = wizard.find_nearest("key")', False),
+    ],
+)
+def test_own_name_is_met_by_a_find_kept_under_a_name_of_the_child_s(code, met):
+    """D345: a find of the kind kept in a variable, and none kept under a refused name; a
+    second find kept under an own name does not mend a first kept as `book`."""
+    result = run_code(own_name_level(), code + "\nwizard.move_right()\nwizard.pick_up()")
+    assert result.goals[1].met is met
+
+
+@pytest.mark.parametrize(
+    "goal",
+    [
+        {"kind": "own_name", "find": "dragon", "not": []},
+        {"kind": "own_name", "find": "book", "not": "book"},
+        {"kind": "own_name", "find": "book", "not": ["my book"]},
+    ],
+)
+def test_an_own_name_goal_finds_a_kind_and_refuses_python_names(goal):
+    level = Level.from_dict(
+        {"id": "own", "map": ["S.E"], "goals": [{"kind": "reach", "marker": "E"}, goal]}
+    )
+    with pytest.raises(LevelError):
+        World(level)

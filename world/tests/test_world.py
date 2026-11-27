@@ -1,5 +1,5 @@
 import pytest
-from kydux_world.level import Level, Position
+from kydux_world.level import Level, LevelError, Position
 from kydux_world.run import run_code
 from kydux_world.world import TooManyTicks, World
 
@@ -120,3 +120,58 @@ def test_events_outside_the_child_s_code_have_no_line():
     world = World(ROOM)
     world.wizard.move_right()
     assert world.events[0].line is None
+
+
+def lit_level(told=None):
+    """A level with a key behind a shelf and a friend, whose words for the moment a thing
+    lights are `told` (D355)."""
+    data = {
+        "id": "lit",
+        "map": ["S.F.", "=k.."],
+        "things": [{"kind": "key", "id": "key", "marker": "k"}],
+        "actors": [{"kind": "friend", "id": "mate", "marker": "F"}],
+        "goals": [{"kind": "collect", "id": "key"}],
+    }
+    if told is not None:
+        data["told"] = told
+    return Level.from_dict(data)
+
+
+def test_a_figure_s_words_are_told_in_the_tick_of_the_first_reveal_once():
+    """D355: `told.revealed` is said in the tick of the run's first `reveal` that lights a
+    thing, once in the run; a run with no reveal tells nothing."""
+    from kydux_world.run import run_code
+
+    level = lit_level({"revealed": [["mate", "revealed"]]})
+    code = 'mine = wizard.find_nearest("key")\nmine.reveal()\nmine.reveal()\n'
+    result = run_code(level, code)
+    told = [e for e in result.events if e.kind == "told"]
+    reveals = [e for e in result.events if e.kind == "reveal"]
+    assert [(e.data["who"], e.data["key"]) for e in told] == [("mate", "revealed")]
+    assert told[0].tick == reveals[0].tick
+    assert not [e for e in run_code(level, "wizard.move_right()").events if e.kind == "told"]
+    assert not [e for e in run_code(lit_level(), code).events if e.kind == "told"]
+
+
+def test_a_refused_reveal_tells_nothing():
+    level = lit_level({"revealed": [["mate", "revealed"]]})
+    code = (
+        'mine = wizard.find_nearest("key")\nwizard.move_right()\nwizard.pick_up()\nmine.reveal()\n'
+    )
+    result = run_code(level, code)
+    assert [e.data["reason"] for e in result.events if e.kind == "blocked"] == ["not_here"]
+    assert not [e for e in result.events if e.kind == "told"]
+
+
+@pytest.mark.parametrize(
+    "told",
+    [
+        {"revealed": [["teacher", "revealed"]]},
+        {"opened": [["mate", "opened"]]},
+        {},
+        {"won": "mate"},
+    ],
+)
+def test_told_names_someone_of_the_level_at_a_moment_it_knows(told):
+    with pytest.raises(LevelError):
+        lit_level(told)

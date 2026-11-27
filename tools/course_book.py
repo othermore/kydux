@@ -185,7 +185,7 @@ def lesson_section(
     path = CONTENT / "lessons" / lesson_id
     about = load_json(path / "lesson.json")
     body = made((path / f"{lang}.md").read_text(encoding="utf-8"), lang, gender, name)
-    body = body.replace("```python try", "```python")
+    body = re.sub(r"```python try(?: change| rename(?: error)?)?\n", "```python\n", body)
     parts = pages(body)
     title = re.sub(r"^#\s+", "", parts[0].splitlines()[0]) if parts else lesson_id
     lines = [f"### {number}: {title}", ""]

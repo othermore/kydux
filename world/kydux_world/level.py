@@ -33,7 +33,8 @@ may add to, each with its reason (D205);
 gives too and only the page reads (D135); `camera`, a box of cells the page
 shows whole at the level's start (D201), which holds the start, every marker and
 every thing; `familiar`, the familiar the level describes, calls or plays with
-(D260), with `told`, what is said at the end of a run won (D264), and `fault`, the
+(D260); `told`, what is said at the end of a run won (D264) and when a thing first
+lights (D355); `fault`, the
 explanation a fix level's given program stops with (D272); and `ways`, the ways the
 level is played, each one the same program must win (D51). A level may
 come with goals of its own, in a goals.py beside level.json, whose source
@@ -367,6 +368,8 @@ class Level:
     familiar: FamiliarBlock | None = None
     #: What is said at the end of a run won, each by whom and its words' key (D264).
     told_won: tuple[tuple[str, str], ...] = ()
+    #: What is said when the run's first `reveal` lights a thing, the same way (D355).
+    told_revealed: tuple[tuple[str, str], ...] = ()
     #: Where someone painted into the scene speaks from, by id (D264).
     voices: dict[str, Position] = field(default_factory=dict)
     #: The explanation a fix level's given program stops with (D272), or None.
@@ -567,10 +570,12 @@ class Level:
             fault=_fault(data.get("fault"), level_id, kind),
             facing=facing,
         )
+        told = _told(data.get("told"), level)
         level = replace(
             level,
             familiar=_familiar(data.get("familiar"), shape, level),
-            told_won=_told_won(data.get("told"), level),
+            told_won=told.get("won", ()),
+            told_revealed=told.get("revealed", ()),
         )
         check_api(level)
         _level_camera(data.get("camera"), level)
@@ -1737,26 +1742,42 @@ def _orders(
     return tuple(found), value["on"]
 
 
-def _told_won(value: Any, level: "Level") -> tuple[tuple[str, str], ...]:
-    """What is said at the end of a run won (D264): `{"won": [["orla", "won"], ...]}`,
-    each said by an actor of the level or a voice of its scene."""
+#: The moments of a run a level's `told` names words for: the end of a run won (D264),
+#: and the first `reveal` of a run that lights a thing (D355).
+TOLD_MOMENTS = ("won", "revealed")
+
+
+def _told(value: Any, level: "Level") -> dict[str, tuple[tuple[str, str], ...]]:
+    """What is said in a run, by its moment (TOLD_MOMENTS): `{"won": [["orla", "won"],
+    ...], "revealed": [["mate", "revealed"]]}`, each said by an actor of the level or a
+    voice of its scene, in that order."""
     if value is None:
-        return ()
+        return {}
     level_id = level.id
-    said = value.get("won") if isinstance(value, dict) and set(value) == {"won"} else None
-    if not isinstance(said, list):
-        raise LevelError(f"{level_id}: told is what is said when the run is won")
+    if not isinstance(value, dict) or not value or not set(value) <= set(TOLD_MOMENTS):
+        raise LevelError(
+            f"{level_id}: told is what is said when the run is won or a thing is revealed"
+        )
     speakers = {actor.id for actor in level.actors} | set(level.voices)
-    found = []
-    for entry in said:
-        if not (
-            isinstance(entry, list) and len(entry) == 2 and all(isinstance(e, str) for e in entry)
-        ):
-            raise LevelError(f"{level_id}: told says who speaks and the words' key")
-        if entry[0] not in speakers:
-            raise LevelError(f"{level_id}: told's {entry[0]} is no one of the level or its scene")
-        found.append((entry[0], entry[1]))
-    return tuple(found)
+    told: dict[str, tuple[tuple[str, str], ...]] = {}
+    for moment, said in value.items():
+        if not isinstance(said, list):
+            raise LevelError(f"{level_id}: told's {moment} is a list of who speaks and the key")
+        found = []
+        for entry in said:
+            if not (
+                isinstance(entry, list)
+                and len(entry) == 2
+                and all(isinstance(e, str) for e in entry)
+            ):
+                raise LevelError(f"{level_id}: told says who speaks and the words' key")
+            if entry[0] not in speakers:
+                raise LevelError(
+                    f"{level_id}: told's {entry[0]} is no one of the level or its scene"
+                )
+            found.append((entry[0], entry[1]))
+        told[moment] = tuple(found)
+    return told
 
 
 #: What a scene's letters are when it gives no table of its own (D65): wall,

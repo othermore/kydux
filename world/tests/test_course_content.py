@@ -47,7 +47,8 @@ CONCEPTS = {
     "variables",
     "while",
 }
-TRY = re.compile(r"```python try\n(.*?)```", re.S)
+#: A block to try, under any of the four fences a page's test is said on (D354).
+TRY = re.compile(r"```python try(?: change| rename(?: error)?)?\n(.*?)```", re.S)
 FENCED = re.compile(r"```.*?```", re.S)
 INLINE = re.compile(r"`[^`\n]*`")
 HTML = re.compile(r"<[A-Za-z!/]")
@@ -495,7 +496,7 @@ def lessons_with_concepts() -> list[tuple[Path, set[str]]]:
     return found
 
 
-BLOCK = re.compile(r"```python(?: try)?\n(.*?)```", re.S)
+BLOCK = re.compile(r"```python(?: try(?: change| rename(?: error)?)?)?\n(.*?)```", re.S)
 
 
 @pytest.mark.parametrize(

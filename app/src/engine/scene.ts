@@ -527,6 +527,8 @@ class LevelScene extends Phaser.Scene {
   private toldMs = 0;
   /** Whether the tick shown is one of Orla's orders, whose command holds nothing (D303). */
   private ordering = false;
+  /** Whether the tick shown lights a thing: what a figure says in it holds nothing (D367). */
+  private lighting = false;
   private readonly sitting = new Set<Phaser.GameObjects.Sprite>();
   private readonly litPlates = new Set<string>();
   private readonly voiceSprites = new Map<string, Phaser.GameObjects.Sprite>();
@@ -1569,6 +1571,7 @@ class LevelScene extends Phaser.Scene {
     this.shownTick = tick;
     this.toldMs = 0;
     this.ordering = false;
+    this.lighting = events.some((event) => event.kind === 'reveal');
     this.endGlides(tick);
     // Drawn at once on a later tick than it came or last stepped in, a trial that does
     // not hold is not there (D276).
@@ -3405,8 +3408,9 @@ class LevelScene extends Phaser.Scene {
 
   /** Someone says something while the program runs (D264): a bubble over who says it, or
    * from the spot the scene names for a voice painted into it, or the book's band; the
-   * playback holds until the words are read. Words in several pieces are said in a
-   * bubble each, one after another (D274). */
+   * playback holds until the words are read, but for the words told as a thing lights,
+   * read while the program goes on (D367). Words in several pieces are said in a bubble
+   * each, one after another (D274). */
   private tell(tick: number, data: Record<string, unknown>, instant: boolean): void {
     const who = String(data.who);
     const text = toldText(data, this.options.told);
@@ -3441,11 +3445,14 @@ class LevelScene extends Phaser.Scene {
     }
     if (!instant) {
       if (who === 'book' || !later) play('say');
-      // In an order's tick, the command is read while the familiar walks (D303).
+      // In an order's tick, the command is read while the familiar walks (D303); what a
+      // figure says as a thing lights, while the program goes on (D367).
       const whole =
         who === 'book'
           ? Math.min(readingMs(toldWhole(text)), TOLD_MOST)
-          : toldHold(reading, before, this.ordering && who === 'orla');
+          : this.lighting
+            ? 0
+            : toldHold(reading, before, this.ordering && who === 'orla');
       this.playback.holdTick(whole, whole);
     }
   }

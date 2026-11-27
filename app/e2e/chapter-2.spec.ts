@@ -565,6 +565,21 @@ test.describe('the first variable (D343, D355)', () => {
     await expect(page.locator('#scene')).toHaveAttribute('data-told', 'mate:revealed');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hidden-key-friend.png` });
   });
+
+  test('in the hidden key, the wizard walks on while the friend speaks', async ({ page }) => {
+    await open(page, 'the-hidden-key');
+    await page.locator('#speed').selectOption('1');
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('my_key = wizard.find_nearest("key")\nmy_key.reveal()\nwizard.move_down(2)');
+    await page.locator('#run').click();
+    const scene = page.locator('#scene');
+    await expect(scene).toHaveAttribute('data-told', 'mate:revealed', { timeout: ciTimes(60_000) });
+    // The friend's words take over five seconds to read (D367): the two steps after them
+    // are walked in under one, the bubble still up.
+    await expect(scene).toHaveAttribute('data-wizard', '11,13', { timeout: 3_000 });
+    await expect(scene).toHaveAttribute('data-speaker', 'mate');
+  });
 });
 
 /** The four levels before the lost book, and Eldra's: each wrong program, and the

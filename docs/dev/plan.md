@@ -794,7 +794,9 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     over it (D352), no screen left by mistake (D353), a lesson's page passed by trying
     it (D354), a figure's words when a thing lights (D355), a saved game on a course
     that has grown (D356), the tips of the comments and of the two lists (D357), and a
-    tip's picture as a photograph pinned up (D358).
+    tip's picture as a photograph pinned up (D358); and, in `sprint-62.md`, the editor
+    that keeps five lines under the hints and the answer (D363), and every question
+    asked in the game's own dialog (D364).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

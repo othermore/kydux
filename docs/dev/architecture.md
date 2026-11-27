@@ -5834,7 +5834,7 @@ one overturns stays, marked as superseded.
   and open, and every stop reached stays as it was. The current chapter (D200) is the
   last chapter neither finished nor locked. The game goes on at `progress.current` when
   it names an open stop of the course, and at the first stop not done otherwise (a stop
-  the course no longer has, a locked one). A chapter's stars count its new levels in
+  the course does not have, a locked one). A chapter's stars count its new levels in
   what the chapter could hold, and a chapter finished before shows as not finished
   until its new stops are done. No saved game is converted: the format's version stays,
   and what a newer game adds (`program`, `lessons[id].tested`) is optional. Rules out a
@@ -5900,7 +5900,7 @@ one overturns stays, marked as superseded.
   14 px letter, and the gear apart at the line's right end; on the second the title, in a
   20 px letter, and its *?*. So every title stands on one line beside its *?* at 1024 by
   700. The first row's fourth button says *Original* / *Original*, the buttons' sides and
-  gaps are a little tighter, and their letter is 15 px, 14 px in a window under 1240 px
+  gaps are tight, and their letter is 15 px, 14 px in a window under 1240 px
   wide, so that *Ejecutar*, *Reiniciar*, *Parar* and *Original* stand in one line down to
   1024 by 700, the smallest window the game is made for (D38). Rules out a long title
   carrying the map and the gear to a line of their own, and a wider editor that narrows the
@@ -5916,7 +5916,7 @@ one overturns stays, marked as superseded.
   picture of its own: on a painted scene such a thing lies as much lower or higher as a
   figure on its cell is drawn. The fallen book is drawn from the book painted by the pile
   (`"art": "old_book"`, D85), the owner's choice over the placeholder of a thing with no
-  picture. The wall still covers the figures' feet there,
+  picture. The wall covers the figures' feet there,
   and the art test keeps the row among the cells seen over what is in front of them. Rules
   out the corridor's cells moved, which the levels' texts walk, and a repainted wall.
 - **D362 — A goal may say less in the goals box than on the start card.** Decided
@@ -5937,3 +5937,32 @@ one overturns stays, marked as superseded.
   `book` ni `tesoro`*, in the goal's own words. Which goals are said shorter is the
   designer's and the owner's to say. Rules out a goals box that takes half the scene for
   one goal, and a rule the child reads only on the card.
+- **D363 — The editor keeps five lines of code under the hints and the answer.** Decided
+  2026-11-26 by the designer, reviewing sprint 61. A hint is read to change the code, and
+  an answer names a line of it: the code, the hint and the answer are seen together, or
+  the child reads the one and has lost the other. On the level's screen with its two panes
+  side by side (a page wider than 800 px) the editor is never lower than five lines of
+  code with its frame, 7.6 times the code's letter times `--fit` (D359): 122 px with the
+  letter at 16 px. The hints' box is what gives way. It takes the height left between
+  the buttons and the answer, never under four times the code's letter, and scrolls
+  inside itself; it stands on the newest hint, whose first line is in sight when the
+  hint is taken and when a level opens with its hints kept, and an edge past which more
+  hints lie fades, as the lists' rows do (D346). The answer stays whole, with the line's
+  number at its end. Where the window is too low even for that, the editor's column
+  scrolls inside the level, and the page stays the window's height (D38). The line an
+  answer marks in the code is brought into the editor's sight when the answer shows and
+  whenever the editor's height changes while the line is marked. A page 800 px wide or
+  less keeps its own layout, which scrolls. Rules out an editor that gives all its height
+  to what stands under it, which three hints and an answer take whole at 1024 by 700;
+  older hints folded to their headings, which puts what the child wants to read again
+  behind a click; an answer that scrolls, which hides the line it names; and a page
+  taller than the window.
+- **D364 — The game asks every question in its own dialog, never in the browser's.**
+  Decided 2026-11-26 by the designer, reviewing sprint 61, as D351 does for *Original*.
+  Deleting a saved game and leaving a level by the map while its program runs ask
+  through `ui/ask.ts`: the question, *Yes* and *No* in the game's language and its look,
+  *No* with the focus, Escape for *No*. The browser's own box has the browser's words on
+  its buttons, whatever the game's language, looks like a fault of the page to a child,
+  and stops the page while it waits, the running program with it. No code of the game
+  calls `window.confirm`, `window.alert` or `window.prompt`, which a test of the project
+  holds. Rules out a question whose buttons the game does not write.

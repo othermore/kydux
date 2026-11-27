@@ -240,13 +240,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const original = pictured('original', 'original', () => t('level.original_code'));
   const hint = pictured('hint', 'hint', () => t('level.hint'));
   const notebookButton = pictured('notebook-open', 'notebook', () => t('notebook.open'));
-  // In the tester's mode, a button writes the level's solution in the editor: the
-  // solution packed apart for it (pack-world.mjs), or on the development server
-  // read from content/ (vite.config.ts). The published game holds no solution
-  // (D333) and has no tester's mode (D335).
-  const solution = debugging()
-    ? [labelled(element('button', { id: 'debug-solution', type: 'button' }), () => t('debug.solution'))]
-    : [];
+  // In the tester's mode, a button writes the level's solution in the editor, a button
+  // as the others of its row: the solution packed apart for it (pack-world.mjs), or on
+  // the development server read from content/ (vite.config.ts). The published game
+  // holds no solution (D333) and has no tester's mode (D335).
+  const solution = debugging() ? [pictured('debug-solution', 'solution', () => t('debug.solution'))] : [];
   // The lists over the editor, made after the notebook their chips open.
   let listed: ProgramLists | null = null;
   const notebook = notebookPanel(

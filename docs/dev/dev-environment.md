@@ -294,7 +294,7 @@ Two more things help you test quickly in this mode:
   https://localhost:5173/?debug#map
   ```
 
-- **Write the solution** is a button under the editor, beside the
+- **Solution** is a button under the editor, beside the
   notebook. It replaces the code with the level's solution, so that a run
   shows the level solved. It is there whenever the address has `?debug`, on
   the development server and on a build served from your machine or from a

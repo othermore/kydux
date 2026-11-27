@@ -210,7 +210,7 @@ export function keptAfter(
 }
 
 /** A level's solution, written with the table's default familiar, made the game's own
- * for the tester's *Escribir la solución* (D265, D266): the kind, the name, its name in
+ * for the tester's *Solución* (D265, D266): the kind, the name, its name in
  * the program and the colour of the game's familiar, else of its draft, and the
  * room-mate's copy as the slate writes it. A game with no familiar keeps it as it is. */
 export function withFamiliar(code: string, kept: KeptFamiliar, table: FamiliarTable): string {

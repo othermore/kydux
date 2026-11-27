@@ -16,7 +16,8 @@ const GEAR_PATHS = [
 
 /** The pictures of the level's buttons (D351), each in a 24 by 24 box: Run's triangle,
  * Restart's turned arrow, Stop's square, Original's page with a turned arrow, the
- * notebook's open book, and the hint's lamp; Play, after a pause, Run's triangle. */
+ * notebook's open book, the hint's lamp, and the pencil of the tester's solution; Play,
+ * after a pause, Run's triangle. */
 const BUTTON_PATHS = {
   run: ['M7.5 4.8 L18.8 12 L7.5 19.2 Z'],
   restart: ['M18.6 13.2 A6.8 6.8 0 1 1 16.4 6.8', 'M16.8 2.6 L16.8 7.2 L12.2 7.2'],
@@ -30,6 +31,7 @@ const BUTTON_PATHS = {
     'M8.6 14.6 C7 13.4 6 11.7 6 9.6 A6 6 0 0 1 18 9.6 C18 11.7 17 13.4 15.4 14.6 V17.4 H8.6 Z',
     'M9.8 20.6 H14.2',
   ],
+  solution: PENCIL_PATHS,
 } as const;
 
 /** The pictures a level's buttons may show (D351). */

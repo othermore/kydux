@@ -120,6 +120,19 @@ for (const [width, height] of [
   });
 }
 
+// The longest words of the first row are Spanish ones: at 1280 by 800 its four buttons still
+// stand on one line, and the second row under them (D351).
+test.describe('in Spanish', () => {
+  test.use({ locale: 'es-ES' });
+  test('at 1280 by 800, the first row is one line and the second stands under it', async ({ page }) => {
+    await open(page, 'the-long-corridor');
+    await expect(page.locator('#original')).toHaveText('Código original');
+    const top = async (selector: string) => (await page.locator(selector).boundingBox())?.y ?? 0;
+    for (const id of ['restart', 'stop', 'original']) expect(await top(`#${id}`)).toBe(await top('#run'));
+    expect(await top('#notebook-open')).toBeGreaterThan(await top('#run'));
+  });
+});
+
 test('Original code asks first, in the game own dialog: No keeps the code, Escape is No, Yes puts the starting code', async ({
   page,
 }) => {

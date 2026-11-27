@@ -28,7 +28,12 @@ export type Outcome = (
   | { kind: 'caught' }
   | { kind: 'error'; error: ErrorInfo }
   | { kind: 'failed' }
-) & { changed?: boolean };
+) & {
+  changed?: boolean;
+  /** The game's advice for a run that did not win, said under the outcome's words
+   * (D349): a find kept in no variable, a variable named by a word the level refuses. */
+  advice?: Explanation;
+};
 
 /** An error explained by the world, in the child's words (D22); `own`, the level's own
  * words for what someone says (D264). */
@@ -40,6 +45,17 @@ export function explanationText(explanation: Explanation, own: Record<string, st
         return t('error.unknown_action', p);
       case 'unknown_name':
         return t('error.unknown_name', p);
+      // A first variable's mistakes, in the child's words (D349).
+      case 'reveal_of_wizard_kept':
+        return t('error.reveal_of_wizard_kept', p);
+      case 'reveal_of_wizard':
+        return t('error.reveal_of_wizard', p);
+      case 'open_of_wizard':
+        return t('error.open_of_wizard', p);
+      case 'search_word_kept':
+        return t('error.search_word_kept', p);
+      case 'search_word':
+        return t('error.search_word', p);
       case 'read_only':
         return t('error.read_only', p);
       case 'no_new_attribute':
@@ -101,12 +117,26 @@ export function explanationText(explanation: Explanation, own: Record<string, st
   return 'suggestion' in p ? `${said} ${t('error.suggestion', p)}` : said;
 }
 
+/** The game's advice in the child's words (D349). */
+export function adviceText(advice: Explanation): string {
+  switch (advice.kind) {
+    case 'found_not_kept':
+      return t('error.found_not_kept', advice.params);
+    case 'variable_not_own':
+      return t('outcome.variable_not_own', advice.params);
+    default:
+      return '';
+  }
+}
+
 /** What the card says: first, when the run's way is not the one on the screen before
  * it, the level's words for what is different this time, on a line of their own
- * (D204). */
+ * (D204); last, on a line of its own, the game's advice (D349). */
 export function outcomeText(outcome: Outcome, different?: string, own: Record<string, string> = {}): string {
   const said = outcomeWords(outcome, own);
-  return outcome.changed && different ? `${different}\n${said}` : said;
+  const advised = outcome.advice ? adviceText(outcome.advice) : '';
+  const words = advised ? `${said}\n${advised}` : said;
+  return outcome.changed && different ? `${different}\n${words}` : words;
 }
 
 function outcomeWords(outcome: Outcome, own: Record<string, string> = {}): string {

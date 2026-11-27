@@ -108,3 +108,49 @@ describe('what the world explains, in the child\'s words', () => {
     );
   });
 });
+
+describe("a first variable's mistakes (D349)", () => {
+  it('says the advice under the outcome, in Spanish', () => {
+    initLanguage(spanish);
+    expect(
+      outcomeText({
+        kind: 'incomplete',
+        met: 1,
+        total: 2,
+        advice: { kind: 'variable_not_own', params: { name: 'book' } },
+      }),
+    ).toBe(
+      'Todavía no: 1 de 2 objetivos cumplidos. Inténtalo otra vez.\n' +
+        'Has guardado el libro en `book`. Funciona, pero hoy Wenna te pide una variable con un nombre inventado por ti: cámbialo en todas las líneas donde la usas.',
+    );
+  });
+
+  it('says a find kept in no variable under an error, with its line', () => {
+    initLanguage(english);
+    const error = {
+      type: 'NameError',
+      message: "name 'book' is not defined",
+      line: 2,
+      explanation: { kind: 'search_word', params: { name: 'book' } },
+    };
+    expect(outcomeText({ kind: 'error', error, advice: { kind: 'found_not_kept', params: { line: 1 } } })).toBe(
+      'There is nothing called `book` here. "book", in quotes, is the word to search with: find the thing first and keep it in a variable with a name you choose. (line 2)\n' +
+        'On line 1 you found something, but you did not keep it. Put a variable and `=` before it to keep it.',
+    );
+  });
+
+  it('says whose method reveal and open are, with no suggestion', () => {
+    initLanguage(spanish);
+    const said = (kind: string, params: Record<string, string> = {}) =>
+      outcomeText({ kind: 'error', error: { type: 'AttributeError', message: '', line: 2, explanation: { kind, params } } });
+    expect(said('reveal_of_wizard_kept', { variable: 'tesoro' })).toBe(
+      '`reveal` no es un método de `wizard`: es un método de la cosa que quieres hacer brillar. Escribe delante del punto la variable donde la guardaste, como en `tesoro.reveal()`. (línea 2)',
+    );
+    expect(said('open_of_wizard')).toBe(
+      '`open` no es un método de `wizard`: es un método de la puerta. Escribe delante del punto la variable de la puerta. (línea 2)',
+    );
+    expect(said('search_word_kept', { name: 'book', variable: 'tesoro' })).toBe(
+      'Aquí no hay nada que se llame `book`. Lo que encontraste con la palabra "book" lo guardaste en `tesoro`: usa esa variable. (línea 2)',
+    );
+  });
+});

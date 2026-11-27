@@ -449,7 +449,10 @@ export class RunController {
    * `way_won` for a way won while another is not (?debug's select), and a run whose way
    * is not the one on the screen before it `changed` (D204). */
   private outcomeOf(world: WorldResult): Outcome {
-    const said = this.outcomeOfOne(world);
+    const told = this.outcomeOfOne(world);
+    // The game's first advice, for a run that did not win (D349).
+    const advice = told.kind !== 'won' ? world.advice?.[0] : undefined;
+    const said: Outcome = advice ? { ...told, advice } : told;
     if (this.shownWay === null) return said;
     if (said.kind === 'won') return this.result?.status === 'won' ? said : { kind: 'way_won' };
     return this.wayChanged ? { ...said, changed: true } : said;

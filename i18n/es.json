@@ -33,7 +33,8 @@
     "caught": "¡Te ha visto el profesor! Inténtalo otra vez, y fíjate hacia dónde mira.",
     "printed": "Tu código ha escrito:",
     "blocked": "En la línea {line}: {reason}",
-    "way_won": "{El mago|La maga} pasa de esta manera. Todavía no de todas: elige otra para verla."
+    "way_won": "{El mago|La maga} pasa de esta manera. Todavía no de todas: elige otra para verla.",
+    "variable_not_own": "Has guardado el libro en `{name}`. Funciona, pero hoy Wenna te pide una variable con un nombre inventado por ti: cámbialo en todas las líneas donde la usas."
   },
   "level": {
     "stop": "Parar",
@@ -105,7 +106,13 @@
     "no_attribute": "Este objeto no tiene nada que se llame `{name}`.",
     "object_arguments": "Para hacer un `{name}` hacen falta {wanted} datos entre los paréntesis, y le has dado {given}.",
     "method_arguments": "`{name}` recibe {wanted} datos entre los paréntesis, y le has dado {given}.",
-    "no_such_method": "{familiar} no tiene ningún método llamado `{name}`."
+    "no_such_method": "{familiar} no tiene ningún método llamado `{name}`.",
+    "found_not_kept": "En la línea {line} has encontrado algo, pero no lo has guardado. Pon delante una variable y `=` para guardarlo.",
+    "reveal_of_wizard_kept": "`reveal` no es un método de `wizard`: es un método de la cosa que quieres hacer brillar. Escribe delante del punto la variable donde la guardaste, como en `{variable}.reveal()`.",
+    "reveal_of_wizard": "`reveal` no es un método de `wizard`: es un método de la cosa que quieres hacer brillar. Primero encuéntrala y guárdala en una variable; después, escribe esa variable delante del punto.",
+    "open_of_wizard": "`open` no es un método de `wizard`: es un método de la puerta. Escribe delante del punto la variable de la puerta.",
+    "search_word_kept": "Aquí no hay nada que se llame `{name}`. Lo que encontraste con la palabra \"{name}\" lo guardaste en `{variable}`: usa esa variable.",
+    "search_word": "Aquí no hay nada que se llame `{name}`. \"{name}\", entre comillas, es la palabra para buscar: encuentra la cosa primero y guárdala en una variable con el nombre que tú elijas."
   },
   "things": {
     "door": "la puerta",

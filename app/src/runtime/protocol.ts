@@ -93,6 +93,9 @@ export interface WorldResult {
   };
   /** In the birth level, whether the rehearsal passed (D268). */
   passes?: boolean;
+  /** The game's advice for a run that did not win (kydux_world.advice, D349): each a
+   * kind and its parameters, the first said under the outcome's words. */
+  advice?: Explanation[];
 }
 
 /** One way's result, by the way's id. */

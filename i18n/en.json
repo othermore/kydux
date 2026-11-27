@@ -33,7 +33,8 @@
     "caught": "The teacher saw you! Try again, and watch which way they look.",
     "printed": "Your code printed:",
     "blocked": "On line {line}: {reason}",
-    "way_won": "The wizard gets through this way. Not every way yet: choose another one to see it."
+    "way_won": "The wizard gets through this way. Not every way yet: choose another one to see it.",
+    "variable_not_own": "You kept the book in `{name}`. It works, but today Wenna asks you for a variable with a name you made up yourself: change it on every line where you use it."
   },
   "level": {
     "stop": "Stop",
@@ -105,7 +106,13 @@
     "no_attribute": "This object has nothing called `{name}`.",
     "object_arguments": "Making a `{name}` takes {wanted} data between the brackets, and you gave it {given}.",
     "method_arguments": "`{name}` takes {wanted} data between the brackets, and you gave it {given}.",
-    "no_such_method": "{familiar} has no method called `{name}`."
+    "no_such_method": "{familiar} has no method called `{name}`.",
+    "found_not_kept": "On line {line} you found something, but you did not keep it. Put a variable and `=` before it to keep it.",
+    "reveal_of_wizard_kept": "`reveal` is not a method of `wizard`: it is a method of the thing you want to make glow. Write before the dot the variable you kept it in, as in `{variable}.reveal()`.",
+    "reveal_of_wizard": "`reveal` is not a method of `wizard`: it is a method of the thing you want to make glow. First find it and keep it in a variable; then write that variable before the dot.",
+    "open_of_wizard": "`open` is not a method of `wizard`: it is a method of the door. Write the door's variable before the dot.",
+    "search_word_kept": "There is nothing called `{name}` here. What you found with the word \"{name}\" you kept in `{variable}`: use that variable.",
+    "search_word": "There is nothing called `{name}` here. \"{name}\", in quotes, is the word to search with: find the thing first and keep it in a variable with a name you choose."
   },
   "things": {
     "door": "the door",

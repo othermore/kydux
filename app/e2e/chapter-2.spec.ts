@@ -554,3 +554,41 @@ test.describe('the first variable (D343, D355)', () => {
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hidden-key-friend.png` });
   });
 });
+
+/** The four levels before the lost book, and Eldra's: each wrong program, and the
+ * words it ends on (D349), in Spanish. */
+const ANSWERS: [string, string, RegExp][] = [
+  ['the-reading-room', 'numbers_by_hand.py', /^Todavía no: 1 de 2 objetivos cumplidos/],
+  ['the-reading-room', 'one_step_short.py', /^Todavía no/],
+  ['the-reading-room', 'the_other_gap.py', /^Todavía no/],
+  ['wennas-door', 'door_closed.py', /^Todavía no/],
+  ['wennas-door', 'from_afar.py', /^Todavía no/],
+  ['wennas-door', 'open_of_the_wizard.py', /^`?open`? no es un método de `?wizard`?: es un método de la puerta\./],
+  ['the-fallen-book', 'never_lit.py', /^Todavía no: 1 de 2 objetivos cumplidos/],
+  ['the-fallen-book', 'reveal_of_the_wizard.py', /^reveal no es un método de wizard: .* como en treasure\.reveal\(\)\./],
+  ['the-fallen-book', 'search_word.py', /^Aquí no hay nada que se llame book\. Lo que encontraste con la palabra "book" lo guardaste en treasure: usa esa variable\./],
+  [
+    'the-lost-book',
+    'kept_as_book.py',
+    /^Todavía no: 1 de 2 objetivos cumplidos\. Inténtalo otra vez\.\nHas guardado el libro en book\. Funciona, pero hoy Wenna te pide una variable con un nombre inventado por ti/,
+  ],
+];
+
+test.describe("the game's answers to a first variable's mistakes (D349)", () => {
+  test.use({ locale: 'es-ES' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  for (const [id, wrong, said] of ANSWERS) {
+    test(`${id}: ${wrong} ends on its words`, async ({ page }) => {
+      await open(page, id);
+      const answer = await run(page, readFileSync(`${CONTENT}levels/${id}/wrong/${wrong}`, 'utf8'));
+      expect(answer).toMatch(said);
+    });
+  }
+
+  test('a find kept in no variable is said under the outcome, with its line', async ({ page }) => {
+    await open(page, 'the-fallen-book');
+    const answer = await run(page, 'wizard.find_nearest("book")\nwizard.move_left(4)\nwizard.pick_up()');
+    expect(answer).toContain('En la línea 1 has encontrado algo, pero no lo has guardado. Pon delante una variable y = para guardarlo.');
+  });
+});

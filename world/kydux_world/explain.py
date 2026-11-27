@@ -4,7 +4,9 @@ The world explains, and the page says it in the player's language through
 its i18n files (architecture.md, D22): `explain` gives a kind, one key under
 `error.` in i18n/<lang>.json, and the names and examples that go in it.
 Suggestions come from the names the level teaches (its `api`) for an action,
-and from `wizard` and the level's ids for a name. Python's own text stays in
+and from `wizard` and the level's variables for a name; a first variable's mistakes,
+a thing's method asked of the wizard and a search word written as a variable, are
+answered in the child's words with no suggestion (D349). Python's own text stays in
 the error beside the explanation, for an adult.
 """
 
@@ -17,6 +19,7 @@ from typing import Any
 
 from . import api
 from .familiars import Familiar, NoAttribute, NoSuchMethod
+from .goals import FINDS_KEPT, kept_finds
 from .level import Level
 from .things import Child, ReadOnly
 from .world import CHILD, ActionArguments, Refused
@@ -139,6 +142,49 @@ def _asked_index(error: IndexError, code: str | None) -> tuple[int, int] | None:
     return None
 
 
+#: The methods of another object a child asks of the wizard by mistake (D349): a thing's
+#: `reveal`, a door's `open`.
+OTHERS_METHODS = {"reveal": "thing", "open": "door"}
+#: The finds whose thing a variable may keep, a list's among them (D349).
+FINDS = (*FINDS_KEPT, "find_all")
+
+
+def first_kept(code: str | None, finds: tuple[str, ...], word: str | None = None) -> str | None:
+    """The variable of the program's first assignment of a find to a single name, of the
+    kind `word` when it is given (D349): `tesoro` for `tesoro = wizard.find_nearest("book")`."""
+    if code is None:
+        return None
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return None
+    return next((name for name, kind, _ in kept_finds(tree, finds) if word in (None, kind)), None)
+
+
+def _others_method(owner: Child, name: str, code: str | None) -> Explanation | None:
+    """A thing's `reveal` or a door's `open` asked of the wizard (D349): whose method it
+    is, and the variable the program keeps a found thing in, when it keeps one."""
+    if owner._k_role != "wizard" or name not in OTHERS_METHODS:
+        return None
+    if name == "open":
+        return Explanation("open_of_wizard")
+    kept = first_kept(code, FINDS_KEPT)
+    if kept is not None:
+        return Explanation("reveal_of_wizard_kept", {"variable": kept})
+    return Explanation("reveal_of_wizard")
+
+
+def _search_word(name: str, level: Level, code: str | None) -> Explanation | None:
+    """A word the level asks the child to find written as a variable (D349): the variable
+    the program keeps a find of that word in, or that the word is for searching."""
+    if name not in level.to_find:
+        return None
+    kept = first_kept(code, FINDS, name)
+    if kept is not None:
+        return Explanation("search_word_kept", {"name": name, "variable": kept})
+    return Explanation("search_word", {"name": name})
+
+
 def explain(error: BaseException, level: Level, code: str | None = None) -> Explanation:
     if isinstance(error, IndexError):
         return index_explanation(error, code)
@@ -168,6 +214,9 @@ def explain(error: BaseException, level: Level, code: str | None = None) -> Expl
             return made
     if isinstance(error, AttributeError) and isinstance(getattr(error, "obj", None), Child):
         owner: Child = error.obj  # type: ignore[attr-defined]
+        others = _others_method(owner, str(error.name), code)
+        if others is not None:
+            return others
         params: dict[str, Any] = {"object": owner._k_child_name, "name": error.name}
         suggestion = suggest(str(error.name), actions_of(owner, level))
         if suggestion:
@@ -183,6 +232,9 @@ def explain(error: BaseException, level: Level, code: str | None = None) -> Expl
         return Explanation("no_attribute", {"name": error.name})
     if isinstance(error, NameError):
         name = str(getattr(error, "name", "") or "")
+        searched = _search_word(name, level, code)
+        if searched is not None:
+            return searched
         params = {"name": name}
         suggestion = suggest(name, ["wizard", *level.ids()])
         if suggestion:

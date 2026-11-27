@@ -14,6 +14,7 @@ import traceback
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Literal
 
+from .advice import advise
 from .explain import NotCalled, check_called, explain, index_explanation
 from .goals import GoalResult
 from .level import Level
@@ -193,6 +194,9 @@ class RunResult:
     #: whether the rehearsal passed (D268).
     familiar: dict[str, Any] | None = None
     passes: bool | None = None
+    #: The game's advice for a run that did not win, each a kind and its parameters, the
+    #: first said under the outcome's words (D349).
+    advice: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         found: dict[str, Any] = {
@@ -210,6 +214,8 @@ class RunResult:
             found["familiar"] = self.familiar
         if self.passes is not None:
             found["passes"] = self.passes
+        if self.advice:
+            found["advice"] = self.advice
         return found
 
 
@@ -313,6 +319,7 @@ def _run_world(level: Level, code: str, verdict: str = "rehearsal") -> RunResult
         stdout.getvalue(),
         error,
         familiar=world.familiar_result(),
+        advice=advise(level, code, status == "won", goals),
     )
 
 

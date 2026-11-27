@@ -5913,8 +5913,10 @@ one overturns stays, marked as superseded.
   -0.25, as a row behind a lower wall's top is drawn higher where the wall hides most of a
   figure (`art/README.md`). A figure and a goal's mark on it are drawn a quarter of a cell
   higher, on the scene and on the plan (D143), and so is a thing the game draws with no
-  picture of its own, the fallen book: on a painted scene such a thing lies as much lower
-  or higher as a figure on its cell is drawn. The wall still covers the figures' feet there,
+  picture of its own: on a painted scene such a thing lies as much lower or higher as a
+  figure on its cell is drawn. The fallen book is drawn from the book painted by the pile
+  (`"art": "old_book"`, D85), the owner's choice over the placeholder of a thing with no
+  picture. The wall still covers the figures' feet there,
   and the art test keeps the row among the cells seen over what is in front of them. Rules
   out the corridor's cells moved, which the levels' texts walk, and a repainted wall.
 - **D362 — A goal may say less in the goals box than on the start card.** Decided

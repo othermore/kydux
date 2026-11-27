@@ -571,7 +571,8 @@ The cells are where the figures walk (D149).
   its base, and a figure on the row behind it walks behind it; that row is not lowered, so
   that the figure's feet do not lie in the statue's base (the crossing).
 - **The row behind a lower wall's top is walked**, the top cut `over` it. Where the wall stands
-  so close that only a hat would show, the row is drawn 0.3 higher (`lowered`, `by` -0.3).
+  so close that only a hat would show, the row is drawn 0.3 higher (`lowered`, `by` -0.3),
+  and a thing the game draws with no picture of its own lies as much higher (D361).
 - **A level starts a cell past an arch**, never in it or on the cell beside its jamb.
 - **A hole keeps its way across**: a cell beside it stays a wall where a child could walk
   round it.

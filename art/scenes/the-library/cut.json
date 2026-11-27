@@ -3227,6 +3227,20 @@
         ]
       ],
       "by": 0.5
+    },
+    {
+      "about": "The corridor behind Wenna's door, behind the wall's top (D342): drawn a quarter of a cell higher, so that the wall hides less of whoever and whatever is there (D361).",
+      "cells": [
+        [
+          1,
+          15
+        ],
+        [
+          11,
+          15
+        ]
+      ],
+      "by": -0.25
     }
   ],
   "marks": {

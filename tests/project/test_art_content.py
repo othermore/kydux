@@ -22,8 +22,8 @@ HIDDEN = 0.08
 STANDS = 0.2
 #: The cells a level puts its start, its mark, a thing or a friend on though a cut-out
 #: covers them, each seen over what is in front of it: the library's corridor behind
-#: Wenna's door, row 15, seen over the wall of her door (D342), and Wenna beside her door,
-#: over the reading room's table.
+#: Wenna's door, row 15, drawn a quarter of a cell higher (D361) and seen over the wall of
+#: her door (D342), and Wenna beside her door, over the reading room's table.
 SEEN_OVER = {
     "the-library": {(x, 15) for x in range(1, 12)} | {(8, 17)},
 }

@@ -578,6 +578,13 @@ class LevelScene extends Phaser.Scene {
     ];
   }
 
+  /** Where a thing with no picture of its own lies on a tile: its middle, or on a painted
+   * scene as much lower or higher as a figure on the tile is drawn (D95, D361). */
+  private thingCentre(tile: Tile): [number, number] {
+    const [x, y] = centre(tile);
+    return [x, y + (this.art ? loweredBy(this.art.scene.lowered, tile) * TILE : 0)];
+  }
+
   /** A figure turned to face a way: its sheet's frame, or the placeholder's. A flying
    * figure keeps the way it last faced upward or downward, which says on which side of a
    * ring's plane it is in the ring's cell (D232). */
@@ -854,7 +861,7 @@ class LevelScene extends Phaser.Scene {
           ? this.add.image(...centre(thing.tile), thingKey('door'), thing.open ? 'open' : thing.lock)
           : thing.kind === 'hole'
             ? this.add.image(...centre(thing.tile), thingKey('hole'), 'closed')
-            : this.add.image(...centre(thing.tile), thingKey(thing.kind));
+            : this.add.image(...this.thingCentre(thing.tile), thingKey(thing.kind));
       // Doors and holes are the castle's shape, seen in the dark; what lies on the
       // floor is under it (D52).
       const shape = thing.kind === 'door' || thing.kind === 'hole';
@@ -1351,7 +1358,7 @@ class LevelScene extends Phaser.Scene {
         if (thing.kind !== 'door') image.setTexture(`art-${this.artOf(thing.id)}-${Object.keys(painted.states)[0]}`);
       } else if (this.sprites.has(thing.id)) {
         this.placeSprite(image, this.sprites.get(thing.id) as ThingSprite, tile);
-      } else image.setPosition(...centre(tile));
+      } else image.setPosition(...(thing.kind === 'door' || thing.kind === 'hole' ? centre(tile) : this.thingCentre(tile)));
       // A thing the way shown takes away, or the first way before any run (D184).
       const way = this.shownWay ?? this.map.firstWay;
       const gone = way !== null && (this.map.wayGone[way] ?? []).includes(thing.id);

@@ -5888,3 +5888,15 @@ one overturns stays, marked as superseded.
   leaves to the card (D228). Rules out a zoom of the whole page, which the scene's canvas
   does not follow; one step from full size to small, which a window a little low would not
   need; and a page drawn smaller at a size the game is made for.
+- **D361 — The library's corridor is drawn a quarter of a cell higher.** Decided
+  2026-11-26 by the owner (*La fila 15 podemos hacer que esté elevada un poco, que los
+  objetos y personajes estén subidos como 0.20 o 0.25 de una casilla para que no los tape
+  tanto el muro*). The library's row 15, columns 1 to 11, the corridor behind Wenna's door
+  and behind her wall's top (D342), is one of the scene's `lowered` cells (D95) with `by`
+  -0.25, as a row behind a lower wall's top is drawn higher where the wall hides most of a
+  figure (`art/README.md`). A figure and a goal's mark on it are drawn a quarter of a cell
+  higher, on the scene and on the plan (D143), and so is a thing the game draws with no
+  picture of its own, the fallen book: on a painted scene such a thing lies as much lower
+  or higher as a figure on its cell is drawn. The wall still covers the figures' feet there,
+  and the art test keeps the row among the cells seen over what is in front of them. Rules
+  out the corridor's cells moved, which the levels' texts walk, and a repainted wall.

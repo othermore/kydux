@@ -5812,8 +5812,10 @@ one overturns stays, marked as superseded.
   to try a page: `python try`, the block run once; `python try change`, a code other
   than the given one run; `python try rename`, a run with no error in which the given
   variable's name is nowhere; `python try rename error`, that and a run that ends on
-  the answer to an unknown name, in either order. An error counts as a run for the
-  first two. The game never checks that a change is the one the page asks for. The
+  the answer to an unknown name, in either order. What is missing of this last is said
+  in the page's order: the answer to an unknown name first, the name on every line
+  after it. An error counts as a run for the first two. The game never checks that a
+  change is the one the page asks for. The
   tests done are kept with the saved game (`lessons[id].tested`), and a lesson is read
   when its last page asks no test or its test is done. A lesson read once asks nothing,
   read again from the map or from a level, nor do the lessons a saved game had read, nor
@@ -5827,8 +5829,8 @@ one overturns stays, marked as superseded.
   has a second moment beside `won`: `"told": {"revealed": [["mate", "revealed"]]}`, who
   speaks and the key of the words in the level's `told` texts. The world tells them in
   the tick of the first `reveal` of a run that lights a thing, once in the run; a
-  refused `reveal` tells nothing, and the playback waits for the words as for every
-  `told`. `the-hidden-key` says it: the friend sees where the key shines and says the
+  refused `reveal` tells nothing, and the program goes on while the words are read
+  (D367). `the-hidden-key` says it: the friend sees where the key shines and says the
   way in between the two bookcases. Rules out the hint that only shows when asked for,
   for what a child standing there would say aloud.
 - **D356 — A saved game on a course that has grown keeps what it won, and nothing it had
@@ -5934,10 +5936,16 @@ one overturns stays, marked as superseded.
   goal in the same order, an empty one for a goal said as it is: the goals box over the
   scene (D227) says the short form, and the start card says every goal whole. The i18n
   check holds that a level's `goals_short`, when given, has one for each goal in every
-  language. A short form is the goal's first clause, cut at its colon or comma: *Pasa por
-  los seis aros en orden.* in the box, and on the card how each pair is flown. Five goals
-  have one (`the-slate`, `the-rings`, `the-rematch`, `the-race`, `the-lost-book`), and
-  `the-lost-book`'s starting code's first comment says the rest of its goal, *que no sea
+  language. A short form says what is to be done in a few words, often the goal's first
+  clause, cut at its colon or comma: *Pasa por los seis aros en orden.* in the box, and
+  on the card how each pair is flown; *Ve en menos de 8 pasos.* for *Ve por el camino más
+  corto: menos de 8 pasos en total.* Eighteen goals have one, in fifteen levels: the
+  long goals of `the-slate`, `the-rings`, `the-rematch`, `the-race` and `the-lost-book`,
+  and the thirteen the owner wrote on 2026-11-27 for the longest left (`the-reading-room`,
+  `eldras-door`, `by-the-statues`, `the-doors-corridor`, `the-dark-tunnel`,
+  `the-first-flight`, `the-shed`, `the-circle`, `the-name-and-the-colour`,
+  `the-small-passage`). `the-lost-book`'s starting code's first comment says the rest
+  of its goal, *que no sea
   `book` ni `tesoro`*, in the goal's own words. Which goals are said shorter is the
   designer's and the owner's to say. Rules out a goals box that takes half the scene for
   one goal, and a rule the child reads only on the card.
@@ -6001,3 +6009,16 @@ one overturns stays, marked as superseded.
   lines are a floor, and folding the hints and the answer gives it the room. When the
   run ends the editor stays where it is. Rules out an editor that centres the running
   line at every step, and one that scrolls smoothly behind a fast run.
+- **D367 — What a figure says as a thing lights holds nothing of the program.** Decided
+  2026-11-27 by the owner (*Si después de el reveal y el mensaje de "mira, la llave...",
+  el mago se mueve, no hay que esperar a que desaparezca el diálogo para que empiece a
+  moverse*). The words a level gives for the moment a thing lights (D355) are a remark
+  on what the child has just done, not an order nor a verdict: the tick of the `reveal`
+  is as long as any, and the wizard takes the next line while the bubble is up over who
+  speaks, for its reading time (D175), following them as every bubble does. Words in
+  several pieces come one after another as they do (D274). A run that ends while they
+  are up waits for them before its card, as for any words on the scene (D175). The
+  scene knows the tick by its `reveal` event; the book's words hold as ever. Every other
+  `told` holds the playback until read (D264), and one of Orla's orders its command
+  aside (D303). Rules out a child who has understood where the key lies waiting five
+  seconds for the wizard to set off.

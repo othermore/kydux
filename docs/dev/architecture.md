@@ -5979,3 +5979,16 @@ one overturns stays, marked as superseded.
   same address under every screen adds nothing. The foot (`chrome`, `main.ts`) is the
   version and the build, in one line. `e2e/about.spec.ts` holds that the foot of a
   screen of each kind has no link. Rules out two links to one address on every screen.
+- **D366 — The editor keeps the line that runs in sight.** Decided 2026-11-26 by the owner,
+  at the designer's proposal (*el niño siempre ve qué instrucción hace cada cosa. El
+  editor solo se movería cuando la línea sale de la vista*). A run marks the line it is
+  on, and the child learns from seeing which instruction does what: in a program longer
+  than the editor shows, the mark would walk out of sight. When the line that runs
+  changes and its mark is not whole inside what the editor shows, the editor scrolls by
+  the least that brings it in, with a line of margin where the code has one; a line in
+  sight moves nothing. It moves neither the cursor nor the focus, at any speed of the
+  run, and it is the same step that shows an answer's line (D363). A loop or a function
+  longer than the editor makes it go back and forth with the run: the editor's five
+  lines are a floor, and folding the hints and the answer gives it the room. When the
+  run ends the editor stays where it is. Rules out an editor that centres the running
+  line at every step, and one that scrolls smoothly behind a fast run.

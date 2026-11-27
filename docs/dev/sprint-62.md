@@ -8,8 +8,10 @@ the owner asked for on reading the review: *Creo que tenemos
 que hacer algo para que las pistas y la salida/errores al
 ejecutar el programa se puedan plegar y no tapen el código o lo
 dejen sin espacio. Y el enlace de la familia Kidux del pie se
-puede quitar ya que está arriba el de Kidux os.* No text of the
-course changes, no level, no scene, no picture.
+puede quitar ya que está arriba el de Kidux os.* The owner also
+said yes to the editor following the line that runs, which the
+review had left for them to ask. No text of the course changes,
+no level, no scene, no picture.
 
 **Where it is today** (commit `690ef68`).
 
@@ -59,7 +61,7 @@ course changes, no level, no scene, no picture.
 
 ## 1. Decisions taken here
 
-The three are in `docs/dev/architecture.md` in full, and D338
+The four are in `docs/dev/architecture.md` in full, and D338
 and D339 say there what the foot and the header hold.
 
 - **D363 — The hints and the answer fold, and the editor keeps
@@ -93,6 +95,12 @@ and D339 say there what the foot and the header hold.
 - **D365 — The game's foot says the version and the build, and
   holds no link.** The header's link to Kidux OS is on every
   screen (D339) and says the family (D338).
+- **D366 — The editor keeps the line that runs in sight.** When
+  the line that runs changes and its mark is not whole inside
+  what the editor shows, the editor scrolls by the least that
+  brings it in; a line in sight moves nothing. Neither the
+  cursor nor the focus moves. When the run ends the editor
+  stays where it is.
 
 ## 2. What is asked
 
@@ -284,8 +292,15 @@ answer's foot does not move.
   the editor's height changes while an error's line is marked,
   a box folded or unfolded among the changes: one
   `ResizeObserver` on the editor's parent, disconnected when
-  the level is destroyed. The running line is not followed
-  (2.6).
+  the level is destroyed.
+- *The line that runs (D366).* In the level's `render`, where
+  the two marked lines are set (`editor.setRunningLine`,
+  `editor.setErrorLine`): when the running line is another than
+  the one shown and is a line, `editor.showLine` is called for
+  it after it is marked. `y: 'nearest'` is what moves nothing
+  for a line in sight and scrolls by the least for one out of
+  it; the scroll is at once, never smooth, at every speed.
+  Nothing is done when the run ends and the mark goes.
 
 Nothing else of the column changes: the lists and the buttons
 keep their sizes, the answer unfolded keeps its words and its
@@ -403,9 +418,22 @@ the build at its left. `README.md`, `README.es.md` and
   steps: the editor has five lines or more, the page's
   `scrollHeight` is the window's height, the answer lies inside
   the window.
-- **`app/src/editor/editor.test.ts`**: `showLine` dispatches a scroll for a line of
-  the document, moves no selection, and does nothing for line 0
-  and for a line past the end.
+- **`app/src/editor/editor.test.ts`**: `showLine` dispatches a
+  scroll for a line of the document, moves no selection, and
+  does nothing for line 0 and for a line past the end.
+- **`app/e2e/screens.spec.ts`, the line that runs (D366)**, in
+  `the-check`, in Spanish, whose starting program has eight
+  lines and runs its lines 5 to 8 in a loop.
+  - At 1024 × 700 with three hints taken, unfolded, and the
+    editor at its top (it shows fewer than eight lines, and the
+    test holds it): *Ejecutar* at speed 2. When `.cm-kydux-running-line`
+    is the eighth line (its text has `untie`), it lies whole
+    inside `.cm-scroller`'s box, and `.cm-scroller`'s
+    `scrollTop` is more than 0. The cursor is where it was
+    (the editor's selection is read before and after).
+  - At 1280 × 800 at the start of the level (the eight lines in
+    sight): *Ejecutar* at speed 2, and when the running line is
+    the eighth, `.cm-scroller`'s `scrollTop` is 0.
 - **`app/e2e/start.spec.ts`**, the test that deletes *Leo*: the
   page throws on any browser dialog (`page.on('dialog', …)` as
   `program.spec.ts` does); *Delete* opens `#ask` with
@@ -463,23 +491,28 @@ Spanish, in a window of 1024 × 700 or the laptop's own.
    marked. A click on either folded line unfolds it.
 4. With both folded, press *Ejecutar*: the new answer comes
    unfolded, and the hints stay folded.
-5. Open the map and come back to the level by its own stop. The
+5. Unfold the hints, so that the code has few lines, bring the
+   code to its first line with the wheel, put the speed at its
+   slowest and press *Ejecutar*. The marked line goes down the
+   program, and when it reaches the editor's foot the code
+   moves up by itself: the line that runs is always seen.
+6. Open the map and come back to the level by its own stop. The
    three hints are there, unfolded, the newest in sight, and
    the code has its five lines.
-6. In the settings, put the code's letter at 24 px and look at
+7. In the settings, put the code's letter at 24 px and look at
    the same level: five lines of code, the hints' box lower.
    Put it back at 16 px.
-7. In *El pasillo largo* (chapter 1), write
+8. In *El pasillo largo* (chapter 1), write
    `wizard.move_right(8)`, put the speed at 1×, press
    *Ejecutar*, open the map and click another stop. The game
    asks in its own box, *Tu programa todavía se está
    ejecutando. ¿Salir del nivel?*, and the wizard keeps walking
    behind it. *No, quedarme* leaves the map open; *Sí, salir*
    goes.
-8. On the start screen, with two saved games, press *Borrar* on
+9. On the start screen, with two saved games, press *Borrar* on
    one. The game asks in its own box, with the game's name.
    *No, conservarla* keeps it; *Sí, borrar* deletes it.
-9. Any screen: the foot says the version and the build, and no
+10. Any screen: the foot says the version and the build, and no
    link; *Conoce Kidux OS* is in the header.
 
 ### 2.6 What is left out, and why
@@ -490,9 +523,9 @@ Spanish, in a window of 1024 × 700 or the laptop's own.
   hold without it (D363).
 - *The fold kept* from one visit of a level to the next. A
   level opened again shows what it has.
-- *The running line followed while a program runs.* A child may
-  be reading another part of the code while it runs; following
-  the line is the owner's to ask.
+- *The running line centred, or followed by a smooth scroll.*
+  The code would move at every step of a run; it moves only
+  when the mark leaves the sight (D366).
 - *The answer made shorter.* Its texts are the course's, written
   and corrected; the column makes room for them.
 - *The narrow page's layout* (800 px or less): it scrolls as a
@@ -506,15 +539,16 @@ a piece touches green before it, in a copy of the repository
 build and no world packed there). The whole `ci/check.sh --e2e`
 once, in a copy, before the last commit.
 
-### 3.1 The editor's column (D363; 2.1)
+### 3.1 The editor's column (D363, D366; 2.1)
 
 `app/src/style.css`, `app/src/ui/level.ts`,
 `app/src/ui/outcome.ts` and its test, `app/src/ui/icons.ts`,
 `app/src/editor/editor.ts` and its test, `i18n/es.json`,
 `i18n/en.json` (the five labels of the fold),
 `app/e2e/screens.spec.ts`. Before the commit: the blocks of 2.4
-green at the three sizes, at 24 px and for the fold,
-`hints.spec.ts`, `program.spec.ts`, `lists.spec.ts`,
+green at the three sizes, at 24 px, for the fold and for the
+line that runs, `level.spec.ts`, `hints.spec.ts`,
+`program.spec.ts`, `lists.spec.ts`,
 `cards.spec.ts` and the whole of `screens.spec.ts` green, and
 the four screenshots `workbench-*.png` looked at: five lines of
 code, the newest hint from its first word, the answer whole;
@@ -538,8 +572,9 @@ names the letters' families alone.
 
 ### 3.4 The documents, the whole check, the report
 
-- `docs/dev/architecture.md`: D363, D364 and D365 are written,
-  and D338 and D339 say the foot and the header as they are;
+- `docs/dev/architecture.md`: D363, D364, D365 and D366 are
+  written, and D338 and D339 say the foot and the header as
+  they are;
   where another entry or a document says how a question is
   asked, what the editor's column holds or what the foot holds
   (D38, D351, D352, the entries on the saved games' *Delete*,
@@ -585,19 +620,20 @@ things. On the level's screen the hints' box and the answer
 fold to one line each by a button of their own, the editor
 keeps five lines of code whatever they take under it, the
 hints' box scrolls and stands on the newest hint, and the line
-an answer names is brought into sight (D363). The two questions
-still asked in the browser's own box, deleting a saved game and
-leaving a level by the map while its program runs, are asked in
-the game's own dialog (D364). The foot of the page loses its
-link to Kidux, which the header has (D365). No text of the
-course, no level, no scene and no picture changes. Build on the
-last commit of main as you find it.
+an answer names is brought into sight (D363), as is the line
+that runs whenever it leaves the editor's sight (D366). The two
+questions still asked in the browser's own box, deleting a
+saved game and leaving a level by the map while its program
+runs, are asked in the game's own dialog (D364). The foot of
+the page loses its link to Kidux, which the header has (D365).
+No text of the course, no level, no scene and no picture
+changes. Build on the last commit of main as you find it.
 
 Read first: CLAUDE.md, .claude/working-model.md,
 docs/dev/README.md, docs/dev/sprint-62.md (this plan, whole: it
 leaves nothing for you to design), and in
 docs/dev/architecture.md D38, D228, D338, D339, D346, D351,
-D352, D359, D363, D364 and D365. Then your memory notes
+D352, D359, D363, D364, D365 and D366. Then your memory notes
 kydux-sprint-61-state, kydux-checks-per-piece, kydux-report-images-current,
 kydux-no-co-authored-by, kydux-docs-present-tense,
 kydux-commit-by-path-shared-tree and kydux-dev-server-build.
@@ -628,7 +664,7 @@ Never run a formatter over app/.
 
 What decides: the plan. Where the plan does not say, ask the
 owner; what the owner decides differently becomes a decision
-from D366 on, written in docs/dev/architecture.md.
+from D367 on, written in docs/dev/architecture.md.
 
 Hand over, in Spanish to the owner: what was built piece by
 piece, what differs from the plan and why, the pictures

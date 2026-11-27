@@ -140,13 +140,45 @@ describe('export and import', () => {
 describe('the helpers', () => {
   beforeEach(() => progress.useStore(new LocalProgressStore(memoryStorage())));
 
-  it('keep the most stars a level has earned, and no program (D131)', () => {
+  it('keep the most stars a level has earned, and no program of the level (D351)', () => {
     progress.markWon('a', 2);
     progress.markWon('a', 1);
     expect(progress.levelProgress('a')).toEqual({ won: true, stars: 2 });
   });
 
-  it('leave a program an older saved game kept as it was, and add none (D131)', () => {
+  it('keep one program, the last level changed, dropped on its starting code (D351)', () => {
+    progress.keepProgram('a', 'wizard.move_right(6)\n', '# Walk\n');
+    expect(progress.keptProgram('a')).toBe('wizard.move_right(6)\n');
+    expect(progress.keptProgram('b')).toBeNull();
+    // Another level's code takes its place.
+    progress.keepProgram('b', 'wizard.move_up()\n', '');
+    expect(progress.keptProgram('a')).toBeNull();
+    expect(progress.load().program).toEqual({ level: 'b', code: 'wizard.move_up()\n' });
+    // A level's starting code is no program: another level's kept program stays.
+    progress.keepProgram('a', '# Walk\n', '# Walk\n');
+    expect(progress.keptProgram('b')).toBe('wizard.move_up()\n');
+    // Its own is dropped.
+    progress.keepProgram('b', '', '');
+    expect(progress.load().program).toBeUndefined();
+    // Winning drops nothing; Original code drops it.
+    progress.keepProgram('a', 'wizard.move_right(6)\n', '# Walk\n');
+    progress.markWon('a', 3);
+    expect(progress.keptProgram('a')).toBe('wizard.move_right(6)\n');
+    progress.dropProgram('b');
+    expect(progress.keptProgram('a')).toBe('wizard.move_right(6)\n');
+    progress.dropProgram('a');
+    expect(progress.keptProgram('a')).toBeNull();
+  });
+
+  it('read a saved game with no kept program as before, and carry one in the exported file (D351)', () => {
+    const saved = defaultProgress();
+    expect(readProgress(JSON.parse(exportProgress(saved)))).toEqual(saved);
+    saved.program = { level: 'the-lost-book', code: 'mine = wizard.find_nearest("book")\n' };
+    expect(importProgress(exportProgress(saved)).program).toEqual(saved.program);
+    expect(readProgress({ ...saved, program: { level: 'Not a level', code: 'x' } })?.program).toBeUndefined();
+  });
+
+  it('leave a program an older saved game kept as it was, and add none (D351)', () => {
     const saved = defaultProgress();
     saved.levels.a = { won: true, stars: 1, code: 'wizard.move_right(6)\n' };
     progress.save(saved);

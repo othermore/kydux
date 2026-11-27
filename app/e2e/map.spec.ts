@@ -34,11 +34,10 @@ test('the map shows the course in order: the first stop open, the rest locked', 
   await expect(gate.locator('a')).toHaveCount(0);
 });
 
-test('a level won and opened again from the map starts from its starting code (D131)', async ({ page }) => {
+test('a level won and opened again from the map opens on the program that won (D351)', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
-  const starting = await page.locator('.cm-content').innerText();
   await page.locator('#speed').selectOption('4');
   await page.locator('.cm-content').click();
   await page.keyboard.press('ControlOrMeta+A');
@@ -51,8 +50,7 @@ test('a level won and opened again from the map starts from its starting code (D
   await page.locator('#level-map').click();
   await stop(page, 'level:the-long-corridor').click();
   await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
-  await expect(page.locator('.cm-content')).toHaveText(starting);
-  expect(starting).not.toContain('move_right(8)');
+  await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(8)');
 });
 
 test('a won level is done with its stars, and opens the next stop', async ({ page }) => {
@@ -79,7 +77,7 @@ test('the map in Spanish', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/#map');
   await expect(page.locator('.map-chapter h2').first()).toHaveText('La llegada');
-  await expect(stop(page, 'level:the-hidden-key').locator('.stop-number')).toHaveText('Práctica 4');
+  await expect(stop(page, 'level:the-hidden-key').locator('.stop-number')).toHaveText('Práctica 7');
   await context.close();
 });
 

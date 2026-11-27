@@ -83,7 +83,11 @@
     "have": "Tienes",
     "to_find": "Por encontrar",
     "scroll_left": "Ver las anteriores",
-    "scroll_right": "Ver las siguientes"
+    "scroll_right": "Ver las siguientes",
+    "original_code": "Código original",
+    "original_confirm": "¿Borrar lo que has escrito y volver al código original?",
+    "original_yes": "Sí, borrar",
+    "original_no": "No, seguir"
   },
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",

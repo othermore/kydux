@@ -30,7 +30,9 @@ import { zoomBox } from './zoom';
 import { element } from './dom';
 import { type GoalsPanel, type GoalsShape, goalsPanel, takeShape } from './goals';
 import { clampSplit, setSplit, splitAt } from './look';
+import { type Asked, ask } from './ask';
 import { offered } from './complete';
+import { type ButtonIcon, buttonIcon } from './icons';
 import { type GivenChip, programLists, type ProgramLists } from './lists';
 import { type ApiTable, familiarVar, heldObjects, notebookEntries, notebookPanel } from './notebook';
 import { type Outcome, type OutcomeCard, outcomeCard } from './outcome';
@@ -40,6 +42,8 @@ import { withCode } from './words';
 import type { Screen } from './screen';
 
 const SPEEDS: Speed[] = [1, 2, 4];
+/** How long after the last key the program is kept (D351). */
+const KEEP_AFTER = 1000;
 /** How long the goals box stays open before the page folds it, where both its shapes
  * cover something (D227). */
 const FOLD_AFTER = 3000;
@@ -221,15 +225,18 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   timeline.setAttribute('aria-label', t('level.timeline'));
 
   const editorParent = element('div', { className: 'editor' });
-  const run = labelled(element('button', { id: 'run', type: 'button' }), () => t('level.run'));
-  const stop = element('button', { id: 'stop', type: 'button' }, [t('level.stop')]);
-  const restart = labelled(element('button', { id: 'restart', type: 'button' }), () =>
-    t('level.restart'),
-  );
-  const hint = labelled(element('button', { id: 'hint', type: 'button' }), () => t('level.hint'));
-  const notebookButton = labelled(element('button', { id: 'notebook-open', type: 'button' }), () =>
-    t('notebook.open'),
-  );
+  // The buttons under the editor (D351): each with its picture before its word.
+  const pictured = (id: string, icon: ButtonIcon, say: () => string) => {
+    const word = labelled(element('span', { className: 'button-word' }), say);
+    return element('button', { id, type: 'button', className: 'pictured' }, [buttonIcon(icon), word]);
+  };
+  const run = pictured('run', 'run', () => t('level.run'));
+  const stopWord = element('span', { className: 'button-word' }, [t('level.stop')]);
+  const stop = element('button', { id: 'stop', type: 'button', className: 'pictured' }, [buttonIcon('stop'), stopWord]);
+  const restart = pictured('restart', 'restart', () => t('level.restart'));
+  const original = pictured('original', 'original', () => t('level.original_code'));
+  const hint = pictured('hint', 'hint', () => t('level.hint'));
+  const notebookButton = pictured('notebook-open', 'notebook', () => t('notebook.open'));
   // In the tester's mode, a button writes the level's solution in the editor: the
   // solution packed apart for it (pack-world.mjs), or on the development server
   // read from content/ (vite.config.ts). The published game holds no solution
@@ -325,31 +332,41 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     element('section', { className: 'workbench' }, [
       ...(lists ? [lists.node] : []),
       editorParent,
+      // Two rows (D351): the program's, Run, Restart, Stop and Original code; then the
+      // notebook, the hint and the speed.
       element('div', { className: 'buttons' }, [
-        run,
-        stop,
-        restart,
-        hint,
-        notebookButton,
-        ...solution,
-        element('label', { className: 'speed' }, [speedLabel, ' ', speed]),
+        element('div', { className: 'button-row', id: 'program-buttons' }, [run, restart, stop, original]),
+        element('div', { className: 'button-row', id: 'help-buttons' }, [
+          notebookButton,
+          hint,
+          ...solution,
+          element('label', { className: 'speed' }, [speedLabel, ' ', speed]),
+        ]),
       ]),
       hintsBox,
       card.node,
     ]),
   ]);
 
-  // The editor opens on the level's starting code, as the first time (D131): what
-  // the child types is kept while the screen is open, through Run, Restart and Play
-  // again, and the starting code, while untouched, follows the language.
-  let typed = false;
+  // The editor opens on the kept program when it is this level's, and on its starting
+  // code otherwise (D351); what the child types is kept by itself, a second after the last
+  // key and at once when the screen is left or the page hidden, and the starting code,
+  // while untouched, follows the language.
+  const program = progress.keptProgram(loaded.id);
+  let typed = program !== null && program !== text.starting_code;
+  let keepTimer: ReturnType<typeof setTimeout> | null = null;
+  const keep = () => {
+    if (keepTimer !== null) clearTimeout(keepTimer);
+    keepTimer = null;
+    progress.keepProgram(loaded.id, editor.getDoc(), text.starting_code);
+  };
   // After the name of something the child's code holds and a dot, the editor offers what
   // the level teaches of it, with the notebook's words: a variable the level gives, a
   // variable the code keeps a found thing in, the familiar by the variable it was born
   // into (D348); nothing for a name alone, a list or a search word, nothing before a dot
   // and nothing inside quotes or a comment.
   const editor = parts.createEditor(editorParent, {
-    doc: text.starting_code,
+    doc: program ?? text.starting_code,
     label: t('level.code_label'),
     complete: (context) => {
       const found = offered(context.state, context.pos, loaded.level, parts.table, loaded.course);
@@ -358,10 +375,38 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     onRun: () => runCode(),
     onChange: (doc) => {
       typed = doc !== text.starting_code;
+      original.disabled = !typed;
       lists?.changed(doc);
+      if (keepTimer !== null) clearTimeout(keepTimer);
+      keepTimer = setTimeout(keep, KEEP_AFTER);
     },
   });
+  original.disabled = !typed;
   lists?.show(editor.getDoc());
+  const onHidden = () => {
+    if (document.visibilityState === 'hidden') keep();
+  };
+  addEventListener('pagehide', keep);
+  document.addEventListener('visibilitychange', onHidden);
+  // Original code (D351): the starting code back, the kept program dropped, a run stopped
+  // and the scene as at the start, once the child says yes in the game's own dialog.
+  let asked: Asked | null = null;
+  original.addEventListener('click', () => {
+    if (asked || !typed) return;
+    asked = ask(
+      document.body,
+      { question: t('level.original_confirm'), yes: t('level.original_yes'), no: t('level.original_no') },
+      (yes) => {
+        asked = null;
+        if (!yes) return;
+        controller.restart();
+        editor.setDoc(text.starting_code);
+        progress.dropProgram(loaded.id);
+        lists?.show(text.starting_code);
+        editor.focus();
+      },
+    );
+  });
 
   const statusLine = (s: RuntimeStatus): string => {
     switch (s) {
@@ -579,7 +624,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     status.dataset.status = snapshot.runtime;
     run.disabled = !snapshot.canRun;
     // Stop, or Play once the timeline has paused the playback.
-    stop.textContent = snapshot.canPlay ? t('level.play') : t('level.stop');
+    stopWord.textContent = snapshot.canPlay ? t('level.play') : t('level.stop');
+    stop.dataset.play = String(snapshot.canPlay);
     stop.disabled = !snapshot.canStop && !snapshot.canPlay;
     timeline.max = String(snapshot.length);
     timeline.value = String(snapshot.tick);
@@ -670,7 +716,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       onGo: (hash) => {
         if (controller.snapshot.canStop && !window.confirm(t('map.leave_run'))) return;
         closeMap();
-        // The level's own stop opens it again, from its starting code (D131).
+        // The level's own stop opens it again, on the program kept as it was left (D351).
         if (hash === location.hash) document.dispatchEvent(new CustomEvent('kydux:reopen'));
         else location.hash = hash;
       },
@@ -895,6 +941,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     },
     destroy() {
       destroyed = true;
+      // The program is kept as the screen is left (D351).
+      keep();
+      removeEventListener('pagehide', keep);
+      document.removeEventListener('visibilitychange', onHidden);
+      asked?.dismiss();
       planShown?.dismiss();
       shownCard?.close();
       guide?.node.remove();

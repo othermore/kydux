@@ -26,7 +26,8 @@ export interface LevelProgress {
   /** The most stars a run of the level has earned. */
   stars?: number;
   /** A program an older saved game kept for the level: read, so that such a game
-   * loads, and never shown, since a level opens on its starting code (D131). */
+   * loads, and never shown; the program being written is the game's one kept program
+   * (Progress.program, D351). */
   code?: string;
   /** How many hints have been shown. */
   hints?: number;
@@ -62,6 +63,15 @@ export interface Progress {
   /** The familiar (D265): the draft of the last trial while none lives, and the one
    * that lives, for good; absent in a game with no familiar yet. */
   familiar?: KeptFamiliar;
+  /** The kept program (D351): the code of the last level whose code the child changed,
+   * which that level opens with; absent while none is kept. */
+  program?: KeptProgram;
+}
+
+/** The game's one kept program (D351): which level's, and its code. */
+export interface KeptProgram {
+  level: string;
+  code: string;
 }
 
 /** The scene's share of the width, at least and at most (D35). */
@@ -222,6 +232,15 @@ export function readProgress(value: unknown): Progress | null {
   progress.guided = value.guided === true;
   const familiar = readFamiliar(value.familiar);
   if (familiar) progress.familiar = familiar;
+  const program = value.program;
+  if (
+    isObject(program) &&
+    typeof program.level === 'string' &&
+    /^[a-z0-9][a-z0-9-]*$/.test(program.level) &&
+    typeof program.code === 'string'
+  ) {
+    progress.program = { level: program.level, code: program.code };
+  }
   return progress;
 }
 

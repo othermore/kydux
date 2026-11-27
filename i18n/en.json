@@ -83,7 +83,11 @@
     "have": "You have",
     "to_find": "To find",
     "scroll_left": "See the ones before",
-    "scroll_right": "See the next ones"
+    "scroll_right": "See the next ones",
+    "original_code": "Original code",
+    "original_confirm": "Delete what you have written and go back to the original code?",
+    "original_yes": "Yes, delete",
+    "original_no": "No, go on"
   },
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",

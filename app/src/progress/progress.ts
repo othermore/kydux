@@ -150,12 +150,42 @@ function editLevel(id: string, edit: (level: LevelProgress) => void): void {
   });
 }
 
-/** A won run: the level won, and the most stars kept. The program is not kept: a
- * level opened again starts from its starting code (D131). */
+/** A won run: the level won, and the most stars kept. The kept program is left as it
+ * is: the level opened again shows the program that won (D351). */
 export function markWon(id: string, stars: number): void {
   editLevel(id, (level) => {
     level.won = true;
     level.stars = Math.max(level.stars ?? 0, stars);
+  });
+}
+
+/** The program a level opens with (D351): the kept program when it is that level's,
+ * else null, for its starting code. */
+export function keptProgram(levelId: string): string | null {
+  const kept = store.load().program;
+  return kept?.level === levelId ? kept.code : null;
+}
+
+/** The code in a level's editor kept as the game's one program (D351): another level's
+ * kept program gives way to it; code equal to the level's starting code is no program,
+ * and drops a kept program of that level, while another level's stays. */
+export function keepProgram(levelId: string, code: string, starting: string): void {
+  const kept = store.load().program;
+  if (code === starting) {
+    if (kept?.level === levelId) dropProgram(levelId);
+    return;
+  }
+  if (kept?.level === levelId && kept.code === code) return;
+  change((progress) => {
+    progress.program = { level: levelId, code };
+  });
+}
+
+/** The kept program dropped, when it is that level's (D351): Original code. */
+export function dropProgram(levelId: string): void {
+  if (store.load().program?.level !== levelId) return;
+  change((progress) => {
+    delete progress.program;
   });
 }
 

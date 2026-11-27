@@ -2,9 +2,10 @@
 // painting, the school's people on it (D294), for whom, its three pictures of the game in
 // their order and Play; the start screen before a wizard is made leads to it from the
 // header; a button is drawn in the look's moss green; the header has the mark and the
-// link; the foot of every screen has the family's link (D338) and the header of every
-// screen the link to Kidux OS, as the welcome page's own, each in a window of its own
-// (D339); the map's chapters have their cards, a locked one greyed.
+// link; the header of every screen has the link to Kidux OS, as the welcome page has its
+// own, each in a window of its own (D339), and the foot of every screen says the version
+// and the build and holds no link (D365); the map's chapters have their cards, a locked
+// one greyed.
 
 import { expect, type Page, test } from '@playwright/test';
 import { MARTA, seedWizard } from './helpers';
@@ -86,27 +87,23 @@ test.describe('the look', () => {
     await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', /favicon\.svg$/);
   });
 
-  test('the foot of every screen leads to Kidux, in the language chosen (D338)', async ({ page }) => {
+  test('the foot of every screen says the version and the build, and holds no link (D365)', async ({ page }) => {
     await seedWizard(page, MARTA);
     for (const screen of ['#start', '#map', '#about', '#settings', '#lesson/how-much', '#story/at-the-gate', '#level/the-gate']) {
       await page.goto(`/${screen}`);
-      const family = page.locator('footer #family');
-      await expect(family, screen).toHaveText('De la familia Kidux');
-      await expect(family, screen).toHaveAttribute('href', 'https://kidux.org/es/');
-      // A window of its own: the screen left stays as it is.
-      await expect(family, screen).toHaveAttribute('target', '_blank');
-      await expect(family, screen).toHaveAttribute('rel', 'noopener');
+      const foot = page.locator('footer');
+      await expect(foot, screen).toContainText(/Versión \d+\.\d+\.\d+/);
+      await expect(foot.locator('#build'), screen).toBeVisible();
+      await expect(foot.locator('a'), screen).toHaveCount(0);
+      await expect(page.locator('#family'), screen).toHaveCount(0);
+      // One line, the version and the build at its left.
+      const [version, build] = await Promise.all(
+        ['footer > span:first-child', 'footer #build'].map((part) => page.locator(part).boundingBox()),
+      );
+      expect(Math.abs(build!.y - version!.y), screen).toBeLessThan(6);
+      expect(build!.x, screen).toBeGreaterThan(version!.x + version!.width);
+      expect(build!.x + build!.width, screen).toBeLessThan((page.viewportSize()?.width ?? 0) / 2);
     }
-    await page.goto('/#map');
-    await page.locator('#language').selectOption('en');
-    await expect(page.locator('footer #family')).toHaveText('Part of the Kidux family');
-    await expect(page.locator('footer #family')).toHaveAttribute('href', 'https://kidux.org');
-    // The foot is one line: the version and the build at its left, the family at its right.
-    const [build, family] = await Promise.all(
-      ['footer #build', 'footer #family'].map((part) => page.locator(part).boundingBox()),
-    );
-    expect(family!.x).toBeGreaterThan(build!.x + build!.width);
-    expect(Math.abs(family!.y - build!.y)).toBeLessThan(6);
   });
 
   test('the header of every screen leads to Kidux OS, beside the welcome page\'s link (D339)', async ({ page }) => {

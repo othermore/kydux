@@ -6,7 +6,6 @@
     "tagline": "A game for learning Python",
     "language": "Language",
     "version": "Version {version}",
-    "family": "Part of the Kidux family",
     "kidux_url": "https://kidux.org",
     "kidux_link": "Meet Kidux OS"
   },

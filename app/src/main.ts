@@ -426,24 +426,14 @@ function settingsGear(): HTMLElement[] {
 }
 
 /** The header's link to Kidux's website, in the page's language, beside the welcome
- * page's: the system Kydux is of, in sight on every screen. It opens in a window of
- * its own, as the foot's does (D339). */
+ * page's: the system Kydux is of (D338), in sight on every screen, and the one link to
+ * it the screens have. It opens in a window of its own, so that a level being played
+ * stays as it is (D339). */
 function kiduxLink(): HTMLElement {
   return element(
     'a',
     { id: 'kidux-link', href: t('app.kidux_url'), target: '_blank', rel: 'noopener' },
     [t('app.kidux_link')],
-  );
-}
-
-/** The foot's link to Kidux's website, in the page's language: the family Kydux
- * belongs to, under every screen. It opens in a window of its own, so that a level
- * being played stays as it is (D338). */
-function familyLink(): HTMLElement {
-  return element(
-    'a',
-    { id: 'family', href: t('app.kidux_url'), target: '_blank', rel: 'noopener' },
-    [t('app.family')],
   );
 }
 
@@ -463,10 +453,10 @@ function chrome(root: HTMLElement, content: HTMLElement): void {
     ]),
     ...handheldNote(),
     content,
+    // The foot says the version and the build, and holds no link (D365).
     element('footer', {}, [
       element('span', {}, [t('app.version', { version })]),
       element('span', { id: 'build', className: 'build' }, [__BUILD__]),
-      familyLink(),
     ]),
   );
 }

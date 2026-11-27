@@ -121,6 +121,14 @@ test('the check: its brooms to find, in Spanish', async ({ page }) => {
   await page.locator('.workbench').screenshot({ path: `${SHOTS}the-check.png` });
 });
 
+test('at 900 by 600, the search word of a chip to find is read whole', async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 600 });
+  await open(page, 'the-lost-book');
+  const name = page.locator('#find-chips .chip-name').first();
+  await expect(name).toHaveText('"book"');
+  expect(await name.evaluate((word) => word.scrollWidth <= word.clientWidth)).toBe(true);
+});
+
 test('the lists at 900 by 600, in one row each', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 600 });
   await open(page, 'the-check');

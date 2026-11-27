@@ -5681,18 +5681,20 @@ one overturns stays, marked as superseded.
   picture (a list's in brackets, a loop's variable and a copy the same), anything else
   its name alone. So a chip says which variables the program has, never what one holds
   at a moment of a run. A box with more chips than fit scrolls sideways and moves by
-  itself to a chip just added. A chip of *Tienes* opens the notebook at its object's
-  page; one of *Por encontrar*, at the part of what is to find (D347). A chip's picture
-  is the art the level has, cropped to what is painted in it (`ui/pictures.ts`): the
-  cut-out of a thing of the kind in the level, or the kind's own sprite, or a cut-out of
-  the scene named after the kind; a kind with none shows its name alone; someone's chip,
-  the wizard's first, shows their face. The chips take the owner's design (*las cajas
-  […] en el diseño eran más chulas, creo que más cuadradas*, 2026-11-26): rectangles with
-  nearly square corners, a marked border and a bold letter, a value in its own grey band.
-  The lists start
-  at `LISTS_FROM`, `level:the-reading-room`, by the course's order (`showsLists`):
-  chapter 1 and a lesson's code box have no lists. Rules out a list that follows the
-  run, a glow at a run, and squares that take the editor's room.
+  itself to a chip just added. A chip of *Tienes* is never wider than half its box, its
+  name cut with `…`; a chip of *Por encontrar*, a short search word, may take the whole of
+  its box, so that its word is read at every width. A chip of *Tienes* opens the notebook
+  at its object's page; one of *Por encontrar*, at the part of what is to find (D347).
+  A chip's picture is the art the level has, cropped to what is painted in it
+  (`ui/pictures.ts`): the cut-out of a thing of the kind in the level, or the kind's own
+  sprite, or a cut-out of the scene named after the kind; a kind with none shows its
+  name alone; someone's chip, the wizard's first, shows their face. The chips take the
+  owner's design (*las cajas […] en el diseño eran más chulas, creo que más cuadradas*,
+  2026-11-26): rectangles with nearly square corners, a marked border and a bold letter,
+  a value in its own grey band. The lists start at `LISTS_FROM`,
+  `level:the-reading-room`, by the course's order (`showsLists`): chapter 1 and a
+  lesson's code box have no lists. Rules out a list that follows the run, a glow at a
+  run, and squares that take the editor's room.
 - **D347 — The notebook says what the program has and what is to find, and says
   *Objetos* and *Métodos*.** Decided 2026-11-25 by the owner (*en el cuaderno podemos
   distinguir entre "cosas disponibles" y "cosas que tienes que encontrar antes de

@@ -70,7 +70,9 @@ them. A chip of either list opens the notebook at its page. Your program
 is kept as you write it: leave the level and come back, and it is still
 there. Under the editor, the buttons stand in two rows: *Run*, *Restart*,
 *Stop* and *Original code*, then *Notebook* and *Hint*. *Original code*
-puts the level's own program back, once you say yes. *Run* starts the
+puts the level's own program back, once you say yes. In a window smaller
+than 1024 by 700, everything is drawn a little smaller, so that the whole
+level fits. *Run* starts the
 level again and makes the wizard do what your code says, on the left. A
 round mark that beats on the ground shows where your wizard must get to.
 The goals, in the corner, tick themselves off as you reach them. If a run goes wrong, the game says

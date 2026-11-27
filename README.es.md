@@ -75,7 +75,9 @@ abre el cuaderno en su página. Tu programa se guarda mientras lo
 escribes: si sales del nivel y vuelves, sigue ahí. Debajo del editor, los
 botones están en dos filas: *Ejecutar*, *Reiniciar*, *Parar* y *Código
 original*, y luego *Cuaderno* y *Pista*. *Código original* vuelve a poner
-el programa del propio nivel, cuando dices que sí. *Ejecutar* empieza
+el programa del propio nivel, cuando dices que sí. En una ventana más
+pequeña que 1024 por 700, todo se dibuja un poco más pequeño, para que
+quepa el nivel entero. *Ejecutar* empieza
 el nivel otra vez y hace que tu personaje haga lo que dice tu código, a la
 izquierda. Una marca redonda que late en el suelo enseña a dónde debe
 llegar tu personaje. Los objetivos, en la esquina, se marcan solos cuando

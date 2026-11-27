@@ -5870,3 +5870,21 @@ one overturns stays, marked as superseded.
   fails shows the words alone, with no frame and no pin. Rules out a capture shown flat
   and bare, as the game's own screen looks, and a picture painted in the place of the
   capture, which would not show the button as the child will find it.
+- **D359 — A window smaller than the game is made for draws everything smaller, so that
+  the whole level is seen.** Decided 2026-11-26 by the owner (*we could have everything
+  smaller if the resolution is so low*; *también a los botones de abajo y quizás la fuente
+  de todo se puede ajustar también en función a eso*), only under the smallest window the
+  game is made for (D38). A computer's window under 1024 by 700 draws the page smaller, by
+  a factor `--fit` that `ui/look.ts` sets from the window's size and sets again when it
+  changes (`fitOf`): the tighter of the width over 1024 and the height over 700, never
+  under 0.8; from 1024 by 700 up it is 1, and the page is drawn as D38 describes it. The page's letter, the header and the
+  foot, the level's heading, the goals, the lists, the code and the two rows of buttons
+  take their full sizes times `--fit`, and the level takes the window's height less its
+  frame, down to 360 px at the least, so that at 900 by 600 the scene, the editor and
+  both rows of buttons are seen with nothing to scroll. The heading's gaps close faster
+  than its words. A page 800 px wide or less, a phone's or a tablet's, keeps its own
+  layout at its size; the cards keep theirs (D222, D228), and the scene is drawn as at
+  any size. In such a low window the buttons may lie under the start card, which the dim
+  leaves to the card (D228). Rules out a zoom of the whole page, which the scene's canvas
+  does not follow; one step from full size to small, which a window a little low would not
+  need; and a page drawn smaller at a size the game is made for.

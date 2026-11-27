@@ -217,6 +217,23 @@ test.describe('a card in a window 600 px high (D222)', () => {
     await expect(page.locator('.win-card')).toBeVisible();
     await expect.poll(() => top(page, '.win-card')).toEqual({ scroll: 0, titleShown: true, taller: true });
   });
+});
+
+/** The levels of the course, in its order. */
+function courseLevels(): string[] {
+  const chapters = fileURLToPath(new URL('../../content/chapters/', import.meta.url));
+  return readdirSync(chapters)
+    .sort()
+    .flatMap((folder) => JSON.parse(readFileSync(`${chapters}${folder}/chapter.json`, 'utf8')).items as string[])
+    .filter((item) => item.startsWith('level:'))
+    .map((item) => item.slice('level:'.length));
+}
+
+// At the smallest window the game is made for (D38), the start card lies beside the first
+// row of buttons; a lower window draws the page smaller (D359) and may bring the buttons
+// under the card, where the dim's rule (D228) leaves them to the card.
+test.describe('a card at 1024 by 700, the smallest window the game is made for (D38, D222)', () => {
+  test.use({ viewport: { width: 1024, height: 700 } });
 
   test('with the start card open, a button of the page closes it and does what it does; ? opens and closes it', async ({
     page,
@@ -235,8 +252,9 @@ test.describe('a card in a window 600 px high (D222)', () => {
     await page.locator('#hint').click();
     await expect(card).toBeHidden();
     await expect(page.locator('.hints .hint')).toHaveCount(1);
-    // The notebook opens. Its button, on the second row (D351), lies under the card in a
-    // window this low: its click, which a child gives by Alt+N, still closes the card.
+    // The notebook opens. With the outcome and a hint under the buttons, the notebook's
+    // button, on the second row (D351), lies under the card: its click, which a child gives
+    // by Alt+N, still closes the card.
     await page.locator('#about').click();
     await expect(card).toBeVisible();
     await page.locator('#notebook-open').dispatchEvent('click');
@@ -261,16 +279,6 @@ test.describe('a card in a window 600 px high (D222)', () => {
     await expect(card).toBeHidden();
   });
 });
-
-/** The levels of the course, in its order. */
-function courseLevels(): string[] {
-  const chapters = fileURLToPath(new URL('../../content/chapters/', import.meta.url));
-  return readdirSync(chapters)
-    .sort()
-    .flatMap((folder) => JSON.parse(readFileSync(`${chapters}${folder}/chapter.json`, 'utf8')).items as string[])
-    .filter((item) => item.startsWith('level:'))
-    .map((item) => item.slice('level:'.length));
-}
 
 test.describe('the start card over the whole window (D228)', () => {
   test.use({ viewport: { width: 1024, height: 700 } });

@@ -60,7 +60,7 @@ import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
 import { listenForMusic, music } from './engine/music';
 import { setMuted } from './engine/sfx';
-import { applyLook } from './ui/look';
+import { applyFit, applyLook } from './ui/look';
 import { settingsScreen } from './ui/settings';
 import { startScreen } from './ui/start';
 import { themesScreen } from './ui/themes';
@@ -900,6 +900,7 @@ function menuAllowed(target: EventTarget | null): boolean {
  * the screen the address names shown. */
 function begin(page: HTMLElement): void {
   applyLook(progress.settings());
+  applyFit();
   setMuted(!progress.settings().sound);
   music.setVolume(progress.settings().music);
   listenForMusic();

@@ -110,7 +110,10 @@ for (const [width, height] of [
     await expect(page.locator('#help-buttons > .speed')).toBeVisible();
     for (const id of ['run', 'restart', 'stop', 'original', 'notebook-open', 'hint']) {
       await expect(page.locator(`#${id} svg.icon`)).toHaveCount(1);
-      await expect(page.locator(`#${id} .button-word`)).toHaveCSS('font-size', '15px');
+      // A window under 1024 by 700 draws its letter smaller (D359): 15 px times 600 / 700 at
+      // 900 by 600.
+      const size = await page.locator(`#${id} .button-word`).evaluate((word) => parseFloat(getComputedStyle(word).fontSize));
+      expect(size).toBeCloseTo(width === 1280 ? 15 : (15 * 600) / 700, 1);
     }
     await expect(page.locator('#original')).toHaveText('Original code');
     // The second row stands under the first.

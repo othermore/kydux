@@ -5,9 +5,9 @@
 // wizard to change the names.
 // The saved games (D70) are listed in a box as soon as there is one, each by its
 // name, the one being played marked as the open one, the others played from
-// there, each kept as a file or deleted; in the box's corner, New game begins the
-// story again for a new wizard and Import gives a file back as one more game,
-// whose name is asked before it is added (D291).
+// there, each kept as a file or deleted once the game's own dialog has asked (D364);
+// in the box's corner, New game begins the story again for a new wizard and Import
+// gives a file back as one more game, whose name is asked before it is added (D291).
 
 import { t } from '../i18n';
 import * as progress from '../progress/progress';
@@ -21,6 +21,7 @@ import {
   sameName,
   type Wizard,
 } from '../progress/store';
+import { type Asked, ask } from './ask';
 import { backdrop } from './decor';
 import { element } from './dom';
 import { pencilIcon } from './icons';
@@ -71,8 +72,13 @@ function fileName(name: string): string {
 /** The saved games' rows, each by its name, its wizard's under it when they differ,
  * where it is, how long it has been played and when (D70, D290). The game being
  * played is marked as the open one and has no Play; every game has Export, which
- * keeps it as a file, and Delete (D293). */
-function gameRows(saved: SavedGame[], parts: StartScreenParts, redraw: () => void): HTMLElement[] {
+ * keeps it as a file, and Delete (D293), which `askDelete` asks about first (D364). */
+function gameRows(
+  saved: SavedGame[],
+  parts: StartScreenParts,
+  redraw: () => void,
+  askDelete: (name: string, onYes: () => void) => void,
+): HTMLElement[] {
   const current = progress.currentGame();
   return saved.map((game) => {
     const wizard = game.progress.wizard as Wizard;
@@ -87,12 +93,13 @@ function gameRows(saved: SavedGame[], parts: StartScreenParts, redraw: () => voi
     const keep = element('button', { type: 'button', className: 'quiet-button export' }, [t('start.export')]);
     keep.addEventListener('click', () => download(fileName(name), exportProgress(game.progress)));
     const remove = element('button', { type: 'button', className: 'quiet-button delete' }, [t('start.delete')]);
-    remove.addEventListener('click', () => {
-      if (!window.confirm(t('start.delete_confirm', { name }))) return;
-      progress.deleteGame(game.id);
-      if (open) parts.onChanged();
-      else redraw();
-    });
+    remove.addEventListener('click', () =>
+      askDelete(name, () => {
+        progress.deleteGame(game.id);
+        if (open) parts.onChanged();
+        else redraw();
+      }),
+    );
     const row = element('li', { className: 'game' }, [
       figure,
       element('div', { className: 'game-about' }, [
@@ -192,6 +199,20 @@ export function startScreen(parts: StartScreenParts): Screen {
   const message = element('p', { id: 'start-message', className: 'start-message', hidden: true });
   // A game brought from a file, while its name is asked.
   let brought: Brought | null = null;
+  // Delete asks in the game's own dialog, with the game's name (D364): Yes deletes, No and
+  // Escape keep it. One question at a time; the screen left, it is dismissed.
+  let asked: Asked | null = null;
+  const askDelete = (name: string, onYes: () => void) => {
+    if (asked) return;
+    asked = ask(
+      document.body,
+      { question: t('start.delete_confirm', { name }), yes: t('start.delete_yes'), no: t('start.delete_no') },
+      (yes) => {
+        asked = null;
+        if (yes) onYes();
+      },
+    );
+  };
 
   const draw = () => {
     const { wizard } = parts;
@@ -291,7 +312,7 @@ export function startScreen(parts: StartScreenParts): Screen {
               ]),
               element('p', { id: 'saved-note', className: 'saved-note' }, [t('start.saved')]),
               ...bringing,
-              element('ul', {}, gameRows(saved, parts, () => draw())),
+              element('ul', {}, gameRows(saved, parts, () => draw(), askDelete)),
             ]),
           ]
         : bringing;
@@ -311,6 +332,6 @@ export function startScreen(parts: StartScreenParts): Screen {
     node,
     mount: () => node.querySelector<HTMLElement>('#continue')?.focus(),
     relabel: draw,
-    destroy: () => {},
+    destroy: () => asked?.dismiss(),
   };
 }

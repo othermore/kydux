@@ -403,7 +403,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   addEventListener('pagehide', keep);
   document.addEventListener('visibilitychange', onHidden);
   // Original (D351): the starting code back, the kept program dropped, a run stopped
-  // and the scene as at the start, once the child says yes in the game's own dialog.
+  // and the scene as at the start, once the child says yes in the game's own dialog. The
+  // screen asks one question at a time, this or leaving by the map (D364).
   let asked: Asked | null = null;
   original.addEventListener('click', () => {
     if (asked || !typed) return;
@@ -776,7 +777,7 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
 
   // The map as a window over the level (D71, D352): the level stays behind, darkened, its
   // run and its editor as they are; the button back, a click outside the window and
-  // Escape close it, and leaving for another stop while a run goes on asks.
+  // Escape close it, and leaving for another stop while a run goes on asks (D364).
   let mapShown: { node: HTMLElement; destroy: () => void } | null = null;
   const closeMap = () => {
     mapShown?.destroy();
@@ -790,11 +791,28 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     const screen = make({
       onClose: closeMap,
       onGo: (hash) => {
-        if (controller.snapshot.canStop && !window.confirm(t('map.leave_run'))) return;
-        closeMap();
-        // The level's own stop opens it again, on the program kept as it was left (D351).
-        if (hash === location.hash) document.dispatchEvent(new CustomEvent('kydux:reopen'));
-        else location.hash = hash;
+        const go = () => {
+          closeMap();
+          // The level's own stop opens it again, on the program kept as it was left (D351).
+          if (hash === location.hash) document.dispatchEvent(new CustomEvent('kydux:reopen'));
+          else location.hash = hash;
+        };
+        if (!controller.snapshot.canStop) {
+          go();
+          return;
+        }
+        // A program running: the game's own dialog asks over the map's window, and the
+        // program goes on running meanwhile (D364). No and Escape leave the map open; a run
+        // that ends while it asks changes nothing. One question at a time.
+        if (asked) return;
+        asked = ask(
+          document.body,
+          { question: t('map.leave_run'), yes: t('map.leave_yes'), no: t('map.leave_no') },
+          (yes) => {
+            asked = null;
+            if (yes) go();
+          },
+        );
       },
     });
     const frame = element('div', { id: 'map-window', className: 'map-window' }, [screen.node]);

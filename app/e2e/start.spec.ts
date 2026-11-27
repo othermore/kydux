@@ -137,15 +137,30 @@ test('a new game begins the story for a new wizard; the games are played by name
   await page.locator('#games .game', { hasText: 'Leo' }).locator('.export').click();
   expect((await downloading).suggestedFilename()).toBe('kydux-Leo.json');
 
-  // Delete asks first, with the game's name.
-  let asked = '';
-  page.once('dialog', (dialog) => {
-    asked = dialog.message();
-    void dialog.accept();
+  // Delete asks first, with the game's name, in the game's own dialog (D364): never the
+  // browser's.
+  page.on('dialog', () => {
+    throw new Error('no browser dialog');
   });
-  await page.locator('#games .game', { hasText: 'Leo' }).locator('.delete').click();
+  const remove = page.locator('#games .game', { hasText: 'Leo' }).locator('.delete');
+  await remove.click();
+  await expect(page.locator('#ask-question')).toHaveText('Delete the game “Leo”? It cannot be brought back.');
+  await expect(page.locator('#ask-yes')).toHaveText('Yes, delete');
+  await expect(page.locator('#ask-no')).toHaveText('No, keep it');
+  await expect(page.locator('#ask-no')).toBeFocused();
+  // Escape is No: the two games stay, the focus back on Leo's Delete.
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ask')).toHaveCount(0);
+  await expect(page.locator('#games .game')).toHaveCount(2);
+  await expect(remove).toBeFocused();
+  await remove.click();
+  await page.locator('#ask-no').click();
+  await expect(page.locator('#ask')).toHaveCount(0);
+  await expect(page.locator('#games .game')).toHaveCount(2);
+  await remove.click();
+  await page.locator('#ask-yes').click();
+  await expect(page.locator('#ask')).toHaveCount(0);
   await expect(page.locator('#games .game')).toHaveCount(1);
-  expect(asked).toBe('Delete the game “Leo”? It cannot be brought back.');
   await expect(page.locator('.start-screen h2')).toHaveText('Hello, Marta');
 });
 

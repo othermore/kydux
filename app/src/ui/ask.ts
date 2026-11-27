@@ -1,6 +1,9 @@
-// A question the game asks in its own dialog (D351), never the browser's: its words, Yes
-// and No; No has the focus, and Escape is No. Nothing else of the page takes a click
-// while it is open.
+// A question the game asks in its own dialog, never the browser's (D351, D364): its
+// words, Yes and No, in the game's language; No has the focus, and Escape is No. Nothing
+// else of the page takes a click while it is open. The game asks three: Original, before
+// it puts the starting code back over what the child wrote (D351); Delete, on the start
+// screen, before a saved game is deleted; and a stop chosen on the map while the level's
+// program runs, before the level is left, over the map's window (D364).
 
 import { element } from './dom';
 

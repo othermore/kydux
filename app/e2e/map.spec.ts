@@ -158,6 +158,72 @@ for (const [width, height] of [
   });
 }
 
+test('leaving by the map while a program runs asks in the game\'s own dialog (D364)', async ({ page }) => {
+  await seedWizard(page);
+  page.on('dialog', () => {
+    throw new Error('no browser dialog');
+  });
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+  await page.locator('#speed').selectOption('1');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_right(8)');
+  await page.locator('#run').click();
+  await expect(page.locator('#stop')).toBeEnabled({ timeout: ciTimes(30_000) });
+  await page.locator('#level-map').click();
+  const letter = page.locator('#map-overlay .stop[data-item="story:the-letter"] a');
+  await letter.click();
+  await expect(page.locator('#ask-question')).toHaveText('Your program is still running. Leave the level?');
+  await expect(page.locator('#ask-yes')).toHaveText('Yes, leave');
+  await expect(page.locator('#ask-no')).toHaveText('No, stay');
+  // Escape is No: the question goes, the map's window stays, the level is not left.
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ask')).toHaveCount(0);
+  await expect(page.locator('#map-window')).toBeVisible();
+  await expect(page).toHaveURL(/#level\/the-long-corridor$/);
+  await letter.click();
+  await page.locator('#ask-no').click();
+  await expect(page.locator('#ask')).toHaveCount(0);
+  await expect(page.locator('#map-window')).toBeVisible();
+  await expect(page).toHaveURL(/#level\/the-long-corridor$/);
+  // The program ran on all the while, to its win.
+  await page.locator('#map-close').click();
+  await expect(page.locator('#map-overlay')).toHaveCount(0);
+  await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
+  // A second run, and Yes: the stop is gone to.
+  await page.locator('#run').click();
+  await expect(page.locator('#stop')).toBeEnabled({ timeout: ciTimes(30_000) });
+  await page.locator('#level-map').click();
+  await letter.click();
+  await page.locator('#ask-yes').click();
+  await expect(page).toHaveURL(/#story\/the-letter$/);
+  await expect(page.locator('#map-overlay')).toHaveCount(0);
+});
+
+test('in Spanish, the question about leaving and its two answers (D364)', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'es-ES' });
+  const page = await context.newPage();
+  await seedWizard(page);
+  await page.goto('/#level/the-long-corridor');
+  await page.locator('#start').click();
+  await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+  await page.locator('#speed').selectOption('1');
+  await page.locator('.cm-content').click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('wizard.move_right(8)');
+  await page.locator('#run').click();
+  await expect(page.locator('#stop')).toBeEnabled({ timeout: ciTimes(30_000) });
+  await page.locator('#level-map').click();
+  await page.locator('#map-overlay .stop[data-item="story:the-letter"] a').click();
+  await expect(page.locator('#ask-question')).toHaveText('Tu programa todavía se está ejecutando. ¿Salir del nivel?');
+  await expect(page.locator('#ask-yes')).toHaveText('Sí, salir');
+  await expect(page.locator('#ask-no')).toHaveText('No, quedarme');
+  await page.screenshot({ path: `${SHOTS}leave-asks.png` });
+  await context.close();
+});
+
 test('from the start screen, the map is a whole screen that leads back home (D352)', async ({ page }) => {
   await seedWizard(page, MARTA);
   await page.goto('/#start');

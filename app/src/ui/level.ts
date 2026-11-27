@@ -699,8 +699,9 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   node.addEventListener('click', closeStartFor, { capture: true });
   node.addEventListener('change', closeStartFor, { capture: true });
 
-  // The map over the level (D71): the run and the editor stay as they are; Back,
-  // or Escape, closes it, and leaving for another stop while a run goes on asks.
+  // The map as a window over the level (D71, D352): the level stays behind, darkened, its
+  // run and its editor as they are; the button back, a click outside the window and
+  // Escape close it, and leaving for another stop while a run goes on asks.
   let mapShown: { node: HTMLElement; destroy: () => void } | null = null;
   const closeMap = () => {
     mapShown?.destroy();
@@ -721,7 +722,15 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         else location.hash = hash;
       },
     });
-    const layer = element('div', { id: 'map-overlay', className: 'map-overlay' }, [screen.node]);
+    const frame = element('div', { id: 'map-window', className: 'map-window' }, [screen.node]);
+    frame.setAttribute('role', 'dialog');
+    frame.setAttribute('aria-modal', 'true');
+    frame.setAttribute('aria-labelledby', 'map-window-title');
+    const layer = element('div', { id: 'map-overlay', className: 'map-overlay' }, [frame]);
+    // A click outside the window, on the level darkened around it, closes it.
+    layer.addEventListener('click', (event) => {
+      if (event.target === layer) closeMap();
+    });
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeMap();
     };

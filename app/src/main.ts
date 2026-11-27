@@ -880,6 +880,13 @@ console.info(
     : 'Kydux: not isolated; a runaway program is stopped by starting Python again.', // i18n-ignore
 );
 
+/** Whether the browser's own menu may open over `target` (D353): in the editor, a
+ * lesson's code box and a text field, and nowhere else of the game's screens. */
+function menuAllowed(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  return target.closest('.cm-editor, input, textarea, select, [contenteditable="true"]') !== null;
+}
+
 /** Starts the game on the page: the settings applied, the screens listened for, and
  * the screen the address names shown. */
 function begin(page: HTMLElement): void {
@@ -898,7 +905,13 @@ function begin(page: HTMLElement): void {
       analytics.played(seconds);
     },
   });
-  // A screen opened again where it is, a level from its own stop on the map (D131).
+  // No screen of the game is left by mistake (D353): the browser's own menu opens only in
+  // the editor, a lesson's code box and a text field, where copying and pasting live.
+  document.addEventListener('contextmenu', (event) => {
+    if (!menuAllowed(event.target)) event.preventDefault();
+  });
+  // A screen opened again where it is, a level from its own stop on the map, on its kept
+  // program (D351).
   document.addEventListener('kydux:reopen', () => {
     shownRoute = null;
     route();

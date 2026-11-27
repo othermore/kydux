@@ -2,8 +2,9 @@
 // for a lesson and a door for a level. A stop is done, open or locked (D34); an
 // open or done stop opens its item, a locked one does not, and the locked stops
 // after the first are unnamed: their kind and number show, not what they hold
-// (D71). From a level the map opens over it, marks the stop played, and closes
-// back to it; choosing a stop from there goes through the level's own question.
+// (D71). From a level the map opens as a window over it (D352), with its heading and its
+// button back, marks the stop played, and closes back to it; choosing a stop from there
+// goes through the level's own question.
 // In the tester's mode (?debug) every stop opens and is named, for a tester to
 // go straight to any of them.
 // Each chapter is its card (D200): the current one open, with its stops; a finished
@@ -158,11 +159,22 @@ export function mapScreen(parts: MapScreenParts): Screen {
       });
       return section;
     });
-    const back = parts.overlay
-      ? element('button', { id: 'map-close', type: 'button', className: 'quiet-button' }, [t('map.back_level')])
-      : element('a', { id: 'map-back', className: 'quiet-button', href: '#start' }, [t('map.back')]);
-    if (parts.overlay) back.addEventListener('click', parts.overlay.onClose);
-    node.replaceChildren(back, ...chapters);
+    // Over a level, the map is a window with its heading and, at its top right, the
+    // button back to the level (D352); on its own, a screen that leads back home.
+    if (parts.overlay) {
+      const close = element('button', { id: 'map-close', type: 'button', className: 'quiet-button' }, [
+        t('map.back_level'),
+      ]);
+      close.addEventListener('click', parts.overlay.onClose);
+      const head = element('header', { className: 'map-window-head' }, [
+        element('h2', { id: 'map-window-title' }, [t('map.open_map')]),
+        close,
+      ]);
+      node.replaceChildren(head, element('div', { className: 'map-window-body' }, chapters));
+    } else {
+      const back = element('a', { id: 'map-back', className: 'quiet-button', href: '#start' }, [t('map.back')]);
+      node.replaceChildren(back, ...chapters);
+    }
   };
   draw();
   // From a level, the map opens on the stop being played.

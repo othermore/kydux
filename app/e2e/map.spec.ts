@@ -107,6 +107,66 @@ test('from a level, the map opens over it, says where you are, and closes back t
   await expect(page).toHaveURL(/#story\/the-letter$/);
 });
 
+for (const [width, height] of [
+  [1280, 800],
+  [900, 600],
+] as const) {
+  test(`from a level, the map is a window over it, the level seen all round it, at ${width} by ${height} (D352)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto('/#level/the-long-corridor');
+    await page.locator('#start').click();
+    await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
+    await page.locator('.cm-content').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.keyboard.insertText('wizard.move_right(8)');
+    await page.locator('#level-map').click();
+    const frame = page.locator('#map-window');
+    await expect(frame).toBeVisible();
+    await expect(frame.locator('#map-window-title')).toHaveText('Map');
+    await expect(page.locator('#map-close')).toHaveText('✕ Back to the level');
+    const box = (await frame.boundingBox()) ?? { x: 0, y: 0, width: 0, height: 0 };
+    expect(box.width).toBeLessThanOrEqual(1100);
+    expect(box.height).toBeLessThanOrEqual(height * 0.9 + 1);
+    // A margin of the level all round it.
+    expect(box.x).toBeGreaterThan(20);
+    expect(box.y).toBeGreaterThan(10);
+    expect(width - box.x - box.width).toBeGreaterThan(20);
+    expect(height - box.y - box.height).toBeGreaterThan(10);
+    // The close button at the top right.
+    const close = (await page.locator('#map-close').boundingBox()) ?? { x: 0, y: 0, width: 0, height: 0 };
+    expect(close.x + close.width).toBeGreaterThan(box.x + box.width - 40);
+    expect(close.y).toBeLessThan(box.y + 50);
+    await page.screenshot({ path: `${SHOTS}map-window-${width}x${height}.png` });
+    // Closed by a click outside it, by Escape and by its button, onto the level as it was.
+    await page.mouse.click(Math.max(4, box.x / 2), height / 2);
+    await expect(page.locator('#map-overlay')).toHaveCount(0);
+    await page.locator('#level-map').click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#map-overlay')).toHaveCount(0);
+    // A run going on stays going on under the window.
+    await page.locator('#speed').selectOption('1');
+    await page.locator('#run').click();
+    await expect(page.locator('#stop')).toBeEnabled({ timeout: ciTimes(30_000) });
+    await page.locator('#level-map').click();
+    await expect(frame).toBeVisible();
+    await page.locator('#map-close').click();
+    await expect(page.locator('#map-overlay')).toHaveCount(0);
+    await expect(page.locator('.cm-content')).toHaveText('wizard.move_right(8)');
+    await expect(page.locator('.win-card')).toBeVisible({ timeout: ciTimes(30_000) });
+  });
+}
+
+test('from the start screen, the map is a whole screen that leads back home (D352)', async ({ page }) => {
+  await seedWizard(page, MARTA);
+  await page.goto('/#start');
+  await page.locator('#map-link').click();
+  await expect(page.locator('.map-screen')).toBeVisible();
+  await expect(page.locator('#map-window')).toHaveCount(0);
+  await expect(page.locator('#map-back')).toBeVisible();
+});
+
 test('a level offers its lesson again, which goes back to the level (D71)', async ({ page }) => {
   await page.goto('/#level/the-long-corridor');
   await page.locator('#start').click();

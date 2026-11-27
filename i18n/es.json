@@ -443,7 +443,7 @@
     "trial_not_started": "Todavía no has hecho la prueba que te dice esta lección. Pulsa *Ejecutar* para empezar.",
     "trial_not_changed": "Todavía no has hecho la prueba que te dice esta lección. Cambia el código como dice la página y ejecútalo otra vez.",
     "trial_not_renamed": "Todavía no has hecho la prueba que te dice esta lección. Cambia el nombre de la variable en todas las líneas y ejecuta.",
-    "trial_error_not_seen": "Todavía no has hecho la prueba que te dice esta lección. Ahora cambia el nombre en una sola línea y ejecuta, para ver qué responde el juego."
+    "trial_error_not_seen": "Todavía no has hecho la prueba que te dice esta lección. Cambia el nombre en una sola línea y ejecuta, para ver qué responde el juego."
   },
   "story": {
     "next": "Siguiente",

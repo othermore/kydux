@@ -443,7 +443,7 @@
     "trial_not_started": "You have not yet tried what this lesson tells you to try. Press *Run* to begin.",
     "trial_not_changed": "You have not yet tried what this lesson tells you to try. Change the code as the page says and run it again.",
     "trial_not_renamed": "You have not yet tried what this lesson tells you to try. Change the variable's name on every line and run.",
-    "trial_error_not_seen": "You have not yet tried what this lesson tells you to try. Now change the name on one line only and run, to see what the game answers."
+    "trial_error_not_seen": "You have not yet tried what this lesson tells you to try. Change the name on one line only and run, to see what the game answers."
   },
   "story": {
     "next": "Next",

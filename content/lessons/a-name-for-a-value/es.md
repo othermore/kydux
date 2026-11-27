@@ -45,7 +45,7 @@ El programa imprime primero 9 y después 10. Es la misma variable, pero su valor
 
 El nombre de una variable lo elige quien escribe el programa; a Python le da igual cuál sea, solo le importa que se escriba igual cada vez. Un nombre usa letras, números y la línea baja `_`, sin espacios, y nunca empieza por un número. ¡Un buen nombre dice qué es el valor!
 
-Ejecuta este código. Luego, cambia el nombre en **ambas** líneas por uno tuyo y vuelve a ejecutarlo: imprime lo mismo. Después, cámbialo en una sola línea y mira qué responde el juego. El programa solo conoce un valor por el nombre de la variable donde se guardó.
+Ejecuta este código. Luego, cambia el nombre en **una sola** línea por uno tuyo y mira qué responde el juego. El programa solo conoce un valor por el nombre de la variable donde se guardó. Después, cámbialo en **las dos** líneas y vuelve a ejecutarlo: imprime lo mismo que al principio.
 
 ```python try rename error
 caramelos = 12

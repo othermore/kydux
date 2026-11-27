@@ -3,8 +3,9 @@
 // once, an error counting; `change`, a code other than the given one run, an error
 // counting; `rename`, a run with no error in which the given variable's name is nowhere
 // as a whole word, its comments and strings aside; `rename_error`, that and a run that
-// ended on the answer to a name the program has not, in either order. The game never
-// checks that a change is the one the page asks for. Pure: no DOM.
+// ended on the answer to a name the program has not, in either order; what is missing
+// is said in the page's order, the answer first. The game never checks that a change
+// is the one the page asks for. Pure: no DOM.
 
 import type { LessonTest } from '../content/lessons';
 
@@ -75,10 +76,12 @@ export function lessonTestDue(test: LessonTest, given: string, runs: readonly Le
     case 'rename_error': {
       const name = givenVariable(given);
       const renamed = runs.some((run) => !run.error && (name === null || !names(run.code, name)));
-      if (!renamed) return 'lesson.trial_not_renamed';
-      if (test === 'rename') return null;
+      if (test === 'rename') return renamed ? null : 'lesson.trial_not_renamed';
+      // What is missing is said in the page's order: the answer first, then the name
+      // changed on every line.
       const seen = runs.some((run) => run.error && UNKNOWN_NAME.includes(run.explained ?? ''));
-      return seen ? null : 'lesson.trial_error_not_seen';
+      if (!seen) return 'lesson.trial_error_not_seen';
+      return renamed ? null : 'lesson.trial_not_renamed';
     }
   }
 }

@@ -496,7 +496,7 @@ test.describe("a lesson's page is passed by trying it (D354)", () => {
       if (order === 'rename first') {
         await runCode(page, renamed);
         await page.locator('#lesson-next').click();
-        await expect(asked(page)).toContainText('Now change the name on one line only and run');
+        await expect(asked(page)).toContainText('Change the name on one line only and run');
         await runCode(page, half);
       } else {
         await runCode(page, half);

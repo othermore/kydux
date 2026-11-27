@@ -46,7 +46,8 @@ describe("a lesson's page passed by trying it (D354)", () => {
     const sweets = 'caramelos = 12\nprint(caramelos)\n';
     const renamed = ran('dulces = 12\nprint(dulces)\n');
     const answered = ran('dulces = 12\nprint(caramelos)\n', true, 'unknown_name');
-    expect(lessonTestDue('rename_error', sweets, [])).toBe('lesson.trial_not_renamed');
+    // What is missing is said in the page's order: the answer first, then the name.
+    expect(lessonTestDue('rename_error', sweets, [])).toBe('lesson.trial_error_not_seen');
     expect(lessonTestDue('rename_error', sweets, [renamed])).toBe('lesson.trial_error_not_seen');
     expect(lessonTestDue('rename_error', sweets, [answered])).toBe('lesson.trial_not_renamed');
     expect(lessonTestDue('rename_error', sweets, [renamed, answered])).toBeNull();

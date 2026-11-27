@@ -45,7 +45,7 @@ The program prints 9 first and then 10. It is the same variable, but its value h
 
 The name of a variable is chosen by whoever writes the program; Python does not care which, only that the same name is written each time. A name uses letters, digits and the low line `_`, no spaces, and it never starts with a digit. A good name says what the value is!
 
-Run this code. Then change the name, in **both** lines, to one of your own, and run it again: it prints the same. Then change it in one line only and see what the game answers. The program knows a value only by the name of the variable it was kept in.
+Run this code. Then change the name, in **one** line only, to one of your own, and see what the game answers. The program knows a value only by the name of the variable it was kept in. Then change it in **both** lines and run it again: it prints the same as at first.
 
 ```python try rename error
 sweets = 12

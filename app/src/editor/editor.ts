@@ -120,12 +120,18 @@ export function lineScroll(state: EditorState, line: number, margin: number): Tr
   return { effects: EditorView.scrollIntoView(state.doc.line(line).from, { y: 'nearest', yMargin: margin }) };
 }
 
-/** Whether a line, 1-based, of the document lies whole inside what the editor shows. */
+/** How far under a line's box its mark reaches, in pixels: the wavy line under the line
+ * an answer names is drawn across the box's foot. */
+const MARK_BELOW = 4;
+
+/** Whether a line, 1-based, of the document lies whole inside what the editor shows,
+ * with the mark under it. */
 function wholeInSight(view: EditorView, line: number): boolean {
   const block = view.lineBlockAt(view.state.doc.line(line).from);
   const top = view.documentTop + block.top;
   const shown = view.scrollDOM.getBoundingClientRect();
-  return top >= shown.top - 1 && top + block.height <= shown.top + view.scrollDOM.clientHeight + 1;
+  const foot = shown.top + view.scrollDOM.clientHeight;
+  return top >= shown.top - 1 && top + block.height + MARK_BELOW <= foot + 1;
 }
 
 /** How many columns a line's leading spaces take, a tab to the next stop of four. */

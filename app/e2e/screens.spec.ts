@@ -264,12 +264,13 @@ function newestHintSeen(page: Page): Promise<boolean> {
   });
 }
 
-/** Whether the line an answer names lies inside what the editor shows. */
+/** Whether the line an answer names lies inside what the editor shows, with room under
+ * it for the wavy line that marks it. */
 function errorLineSeen(page: Page): Promise<boolean> {
   return page.evaluate(() => {
     const line = document.querySelector('.cm-kydux-error-line')?.getBoundingClientRect();
     const shown = document.querySelector('.cm-scroller')?.getBoundingClientRect();
-    return Boolean(line && shown && line.top >= shown.top - 1 && line.bottom <= shown.bottom + 1);
+    return Boolean(line && shown && line.top >= shown.top - 1 && line.bottom + 2 <= shown.bottom);
   });
 }
 

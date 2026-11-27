@@ -5521,33 +5521,28 @@ one overturns stays, marked as superseded.
   lightness, as the common one. Rules out one stronger pencil for every scene, which
   would weigh on the grass, where the grid is seen well, and a grid painted into a
   scene's picture.
-- **D338 — Every screen and the pages GitHub shows say the family Kydux belongs to.**
+- **D338 — The game's header and the pages GitHub shows say the family Kydux belongs to.**
   Decided 2026-11-24 by the owner (*añadir un enlace en la web de Kydux a kidux (como
   parte de la familia Kidux) en el pie o en la cabecera, para que salga más o menos
-  siempre. Y igual en las páginas Markdown que se ven en github*). The game's foot,
-  which lies under every screen (`chrome`, `main.ts`), says *Part of the Kidux family*
-  beside the version and the build: a link to Kidux's website in the page's language
-  (`app.family`, and `app.kidux_url`, the address the welcome page's own link leads to).
-  It opens in a window of its own, so that a level being played stays as it is. The
-  header has a link of its own (D339). The pages GitHub
+  siempre. Y igual en las páginas Markdown que se ven en github*). In the game it is
+  the header's link, on every screen (D339); the foot has none (D365). The pages GitHub
   shows say it under their title: `README.md` and `README.es.md`, each with the website
-  in its language, and `docs/dev/README.md`. `e2e/about.spec.ts` holds the foot's link
-  on a screen of each kind and through a change of language, and `test_readmes.py` the
-  pages' line and that its addresses are the game's. Rules out a family named on the
-  welcome page alone, which a player sees once, and a link that takes a child out of a
-  level.
+  in its language, and `docs/dev/README.md`; `test_readmes.py` holds the pages' line
+  and that its addresses are the game's (`app.kidux_url`). Rules out a family named on
+  the welcome page alone, which a player sees once, and a link that takes a child out
+  of a level.
 - **D339 — The header of every screen leads to Kidux OS.** Decided 2026-11-24 by the
   owner (*No tendría que haber un enlace a Kidux en la web principal en la cabecera?
   … pongámoslo junto a Qué es Kydux, "Conoce Kidux OS"*). The header (`chrome`,
   `main.ts`) says *Meet Kidux OS* right after the welcome page's link (`#kidux-link`,
-  `app.kidux_link`): a link to Kidux's website in the page's language, the address of
-  the foot's (`app.kidux_url`). The foot's link stays (D338): the header's is in sight
-  without scrolling on a long page, the welcome page and the map. Both open in a window
-  of their own, and so does the welcome page's own link, *Meet Kidux*, in its last
-  section: no link to Kidux takes the page of the game away. `e2e/about.spec.ts` holds
-  the header's link on a screen of each kind, in the header's line after the welcome
-  page's, through a change of language, and the welcome page's own in its window.
-  Rules out a link in the header of the welcome page alone, which a player sees once.
+  `app.kidux_link`): a link to Kidux's website in the page's language
+  (`app.kidux_url`), in sight without scrolling on a long page, the welcome page and
+  the map. It opens in a window of its own, so that a level being played stays as it
+  is, and so does the welcome page's own link, *Meet Kidux*, in its last section: no
+  link to Kidux takes the page of the game away. `e2e/about.spec.ts` holds the header's
+  link on a screen of each kind, in the header's line after the welcome page's, through
+  a change of language, and the welcome page's own in its window. Rules out a link in
+  the header of the welcome page alone, which a player sees once.
 - **D340 — A donation to Kydux is made where one to Kidux is.** Decided 2026-11-24 by
   the owner (*poner iconos similares de sponsorship y demás en el readme de kydux*).
   `README.md` and `README.es.md` have, under the line of the family, the button
@@ -5937,26 +5932,37 @@ one overturns stays, marked as superseded.
   `book` ni `tesoro`*, in the goal's own words. Which goals are said shorter is the
   designer's and the owner's to say. Rules out a goals box that takes half the scene for
   one goal, and a rule the child reads only on the card.
-- **D363 — The editor keeps five lines of code under the hints and the answer.** Decided
-  2026-11-26 by the designer, reviewing sprint 61. A hint is read to change the code, and
-  an answer names a line of it: the code, the hint and the answer are seen together, or
-  the child reads the one and has lost the other. On the level's screen with its two panes
-  side by side (a page wider than 800 px) the editor is never lower than five lines of
-  code with its frame, 7.6 times the code's letter times `--fit` (D359): 122 px with the
-  letter at 16 px. The hints' box is what gives way. It takes the height left between
-  the buttons and the answer, never under four times the code's letter, and scrolls
-  inside itself; it stands on the newest hint, whose first line is in sight when the
-  hint is taken and when a level opens with its hints kept, and an edge past which more
-  hints lie fades, as the lists' rows do (D346). The answer stays whole, with the line's
-  number at its end. Where the window is too low even for that, the editor's column
-  scrolls inside the level, and the page stays the window's height (D38). The line an
-  answer marks in the code is brought into the editor's sight when the answer shows and
-  whenever the editor's height changes while the line is marked. A page 800 px wide or
-  less keeps its own layout, which scrolls. Rules out an editor that gives all its height
-  to what stands under it, which three hints and an answer take whole at 1024 by 700;
-  older hints folded to their headings, which puts what the child wants to read again
-  behind a click; an answer that scrolls, which hides the line it names; and a page
-  taller than the window.
+- **D363 — The hints and the answer fold, and the editor keeps five lines of code under
+  them.** Decided 2026-11-26: the fold by the owner (*tenemos que hacer algo para que las
+  pistas y la salida/errores al ejecutar el programa se puedan plegar y no tapen el
+  código o lo dejen sin espacio*), the five lines by the designer, reviewing sprint 61.
+  A hint is read to change the code, and an answer names a line of it: the code is what
+  the child works on, and what stands under it never takes it away. The hints' box and
+  the answer (what a run came to, with what the code printed) each have a button at
+  their top right corner that folds them to one line and unfolds them: the hints' line
+  says how many are taken, *Hints: 2 of 3*, and the answer's is its first words, cut
+  with an ellipsis; a click on a folded line unfolds it too. The fold is the child's:
+  nothing folds by itself. What is new unfolds: a hint taken unfolds the hints, and the
+  answer of a run unfolds the answer; a level opens with both unfolded, and the fold
+  lasts as long as the level's screen. The answer of a Python that could not start, with
+  its button to load the page again, does not fold. Unfolded, on the level's screen with
+  its two panes side by side (a page wider than 800 px), the editor is never lower than
+  five lines of code with its frame, 7.6 times the code's letter times `--fit` (D359):
+  122 px with the letter at 16 px. The hints' box is what gives way. It takes the height
+  left between the buttons and the answer, never under four times the code's letter,
+  and scrolls inside itself; it stands on the newest hint, whose first line is in sight
+  when the hint is taken and when a level opens with its hints kept, and an edge past
+  which more hints lie fades, as the lists' rows do (D346). The answer unfolded is whole,
+  with the line's number at its end. Where the window is too low even for that, the
+  editor's column scrolls inside the level, and the page stays the window's height
+  (D38). The line an answer marks in the code is brought into the editor's sight when
+  the answer shows and whenever the editor's height changes while the line is marked,
+  a fold among the changes. A page 800 px wide or less keeps its own layout, which
+  scrolls, and its boxes fold as well. Rules out an editor that gives all its height to
+  what stands under it, which three hints and an answer take whole at 1024 by 700; a
+  box that folds by itself, which hides what the child was reading; hints folded one by
+  one; an answer that scrolls, which hides the line it names; and a page taller than
+  the window.
 - **D364 — The game asks every question in its own dialog, never in the browser's.**
   Decided 2026-11-26 by the designer, reviewing sprint 61, as D351 does for *Original*.
   Deleting a saved game and leaving a level by the map while its program runs ask
@@ -5966,3 +5972,10 @@ one overturns stays, marked as superseded.
   and stops the page while it waits, the running program with it. No code of the game
   calls `window.confirm`, `window.alert` or `window.prompt`, which a test of the project
   holds. Rules out a question whose buttons the game does not write.
+- **D365 — The game's foot says the version and the build, and holds no link.** Decided
+  2026-11-26 by the owner (*el enlace de la familia Kidux del pie se puede quitar ya que
+  está arriba el de Kidux os*). The header's link to Kidux OS is on every screen, in
+  sight without scrolling (D339), and it says the family (D338): a second link to the
+  same address under every screen adds nothing. The foot (`chrome`, `main.ts`) is the
+  version and the build, in one line. `e2e/about.spec.ts` holds that the foot of a
+  screen of each kind has no link. Rules out two links to one address on every screen.

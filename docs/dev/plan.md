@@ -149,7 +149,11 @@ content/
                                           has and the passwords it gives (`words`, D80),
                                           the speaker of its intro (`friend` for the friend,
                                           D77), its kind: practice, fix, improve or
-                                          challenge (D56)
+                                          challenge (D56); the kinds it asks the child to
+                                          find (`to_find`), a door, a hole or a bed that is
+                                          no variable (`"variable": false`, D344); what its
+                                          figures say at a win and when a thing first lights
+                                          (`told`, `won` and `revealed`, D264, D355)
     text.en.json  text.es.json            title, goals, hints, starting code's
                                           comments and strings, intro, outro and what
                                           was learned (D45, D62)
@@ -158,11 +162,14 @@ content/
 ```
 
 Goals are declared (`reach`, `collect`, `open`, `say`, `give`, `cast`, `no_bumps`,
-`not_seen_by`, `ticks_under`, `lines_under`, `numbers_under`, `uses`; and for chapter 4
+`not_seen_by`, `ticks_under`, `lines_under`, `numbers_under`, `uses`, `move_by_variable`,
+`own_name` (D343, D345); and for chapter 4
 `say` with `count_of`, `cast` with `from`, `untied` (with `ids` for the brooms it counts), `no_error`, `through_in_order` and
 `before`, D183 to D189) and a level may add `goals.py` for one of its own. The lesson's
-Markdown, with no HTML in it, may hold one fenced block marked `python try`,
-its example; the level after it starts with its own program (D33, D63). Within a chapter, every item is
+Markdown, with no HTML in it, may hold one block to try a page, fenced `python try`,
+`python try change`, `python try rename` or `python try rename error`, the test the page
+asks before it is left (D142, D354); the last page's is the lesson's example, and the
+level after it starts with its own program (D33, D63). Within a chapter, every item is
 numbered by kind, stories too, and says its chapter: *Chapter 1 · Story 1*, *Chapter 1 · Practice 1*,
 *Fix 1*, *Improve 1* (D56, D78). A text names the friend as `{friend}`, with the friend's gendered words
 in double braces (D77). `pack-world.mjs` writes the chapters, in the order of their
@@ -197,9 +204,11 @@ shows the part the camera follows (D69).
 
 - `ProgressStore` (TypeScript interface, D31): `load()`, `save(progress)`,
   with `progress` = `{version, language, wizard: {name, gender, look},
-  settings: {speed, fontSize, split}, lessons: {id: {read}}, levels: {id:
-  {won, stars, code, hints, tried}}, current}`: `wizard` what the child
-  made (D36), `current` the item last opened, where *Continue game* goes. The
+  settings: {speed, fontSize, split}, lessons: {id: {read, tested}}, levels: {id:
+  {won, stars, code, hints, tried}}, current, program}`: `wizard` what the child
+  made (D36), `current` the item last opened, where *Continue game* goes while the
+  course has it open (D356), `lessons[id].tested` the pages whose test is done (D354),
+  `program` the one kept program, `{level, code}` (D351). The
   game keeps no list of the start cards seen: a level's card opens every
   time the level opens (D248). Each saved game is
   one such document (D70): `GamesStore` keeps them in `localStorage` under
@@ -772,7 +781,19 @@ What the owner's UAT of 2026-10-22 taught, which every chapter follows
     workflow that runs no browser test and stores nothing (D325); the walk-on
     pupils in colours of their own (D326); a story step whose camera goes
     with a figure (D327); a tip's picture that shows what a child sees there
-    (D331); and a thing set in the floor under every figure (D332).
+    (D331); and a thing set in the floor under every figure (D332); and, in
+    `sprint-61.md`, chapter 2 taught one idea a lesson on 24 stops (D342), the first
+    variable on a number used three times and a practice that may come with a line
+    written (D343), what is to find no variable until the program finds it and keeps
+    it (D344), a found thing kept in a variable the child names (D345), the two lists
+    over the editor (D346), the notebook's two parts (D347), the completion after a
+    dot from the variables the lists know (D348), the game's answers to a first
+    variable's mistakes (D349), *variable* and *método* as the game's words (D350),
+    the kept program and *Original code* (D351), the map from a level as a window
+    over it (D352), no screen left by mistake (D353), a lesson's page passed by trying
+    it (D354), a figure's words when a thing lights (D355), a saved game on a course
+    that has grown (D356), the tips of the comments and of the two lists (D357), and a
+    tip's picture as a photograph pinned up (D358).
 5.8 Challenges: ten levels with no lesson, each combining more, with bonus
     goals, extended over time.
 5.9 Each level with `solution.py`, three or more `wrong/`, hints, both

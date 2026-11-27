@@ -49,7 +49,10 @@ historias vienen lecciones y niveles. Cada historia, lección y nivel va
 numerado dentro de su capítulo: *Capítulo 1 · Historia 1*, *Capítulo 1 ·
 Lección 1*, y así. Una lección son
 unas pocas páginas cortas, que enseña un personaje de la historia, de pie
-junto al texto. Cada página explica una idea, con un ejemplo. En la última página, *Probar* abre el
+junto al texto. Cada página explica una idea, con un ejemplo. Una página
+con código te deja ejecutarlo, y la primera vez que lees la lección sigue
+cuando ya has probado lo que pide; si no, la página dice lo que falta. En
+la última página, *Probar* abre el
 nivel que viene después, donde escribes tu propio programa. La
 mayoría de los niveles son prácticas, una pantalla que resolver. Un
 *arreglo* te da un programa que no funciona, para repararlo. Una *mejora*
@@ -63,7 +66,16 @@ botones *+* y *−*, o la rueda del ratón, la acercan y la alejan, y puedes
 arrastrarla para mirar alrededor; *Buscar a mi maga*, o *a mi mago*, la devuelve a tu
 lado.
 
-En un nivel, escribes Python en el editor, a la derecha. *Ejecutar* empieza
+En un nivel, escribes Python en el editor, a la derecha. Desde la
+biblioteca, encima del editor hay dos listas. *Tienes* enseña las
+variables que tiene tu programa: las que trae el nivel y las que escribes
+tú. *Por encontrar* enseña las cosas que tienes que encontrar y guardar en
+una variable antes de poder usarlas. Una ficha de cualquiera de las dos
+abre el cuaderno en su página. Tu programa se guarda mientras lo
+escribes: si sales del nivel y vuelves, sigue ahí. Debajo del editor, los
+botones están en dos filas: *Ejecutar*, *Reiniciar*, *Parar* y *Código
+original*, y luego *Cuaderno* y *Pista*. *Código original* vuelve a poner
+el programa del propio nivel, cuando dices que sí. *Ejecutar* empieza
 el nivel otra vez y hace que tu personaje haga lo que dice tu código, a la
 izquierda. Una marca redonda que late en el suelo enseña a dónde debe
 llegar tu personaje. Los objetivos, en la esquina, se marcan solos cuando
@@ -76,7 +88,8 @@ palabra o signo de Python, su pestaña *Python* los enseña, cada uno como
 se escribe, con lo que hace y un ejemplo para leer. Cuando ya sabes un
 hechizo o una contraseña, su pestaña *Hechizos y palabras* los enseña
 también, con lo que hace cada uno. *Lección* vuelve a leer la lección del nivel, y *Mapa* abre el mapa
-encima del nivel.
+en una ventana encima del nivel. *✕ Volver al nivel*, un clic fuera de
+la ventana o la tecla Escape la cierran.
 
 Gana el nivel, y el juego te da hasta tres estrellas, y te dice por qué.
 Te quedas con las tres si no necesitas pistas, no chocas nunca contra una

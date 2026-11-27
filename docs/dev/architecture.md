@@ -617,7 +617,9 @@ one overturns stays, marked as superseded.
   teach, so the course's order cannot be broken by accident; the
   suggestions of D22 come from the same list, and the grimoire and the
   editor's completion will show it. A variable named like a thing's id is
-  taken for that thing, which errs on the side of checking.
+  taken for that thing, which errs on the side of checking, and a variable the
+  program keeps a found thing in, a loop's over a list of them or an element taken
+  from one, is taken for a thing of the kind it was found by (D344).
 - **D24 — A door is opened from next to it.** Decided 2026-10-21, piece
   2.2. `door.open()` works only with the wizard on a tile beside the door;
   from further away it is `blocked` with the reason `far`, and so is
@@ -2291,7 +2293,8 @@ one overturns stays, marked as superseded.
   world of the first level after the lesson, in that level's first way, at its
   start, and writes under the editor what the program printed, how far the
   wizard walked if it moved, or what stopped it in the child's words; no scene
-  is shown, and a program that casts the map's spell opens the plan's window.
+  is shown, and a program that casts the map's spell opens the plan's window. The
+  fence says the page's test (D354).
   The child edits the block and runs it again, always from the start. The
   lesson's last page keeps the button that leads to the level, which never
   starts with the block (D63). Rules out a lesson that explains an expression
@@ -5591,7 +5594,12 @@ one overturns stays, marked as superseded.
   with no line written. In the library's story Wenna walks to her door and leaves it
   closed: the child opens it in `wennas-door`. A thing's attributes (`wizard.items`,
   `door.locked`) are chapter 3's, taught with `position` by `where-i-am`; no level of
-  chapter 2 has them in its `api`. Chapter 2's order is `docs/dev/course.md`'s. Rules out
+  chapter 2 has them in its `api`, and the level after `where-i-am`, `the-dark-tunnel`,
+  has them in its own, as every level after a lesson has what the lesson explains (D23).
+  The corridor behind Wenna's door, row 15, is seen over the wall of her door: the
+  fallen book's start and its book, and the lost book's start, stand there, and Wenna
+  beside her door stands over the reading room's table; the art's check of what a
+  cut-out covers names those cells. Chapter 2's order is `docs/dev/course.md`'s. Rules out
   a lesson of seven pages, and a level that asks for three new things at once.
 - **D343 — The first variable is practised on a number used three times, and a practice
   may come with a line written.** Decided 2026-11-25 by the owner (*Sí. Es un objetivo
@@ -5610,14 +5618,15 @@ one overturns stays, marked as superseded.
   Decided 2026-11-25 by the owner (*Me parece bien que lo que se supone que el niño tiene
   que encontrar, requiera que se encuentre antes de poder usarlo*; of chapters 3 to 5,
   *Hay que hacerlo ya, tenemos que dar algo completo*). A program starts with `wizard`,
-  every actor that is not someone else's familiar, every thing of kind `door`, `hole` or
-  `bed` by its id, the `Familiar` class and the living familiar (`World.namespace()`).
-  No thing of another kind is ever a variable (a key, a book, a wand, a potion, a map, a
-  broom, a thread, a ring, a trail, a plate): the program reaches one with
+  every actor that is not someone else's familiar, every thing of kind `door`, `hole`,
+  `bed` or `plate` by its id (`VARIABLE_KINDS`), a plate being one the level names to the
+  child by its id (`moon.position`, D299), the `Familiar` class and the living familiar
+  (`World.namespace()`). No thing of another kind is ever a variable (a key, a book, a
+  wand, a potion, a map, a broom, a thread, a ring, a trail): the program reaches one with
   `wizard.find_nearest`, `find_all` or `find_item` and keeps what comes back. A level
   says what it asks the child to find, `"to_find": ["book"]`: kinds of `THING_KINDS`,
   none twice, each with a thing in the level, what the wizard carries counted; a door,
-  a hole or a bed whose kind is in `to_find` is no variable either (the three doors of
+  a hole, a bed or a plate whose kind is in `to_find` is no variable either (the three doors of
   `the-three-doors`), and one that says `"variable": false` is in the world, drawn, with
   no variable, no chip and no page of the notebook (Wenna's door where the level is not
   about it). `Level.ids()`, which the explanations suggest from, and the notebook's
@@ -5636,8 +5645,14 @@ one overturns stays, marked as superseded.
   searched for and the variable that keeps the find are never taken for one: `tesoro`,
   `libro_de_eldra`, `llave_de_eldra`, `mi_llave`, `escoba` in Spanish; `treasure`,
   `eldras_book`, `eldras_key`, `my_key`, `my_broom`, `each_broom`, `next_door` in
-  English, where the kind's word would be the natural name. A test of the course holds
-  it. `the-lost-book` asks for a name of the child's own as a required goal: the goal
+  English, where the kind's word would be the natural name; the found key of
+  `the-hidden-key` is `my_key`, and a loop's piece of thread in `the-forgotten-room`
+  `piece`. A test of the course holds it. The examples of the API's table, which the
+  notebook and the game's answers show, give the wizard a thing by such a name
+  (`wizard.give(eldras_book)`, `wizard.cast("fendra", other_book)`); the notebook writes
+  in its place the child's own variable that keeps a found thing, or `tu_variable` /
+  `your_variable` while the code keeps none (D347), and an answer that shows such an
+  example, the child's own variable where the code keeps one. `the-lost-book` asks for a name of the child's own as a required goal: the goal
   kind `own_name`, `{"kind": "own_name", "find": "book", "not": ["book", "tesoro",
   "treasure"]}`, met when the program assigns a find of that kind to a single name and
   no such name is in `not`. The names of the functions, classes, methods and arguments
@@ -5667,9 +5682,17 @@ one overturns stays, marked as superseded.
   its name alone. So a chip says which variables the program has, never what one holds
   at a moment of a run. A box with more chips than fit scrolls sideways and moves by
   itself to a chip just added. A chip of *Tienes* opens the notebook at its object's
-  page; one of *Por encontrar*, at the part of what is to find (D347). Chapter 1 and a
-  lesson's code box have no lists. Rules out a list that follows the run, a glow at a
-  run, and squares that take the editor's room.
+  page; one of *Por encontrar*, at the part of what is to find (D347). A chip's picture
+  is the art the level has, cropped to what is painted in it (`ui/pictures.ts`): the
+  cut-out of a thing of the kind in the level, or the kind's own sprite, or a cut-out of
+  the scene named after the kind; a kind with none shows its name alone; someone's chip,
+  the wizard's first, shows their face. The chips take the owner's design (*las cajas
+  […] en el diseño eran más chulas, creo que más cuadradas*, 2026-11-26): rectangles with
+  nearly square corners, a marked border and a bold letter, a value in its own grey band.
+  The lists start
+  at `LISTS_FROM`, `level:the-reading-room`, by the course's order (`showsLists`):
+  chapter 1 and a lesson's code box have no lists. Rules out a list that follows the
+  run, a glow at a run, and squares that take the editor's room.
 - **D347 — The notebook says what the program has and what is to find, and says
   *Objetos* and *Métodos*.** Decided 2026-11-25 by the owner (*en el cuaderno podemos
   distinguir entre "cosas disponibles" y "cosas que tienes que encontrar antes de
@@ -5749,8 +5772,9 @@ one overturns stays, marked as superseded.
   code before its word: *Ejecutar*, *Reiniciar*, *Parar*, *Código original*; then
   *Cuaderno*, *Pista* and the speed. *Código original* puts the starting code back and
   drops the kept program: it is disabled while the editor holds the starting code, asks
-  first in the game's own dialog (*¿Borrar lo que has escrito y volver al código
-  original?*, *Sí, borrar* / *No, seguir*, the focus on *No*), and stops a run and
+  first in the game's own dialog (`ui/ask.ts`, never the browser's: *¿Borrar lo que has
+  escrito y volver al código original?*, *Sí, borrar* / *No, seguir*, the focus on *No*,
+  Escape *No*), and stops a run and
   resets the scene as *Reiniciar* does; *Reiniciar* leaves the code. No text of the game
   names the kept program. It supersedes D131. Rules out a program kept for every level,
   and a child who leaves a level by mistake and finds an empty editor.
@@ -5786,9 +5810,11 @@ one overturns stays, marked as superseded.
   first two. The game never checks that a change is the one the page asks for. The
   tests done are kept with the saved game (`lessons[id].tested`), and a lesson is read
   when its last page asks no test or its test is done. A lesson read once asks nothing,
-  read again from the map or from a level, nor do the lessons a saved game had read;
-  the tester's mode passes every page. A lesson's run explains an unknown name as a
-  level's does. Rules out a disabled button with no word of why, and a way round the
+  read again from the map or from a level, nor do the lessons a saved game had read, nor
+  a lesson opened from a level (`#lesson/<id>/from/<level>`), which is read again; the
+  tester's mode passes every page. Whether a test is done is `ui/lessontest.ts`'s to say,
+  the names of a code read outside its comments and strings. A lesson's run explains an
+  unknown name as a level's does, in its level and with none (`run.py`). Rules out a disabled button with no word of why, and a way round the
   test in the published game (D335).
 - **D355 — A level may give a figure words for the moment a thing lights.** Decided
   2026-11-25 by the owner's *OK* to the friend as the speaker. A level's `told` (D264)
@@ -5820,7 +5846,10 @@ one overturns stays, marked as superseded.
   among a child's tips when `the-reading-room`, the first level with the lists, is open
   or done in the game being played, and is not among them otherwise. A tip told from a
   stop comes after every tip told always, so that leaving it out moves no other tip's
-  number in the order the browser keeps; a test holds it. Their pictures are D221's and
+  number in the order the browser keeps, and a number kept past the game's tips is
+  followed by the first; a test holds it. The waiting view reads the game's tips each time
+  one is due (`tipsOf`), so that a wait begun before the course is known tells `lists` once
+  it is. Their pictures are D221's and
   D331's: the editor of `the-dark-note` with its comment, and the two boxes over the
   editor of `the-lost-book`, with no part of the scene. Rules out a tip about something
   the child's game has not shown yet.
@@ -5834,7 +5863,8 @@ one overturns stays, marked as superseded.
   game draws at the middle of its top edge; the tip's words stay straight under it, and
   the picture takes no click. It is the view's alone: the files of `content/tips/` are the
   captures as they are. The picture is still the element loaded first (D246) and as large
-  as the window lets with the frame, the turn and the pin counted (D239); a picture that
+  as the window lets with the frame, the turn and the pin counted (D239), measured with
+  the tallest tip, the lists' (`--tip-rest`); a picture that
   fails shows the words alone, with no frame and no pin. Rules out a capture shown flat
   and bare, as the game's own screen looks, and a picture painted in the place of the
   capture, which would not show the button as the child will find it.

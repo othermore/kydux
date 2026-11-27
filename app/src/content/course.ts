@@ -194,7 +194,7 @@ export function stopState(course: Course, item: string, progress: Progress): Sto
 
 /** Where the game goes on (D356): the item last opened when it is a stop of the course
  * that is not locked, and never the opening (D78); else the first stop of the course not
- * done, as for an item the course no longer has; the course's start when every stop is
+ * done, as for an item the course does not have; the course's start when every stop is
  * done. */
 export function goOnAt(course: Course, progress: Progress): string {
   const all = items(course);

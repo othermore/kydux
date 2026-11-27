@@ -47,7 +47,10 @@ the picture. *Next*, or the Enter key, goes on. Between the stories come
 lessons and levels. Every story, lesson and level is numbered in its
 chapter: *Chapter 1 · Story 1*, *Chapter 1 · Lesson 1*, and so on. A lesson is a few short pages, taught
 by a character of the story, who stands beside the words. Each page
-explains one idea, with an example. On the last page, *Try it* opens the level that comes next, where
+explains one idea, with an example. A page with code lets you run it, and
+the first time you read the lesson it goes on once you have tried what it
+asks; if you have not, the page says what is missing. On the last page,
+*Try it* opens the level that comes next, where
 you write your own program. Most levels are practices, a screen to
 solve. A *fix* level gives you a program that does not work, to repair. An
 *improve* level gives you one that works, to make better.
@@ -59,7 +62,15 @@ The scene follows your wizard as it walks. The *+* and *−* buttons, or the
 mouse wheel, zoom it, and you can drag it to look around; *Find my wizard*
 brings it back.
 
-In a level, you write Python in the editor, on the right. *Run* starts the
+In a level, you write Python in the editor, on the right. From the library
+on, two lists sit over the editor. *You have* shows the variables your
+program has: the ones the level gives, and the ones you write. *To find*
+shows the things you must find and keep in a variable before you can use
+them. A chip of either list opens the notebook at its page. Your program
+is kept as you write it: leave the level and come back, and it is still
+there. Under the editor, the buttons stand in two rows: *Run*, *Restart*,
+*Stop* and *Original code*, then *Notebook* and *Hint*. *Original code*
+puts the level's own program back, once you say yes. *Run* starts the
 level again and makes the wizard do what your code says, on the left. A
 round mark that beats on the ground shows where your wizard must get to.
 The goals, in the corner, tick themselves off as you reach them. If a run goes wrong, the game says
@@ -70,7 +81,9 @@ have learned some of Python's own words and signs, its tab *Python*
 lists them, each as it is typed, with what it does and an example to
 read. Once you know a spell or a password, its tab *Spells and words*
 lists them too, with what each one does. *Lesson* reads
-the level's lesson again, and *Map* opens the map over the level.
+the level's lesson again, and *Map* opens the map in a window over the
+level. *✕ Back to the level*, a click outside the window or the Escape key
+closes it.
 
 Win the level, and the game gives you up to three stars, and says why.
 You keep all three if you need no hint, never bump into a wall, and meet

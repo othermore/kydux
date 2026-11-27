@@ -615,7 +615,7 @@ async function showMap(content: HTMLElement): Promise<void> {
   const [parts, { mapScreen }] = await Promise.all([mapParts(), import('./ui/map')]);
   if (shownRoute !== 'map') return;
   // Opened by itself, the map opens at the item last opened, marked (D122), or where the
-  // game goes on when the course no longer has that item (D356).
+  // game goes on when the course does not have that item (D356).
   const { current } = parts.progress;
   const here = current && !items(parts.course).includes(current) ? goOnAt(parts.course, parts.progress) : current;
   show(content, mapScreen({ ...parts, here: here ?? undefined }));

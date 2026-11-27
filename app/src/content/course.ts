@@ -167,17 +167,34 @@ export function conceptsAt(course: Course, levelId: string): string[] {
   return course.concepts?.[levelId] ?? [];
 }
 
-/** A stop's state on the map (D34): done; open, the first of the course or the one
- * after a done item; locked otherwise. */
+/** A stop's state on the map (D34): done; open, the first of the course, the one after
+ * a done item, or one with a done item after it, so that a stop the course has put in
+ * before the child's place is open and nothing reached closes (D356); locked otherwise. */
 export function stopState(course: Course, item: string, progress: Progress): StopState {
   if (isDone(item, progress, course)) return 'done';
   const before = previous(course, item);
   if (before === null || isDone(before, progress, course)) return 'open';
+  const all = items(course);
+  if (all.slice(all.indexOf(item) + 1).some((later) => isDone(later, progress, course))) return 'open';
   return 'locked';
 }
 
+/** Where the game goes on (D356): the item last opened when it is a stop of the course
+ * that is not locked, and never the opening (D78); else the first stop of the course not
+ * done, as for an item the course no longer has; the course's start when every stop is
+ * done. */
+export function goOnAt(course: Course, progress: Progress): string {
+  const all = items(course);
+  const current = progress.current;
+  if (current && current !== course.opening && all.includes(current) && stopState(course, current, progress) !== 'locked') {
+    return current;
+  }
+  return all.find((item) => item !== course.opening && !isDone(item, progress, course)) ?? courseStart(course);
+}
+
 /** How a chapter stands on the map (D200): finished, every stop done; locked, its first
- * stop locked; the current one, the first neither finished nor locked, or the last not
+ * stop locked; the current one, the last neither finished nor locked, the chapter the
+ * child has reached when the course has put stops in before it (D356), or the last not
  * locked when every reached one is finished. */
 export interface ChapterStanding {
   id: string;
@@ -205,7 +222,7 @@ export function chapterStandings(course: Course, progress: Progress, maxStars: n
     };
   });
   const current =
-    standings.find((standing) => !standing.finished && !standing.locked) ??
+    standings.filter((standing) => !standing.finished && !standing.locked).at(-1) ??
     standings.filter((standing) => !standing.locked).at(-1);
   if (current) current.current = true;
   return standings;

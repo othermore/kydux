@@ -301,7 +301,9 @@ wizard.flying                # whether it flies on its broom, from drevo to the 
 len(things)                  # how many things a list holds, a builtin the sandbox lets
                              # through (D184)
 
-thing.kind, thing.name       # a key, a book, a wand, a potion, a door, a bed: by its id
+thing.kind, thing.name       # a door, a hole, a bed: a variable by its id; a key, a book,
+                             # a broom, any other thing: found first and kept in a
+                             # variable of the child's (D344)
 thing.position               # where it lies; None once carried
 thing.distance_to(other)     # the steps to the wizard, a thing or an actor (D86); a
                              # carried thing is where the wizard is
@@ -1283,7 +1285,8 @@ one overturns stays, marked as superseded.
   list's first game the first time the list is read, so the document keeps
   its version: its shape is the same. The online game (plan, phase 7) keeps
   the same list on the server it runs from.
-- **D71 — The map opens over the level, and a lesson from it.** Decided
+- **D71 — The map opens over the level, and a lesson from it** (the map from a level
+  is a window over it, D352). Decided
   2026-10-22 by the owner's UAT (sprint-11.md), built the same day. From a
   level, *Map* opens the map over it (the run and the editor kept), the
   stop being played marked *You are here*; *Back to the level* or Escape
@@ -2152,7 +2155,8 @@ one overturns stays, marked as superseded.
   figure that snaps into the bed in a blink, one that slides to the
   pillow faster than it walks, one that crosses the bed to get there, and
   a child who does not know where to stand.
-- **D131 — A level opened again starts from its starting code.** Decided
+- **D131 — A level opened again starts from its starting code** (superseded by D351:
+  a saved game keeps the program being written). Decided
   2026-11-01 by the owner. Opening a level from the map, from the course
   or from its lesson shows the level's starting code, as the first time;
   the program the child typed is kept only while the level's screen is
@@ -4237,7 +4241,8 @@ one overturns stays, marked as superseded.
   Bimo's at a win, are said one after another in their order, the tick held for all of
   them (`Speech.sayAfter`). They are built on `Speech`, as the race's verdict
   is (D234). The words said at a win are named in the level's `level.json`, `"told": {"won":
-  [["orla", "won"], ["bimo", "bimo"]]}`, and said in that order after the goals. Someone
+  [["orla", "won"], ["bimo", "bimo"]]}`, and said in that order after the goals; a level
+  may also name words for the moment a thing lights, `"revealed"` (D355). Someone
   painted into a scene speaks from a spot the scene names (`scene.json`, `"voices": {"bimo":
   [9, 3]}`); a story's `who` with no actor of that id speaks from the same spot. A warning
   (D261) is told the same way, by Orla. Long words are said in pieces (D274); in the tick
@@ -5571,3 +5576,265 @@ one overturns stays, marked as superseded.
   the painting of each of the two has come, and Python on its way at once from *Start
   playing* and at a level opened by its address. Rules out a tip over the start screen
   or the welcome page, and a file of a later screen fetched ahead of theirs.
+- **D342 — Chapter 2 teaches one idea a lesson, on 24 stops.** Decided 2026-11-25 by the
+  owner, after watching children play (*he notado que el primer nivel de la biblioteca se
+  les hace un poco difícil. Tienen que hacer un find_nearest pero tienen que asignarlo a
+  una variable, y eso les confunde, y luego tienen que usar esa variable para hacer el
+  reveal*; *habría también que partir la lección de lo que las cosas saben de si mismas,
+  porque es muy larga, y pensar bien el orden de lo que explicamos y qué nivel o niveles
+  metemos en medio*). Between the library's story and `the-lost-book` come three lessons,
+  each with a short level of its own on the library's scene: `a-name-for-a-value` (`print`,
+  a variable, arithmetic with variables) with `the-reading-room`; `each-thing-its-methods`
+  (a method is its object's: `door.open()`) with `wennas-door`; `finding-things`
+  (`find_nearest` gives a thing back, which is kept in a variable, and `reveal` is that
+  thing's method) with `the-fallen-book`. `the-lost-book` then asks for the three together
+  with no line written. In the library's story Wenna walks to her door and leaves it
+  closed: the child opens it in `wennas-door`. A thing's attributes (`wizard.items`,
+  `door.locked`) are chapter 3's, taught with `position` by `where-i-am`; no level of
+  chapter 2 has them in its `api`. Chapter 2's order is `docs/dev/course.md`'s. Rules out
+  a lesson of seven pages, and a level that asks for three new things at once.
+- **D343 — The first variable is practised on a number used three times, and a practice
+  may come with a line written.** Decided 2026-11-25 by the owner (*Sí. Es un objetivo
+  obligatorio*; *No hay problema, puede haber una línea ya escrita (y puede que más
+  adelante también lo aceptemos, no es un problema)*). `the-reading-room` is walked by one
+  way, two cells left, two up, two right, and its required goal is a move whose argument
+  is a variable: the goal kind `move_by_variable`, met when some call of `wizard.move_up`,
+  `move_down`, `move_left` or `move_right` has as its first argument a name the program
+  assigns a whole number written by hand; one number written in the whole program is its
+  bonus (`numbers_under`). It is read on the code's tree, as `uses` is. The starting code
+  of `the-fallen-book` holds the line that finds the book and keeps it, in the page's
+  language (`tesoro = wizard.find_nearest("book")`, `treasure = …`), so that its one new
+  thing is the method called on the variable. Rules out a first variable that holds a
+  thing of the world, and a starting code that is only comments by rule.
+- **D344 — What is to be found is no variable until the program finds it and keeps it.**
+  Decided 2026-11-25 by the owner (*Me parece bien que lo que se supone que el niño tiene
+  que encontrar, requiera que se encuentre antes de poder usarlo*; of chapters 3 to 5,
+  *Hay que hacerlo ya, tenemos que dar algo completo*). A program starts with `wizard`,
+  every actor that is not someone else's familiar, every thing of kind `door`, `hole` or
+  `bed` by its id, the `Familiar` class and the living familiar (`World.namespace()`).
+  No thing of another kind is ever a variable (a key, a book, a wand, a potion, a map, a
+  broom, a thread, a ring, a trail, a plate): the program reaches one with
+  `wizard.find_nearest`, `find_all` or `find_item` and keeps what comes back. A level
+  says what it asks the child to find, `"to_find": ["book"]`: kinds of `THING_KINDS`,
+  none twice, each with a thing in the level, what the wizard carries counted; a door,
+  a hole or a bed whose kind is in `to_find` is no variable either (the three doors of
+  `the-three-doors`), and one that says `"variable": false` is in the world, drawn, with
+  no variable, no chip and no page of the notebook (Wenna's door where the level is not
+  about it). `Level.ids()`, which the explanations suggest from, and the notebook's
+  objects (`heldObjects`) follow the same rule. A thing's `repr` names its id only when
+  it is a variable: `print(treasure)` writes `<book at 3, 15>`. `to_find` is said by the
+  levels of chapter 2 from `the-fallen-book` on, `the-three-doors` and `the-dark-room`,
+  chapter 4's levels with brooms to find, and `the-forgotten-room`; `the-night-walk`,
+  whose key is picked up on the way, says none. Rules out `key.reveal()` with nothing
+  found, and a name put into the child's program that the child did not write (D123).
+- **D345 — A found thing is kept in a variable the child names, and no text names a
+  variable as its search word.** Decided 2026-11-25 by the owner (*Me parece bien
+  obligatorio*; *Eso solo ayuda en español, pero no en ingles […] en inglés hay que
+  encontrar otros nombres para que se vea el mismo efecto*). No text of the game, no
+  starting code and no solution assigns to a name that is a thing's kind (`book`, `key`,
+  `broom`, `door`, `thread`), in either language, so that the word in quotes that is
+  searched for and the variable that keeps the find are never taken for one: `tesoro`,
+  `libro_de_eldra`, `llave_de_eldra`, `mi_llave`, `escoba` in Spanish; `treasure`,
+  `eldras_book`, `eldras_key`, `my_key`, `my_broom`, `each_broom`, `next_door` in
+  English, where the kind's word would be the natural name. A test of the course holds
+  it. `the-lost-book` asks for a name of the child's own as a required goal: the goal
+  kind `own_name`, `{"kind": "own_name", "find": "book", "not": ["book", "tesoro",
+  "treasure"]}`, met when the program assigns a find of that kind to a single name and
+  no such name is in `not`. The names of the functions, classes, methods and arguments
+  of chapters 4 and 5 are English (*No tiene que ir todo en español, era sobre todo al
+  principio para que entendiese el concepto de variable*). Rules out
+  `book = wizard.find_nearest("book")` in anything the child reads.
+- **D346 — Two lists over the editor: what the program has, and what is to find.**
+  Decided 2026-11-25 by the owner (*justo arriba del código ver una lista […] con los
+  objetos que están disponibles en ese nivel*; *Dejalo en tienes y "por encontrar"*;
+  *Fichas alargadas en vez de cuadrados -> Sí, vamos a intentar no quitar mucho espacio
+  al editor […] Puede usarse una fuente más pequeñita*; *Sí, cualquier variable que se
+  declare en el programa. Pero quizás necesitamos un método de scroll*; *Un brillo al
+  ejecuta --> No hace falta*). From `the-reading-room` on, a level's editor has two boxes
+  over it, in one row the height of two lines of code: *Tienes* / *You have*, with a
+  solid border, and *Por encontrar* / *To find*, with a dashed one. *Tienes* holds long
+  chips, a picture and a name in a small letter: in green the variables the level gives
+  (`wizard`, each variable of D344 that has a page of the notebook, the actor a `give`
+  goal names, the living familiar), then in gold what the child's code declares, in the
+  order written: variables, functions with their arguments, classes. *Por encontrar*
+  holds the level's `to_find`, each as its search word in quotes with the kind's
+  picture; a word leaves it when the code keeps a find of that kind, and the box goes
+  with its title when it is empty. The lists are read from the code as written, never
+  from a run (`readVariables`, `app/src/editor/variables.ts`, on the editor's own
+  parser, half a second after the last key), by a closed table: a number or a string
+  written by hand and assigned once shows its value, a kept find shows its kind's
+  picture (a list's in brackets, a loop's variable and a copy the same), anything else
+  its name alone. So a chip says which variables the program has, never what one holds
+  at a moment of a run. A box with more chips than fit scrolls sideways and moves by
+  itself to a chip just added. A chip of *Tienes* opens the notebook at its object's
+  page; one of *Por encontrar*, at the part of what is to find (D347). Chapter 1 and a
+  lesson's code box have no lists. Rules out a list that follows the run, a glow at a
+  run, and squares that take the editor's room.
+- **D347 — The notebook says what the program has and what is to find, and says
+  *Objetos* and *Métodos*.** Decided 2026-11-25 by the owner (*en el cuaderno podemos
+  distinguir entre "cosas disponibles" y "cosas que tienes que encontrar antes de
+  usar"*). The notebook's first tab is *Objetos* / *Objects*, and the heading over an
+  object's methods *Métodos* / *Methods*. In a level with `to_find` the tab has two
+  parts: *Lo que tu programa ya tiene* and *Lo que hay que encontrar antes de usarlo*.
+  The second gives, for each kind to find, its search word and its plain name (*un
+  libro*), the line that finds it and keeps it (`tu_variable = wizard.find_nearest("book")`,
+  with `find_item` where the kind is only carried), which a click writes into the
+  program, and the kind's methods dimmed, written with `tu_variable`, which a click does
+  not write. Once the code keeps a find of the kind (D346), the kind's page is in the
+  first part under the child's variable, its methods written with it. The notebook's
+  examples name a variable of D345. Rules out a page that offers `book.reveal()` before
+  a book is found.
+- **D348 — The editor completes after a dot from the variables the lists know.** Decided
+  2026-11-25 by the owner (*mejor no completar antes del punto, creo que va a confundir
+  demasiado al niño. Y mejor no completar una cadena tampoco. Pero lo de usar las
+  variables que hemos detectado, sí.*). After a name and a dot the editor offers: for a
+  variable the level gives, its members; for a variable *Tienes* shows with a kind's
+  picture (a kept find, a loop's variable, one taken from a list or from another
+  variable), the methods and attributes the level teaches of that kind, with the
+  notebook's words; for the child's familiar by the variable it was born into, the
+  familiar's. Nothing is offered for a variable with a name only, for a list, nor for a
+  search word written as a name. Rules out the completion of a variable's name and of
+  anything inside quotes.
+- **D349 — The game answers the four mistakes of a first variable in the child's
+  words.** Decided 2026-11-25 by the owner, who corrected each text. (1) A find not
+  kept: a run of a level with `to_find` that does not win, with a statement that is only
+  a call of `find_nearest`, `find_all` or `find_item`, says the line and to put a
+  variable and `=` before it. (2) A method asked of the wizard that is another object's
+  (`wizard.reveal(…)`, `wizard.open()`): the answer says whose method it is and to write
+  before the dot the variable the thing is kept in, quoting the child's own when the
+  code keeps one; it never writes `door.open()` whole. (3) A search word used as a
+  variable (`book.reveal()`): *Aquí no hay nada que se llame `book`*, and either the
+  variable the find is kept in or that the word in quotes is for searching; no *¿Querías
+  decir…?* follows. (4) In a level with an `own_name` goal, the find kept under a
+  refused name with every other required goal met: the answer names it and asks for an
+  invented one in every line. (2) and (3) are kinds of `explain`, which reads the code's
+  tree for the kept variable. (1) and (4) are no errors: `advice.py` reads the code's
+  tree and the run's end, the run's result carries `advice`, a list of `{kind, params}`,
+  and the level's screen says the first under the outcome's words when the run did not
+  win. They are the game's voice under the editor, no character's. Rules out
+  *`wizard` no tiene ningún método llamado `reveal`* as the whole answer to a child who
+  does not yet know whose `reveal` is.
+- **D350 — *Variable* and *método* are the game's words.** Decided 2026-11-25 by the
+  owner (*Está bien decir lo de guardar bajo un nombre, o darle un nombre, pero solo las
+  primeras veces, y luego hay que usar el término variable*; of *método*, *Hay que
+  repasarlo ya y hacer un sprint completo*; *Podemos decir acción y poner entre
+  paréntesis un método y decir que lo explicaremos luego*). *Darle un nombre a un valor*
+  is said in chapter 2's lesson `a-name-for-a-value` alone, where the idea is first met;
+  from the level after it every text says *variable*, of what the level gives (`wizard`,
+  `door`) too. A function's, a class's, a method's and the familiar's own name stay
+  *nombre*. The game's answers, the notebook and every text from chapter 1's lesson
+  `objects-and-actions` on say *método* / *method*; *acción* is kept in the sentence of
+  `what-a-program-is` that presents the first instruction (*una acción (un método;
+  luego te explico esa palabra)*) and in its recall in chapter 1's closing story. It is
+  D27's pair reached the way the project's rule says: the easy word beside the proper
+  one for the first uses, then the proper one. The ids and file names of lessons and
+  levels keep their words. Rules out *acción* for a method after its lesson, and
+  *guardar bajo un nombre* where the course has said *variable*.
+- **D351 — A saved game keeps the program being written, one, and *Código original*
+  asks before it erases.** Decided 2026-11-25 by the owner (*estaría super bien que
+  cuando un niño deja una partida a medias […] se quede guardado lo que tiene escrito*;
+  *Creo que lo mejor es que solo guardemos un nivel […] un único "notepad" que sabe qué
+  nivel es y el código que tiene […] Y si se presiona el reset del código, se borra el
+  notepad y se carga el código por defecto del nivel (quizás hay que pedir confirmación
+  al hacer reset)*; *Vamos a poner Ejecutar, reiniciar y parar, y código original en
+  una fila, y cuaderno y pista en la otra. Quizás le podríamos poner iconos a los
+  botones y poner el texto más pequeño*). A saved game holds one kept program,
+  `program: {level, code}`: the code of the last level whose code the child changed. It
+  is kept by itself, a second after the last key and at once when the level's screen is
+  left or the page hidden; no button keeps it. A level opens with the kept program when
+  it is that level's, by whatever way it is opened, and with its starting code
+  otherwise. Code equal to the starting code is no program; another level's changed
+  code takes the former's place; winning drops nothing; a lesson's code boxes are not
+  kept. Under the editor the buttons are two rows, each with a small picture drawn in
+  code before its word: *Ejecutar*, *Reiniciar*, *Parar*, *Código original*; then
+  *Cuaderno*, *Pista* and the speed. *Código original* puts the starting code back and
+  drops the kept program: it is disabled while the editor holds the starting code, asks
+  first in the game's own dialog (*¿Borrar lo que has escrito y volver al código
+  original?*, *Sí, borrar* / *No, seguir*, the focus on *No*), and stops a run and
+  resets the scene as *Reiniciar* does; *Reiniciar* leaves the code. No text of the game
+  names the kept program. It supersedes D131. Rules out a program kept for every level,
+  and a child who leaves a level by mistake and finds an empty editor.
+- **D352 — From a level the map opens as a window over it.** Decided 2026-11-25 by the
+  owner (*Quizás el mapa puede verse como una ventana "modal" superpuesta encima y así
+  se ve que tienes detrás todavía tu nivel, y pinchando fuera o dándole a cerrar en la
+  esquina, vuelves?*). D71's map, opened from a level, is a window centred over it, at
+  most 1100 px wide and 90% of the page's height, the level darkened and seen all around
+  it down to a 900×600 window. It has the heading *Mapa* and, at its top right, *✕
+  Volver al nivel*; it closes by that button, by a click outside it and by Escape, onto
+  the level as it was: its code, its scene and a run going on. Going to another stop
+  from it is D71's, the program kept first (D351). The map opened from the start screen
+  is a whole screen. Rules out a map that looks like having left the level.
+- **D353 — No screen of the game is left by mistake.** Decided 2026-11-25 by the owner
+  (*a mi hijo le pasaba que a veces se salía del nivel […] hacía clic con dos dedos
+  (clic derecho) y en el menú desplegable le daba a "atrás"*; *Sin menú del navegador en
+  las pantallas del juego -> OK. Sin gesto de deslizar para ir atrás -> OK.*). The
+  browser's own menu (a right click, a two-finger click, a long press) does not open on
+  the game's screens; it opens inside the editor, a lesson's code box and every text
+  field, where copying and pasting live. A sideways swipe does not go back in the
+  browser's history (`overscroll-behavior-x: none`, and nothing of a level scrolls the
+  page sideways). The browser's back button works, and a level left by it shows its
+  program when opened again (D351). Rules out taking the back button from the child.
+- **D354 — A lesson's page with code is passed by trying it.** Decided 2026-11-25 by the
+  owner (*No dejemos que pase, tiene que hacerlo.*). On a first reading, the button that
+  leaves a page with code to try, pressed before the page's test is done, leaves the
+  page where it is and shows under the code box what is missing; the button is never
+  disabled and *Atrás* always works. The test is said on the block's fence, one block
+  to try a page: `python try`, the block run once; `python try change`, a code other
+  than the given one run; `python try rename`, a run with no error in which the given
+  variable's name is nowhere; `python try rename error`, that and a run that ends on
+  the answer to an unknown name, in either order. An error counts as a run for the
+  first two. The game never checks that a change is the one the page asks for. The
+  tests done are kept with the saved game (`lessons[id].tested`), and a lesson is read
+  when its last page asks no test or its test is done. A lesson read once asks nothing,
+  read again from the map or from a level, nor do the lessons a saved game had read;
+  the tester's mode passes every page. A lesson's run explains an unknown name as a
+  level's does. Rules out a disabled button with no word of why, and a way round the
+  test in the published game (D335).
+- **D355 — A level may give a figure words for the moment a thing lights.** Decided
+  2026-11-25 by the owner's *OK* to the friend as the speaker. A level's `told` (D264)
+  has a second moment beside `won`: `"told": {"revealed": [["mate", "revealed"]]}`, who
+  speaks and the key of the words in the level's `told` texts. The world tells them in
+  the tick of the first `reveal` of a run that lights a thing, once in the run; a
+  refused `reveal` tells nothing, and the playback waits for the words as for every
+  `told`. `the-hidden-key` says it: the friend sees where the key shines and says the
+  way in between the two bookcases. Rules out the hint that only shows when asked for,
+  for what a child standing there would say aloud.
+- **D356 — A saved game on a course that has grown keeps what it won, and nothing it had
+  open closes.** Decided 2026-11-25 by the owner's *OK* to the designer's proposal. A
+  stop is open when the stop before it is done, and also when some stop after it in the
+  course is done (`stopState`): stops added before the child's place show as not done
+  and open, and every stop reached stays as it was. The current chapter (D200) is the
+  last chapter neither finished nor locked. The game goes on at `progress.current` when
+  it names an open stop of the course, and at the first stop not done otherwise (a stop
+  the course no longer has, a locked one). A chapter's stars count its new levels in
+  what the chapter could hold, and a chapter finished before shows as not finished
+  until its new stops are done. No saved game is converted: the format's version stays,
+  and what a newer game adds (`program`, `lessons[id].tested`) is optional. Rules out a
+  child sent back to chapter 2 with chapters 3 and 4 closed.
+- **D357 — A tip for the comments, and a tip for the two lists once the child's game has
+  them.** Decided 2026-11-26 by the owner (*Habría que añadir algún consejo nuevo
+  explicando lo de TIENES y POR ENCONTRAR y, si no tenemos, uno recordando lo de los
+  comentarios*). The tips (D214) are twelve; the last two are `comments`, a line that
+  begins with `#` and what a level's comments are for, and `lists`, what *Tienes* and
+  *Por encontrar* show (D346). A tip may be told from a stop (`TIP_FROM`): `lists` is
+  among a child's tips when `the-reading-room`, the first level with the lists, is open
+  or done in the game being played, and is not among them otherwise. A tip told from a
+  stop comes after every tip told always, so that leaving it out moves no other tip's
+  number in the order the browser keeps; a test holds it. Their pictures are D221's and
+  D331's: the editor of `the-dark-note` with its comment, and the two boxes over the
+  editor of `the-lost-book`, with no part of the scene. Rules out a tip about something
+  the child's game has not shown yet.
+- **D358 — A tip's picture is shown as a photograph pinned up: framed, a little turned, a
+  pin over it.** Decided 2026-11-26 by the owner (*a veces los niños intentan hacer clic en
+  los botones de las capturas de los consejos*; *la imagen girada con un marco tipo foto y
+  una chincheta la veo bien*). A tip's picture (D221) is a capture of the game at nearly
+  its true size, which a child takes for the screen itself. The waiting view shows it
+  inside a plain light frame with a lifted shadow, turned two degrees, to the left for a
+  tip at an even place in the order and to the right for the next, with a drawing pin the
+  game draws at the middle of its top edge; the tip's words stay straight under it, and
+  the picture takes no click. It is the view's alone: the files of `content/tips/` are the
+  captures as they are. The picture is still the element loaded first (D246) and as large
+  as the window lets with the frame, the turn and the pin counted (D239); a picture that
+  fails shows the words alone, with no frame and no pin. Rules out a capture shown flat
+  and bare, as the game's own screen looks, and a picture painted in the place of the
+  capture, which would not show the button as the child will find it.

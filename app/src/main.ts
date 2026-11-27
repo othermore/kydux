@@ -7,6 +7,7 @@ import {
   chapterThemeOf,
   conceptsAt,
   courseStart,
+  goOnAt,
   items,
   itemHash,
   knownApi,
@@ -579,12 +580,10 @@ function failed(content: HTMLElement, error: unknown): void {
   );
 }
 
-/** Where Continue goes: the item last opened, else the first of the course. */
+/** Where Continue goes: the item last opened while the course has it open, else the
+ * first stop not done (D356); never the opening (D78). */
 function continueTarget(course: Course): string {
-  const current = progress.load().current;
-  // Continue never leads back to the opening (D78).
-  const item = current && current !== course.opening && items(course).includes(current) ? current : courseStart(course);
-  return itemHash(item);
+  return itemHash(goOnAt(course, progress.load()));
 }
 
 /** What the map shows: the course, the progress, and every item's and chapter's
@@ -614,8 +613,11 @@ async function showMap(content: HTMLElement): Promise<void> {
   document.title = t('map.title_page');
   const [parts, { mapScreen }] = await Promise.all([mapParts(), import('./ui/map')]);
   if (shownRoute !== 'map') return;
-  // Opened by itself, the map opens at the item last opened, marked (D122).
-  show(content, mapScreen({ ...parts, here: parts.progress.current ?? undefined }));
+  // Opened by itself, the map opens at the item last opened, marked (D122), or where the
+  // game goes on when the course no longer has that item (D356).
+  const { current } = parts.progress;
+  const here = current && !items(parts.course).includes(current) ? goOnAt(parts.course, parts.progress) : current;
+  show(content, mapScreen({ ...parts, here: here ?? undefined }));
 }
 
 /** The last lesson before a level in the course, which the level offers to read again. */
@@ -655,7 +657,7 @@ async function showStart(content: HTMLElement): Promise<void> {
       continueTo,
       wizard: progress.wizard(),
       opening: OPENING,
-      placeOf: (item) => (item ? places.get(item) : undefined) ?? places.get(courseStart(course)) ?? '',
+      placeOf: (kept) => places.get(goOnAt(course, kept)) ?? places.get(courseStart(course)) ?? '',
       onChanged: () => {
         shownRoute = null;
         route();

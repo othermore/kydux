@@ -34,8 +34,8 @@ export interface StartScreenParts {
   wizard: Wizard | null;
   /** The address of the game's opening story, where a new game begins (D61). */
   opening: string;
-  /** Where in the course a game is, in words, from its current item. */
-  placeOf: (item: string | null | undefined) => string;
+  /** Where in the course a game goes on, in words (D356). */
+  placeOf: (game: Progress) => string;
   /** The progress changed (cleared or imported): the screen is drawn again. */
   onChanged: () => void;
 }
@@ -98,7 +98,7 @@ function gameRows(saved: SavedGame[], parts: StartScreenParts, redraw: () => voi
       element('div', { className: 'game-about' }, [
         element('strong', { className: 'game-name' }, [name]),
         ...(sameName(name, wizard.name) ? [] : [element('span', { className: 'game-wizard' }, [wizard.name])]),
-        element('span', { className: 'game-place' }, [parts.placeOf(game.progress.current)]),
+        element('span', { className: 'game-place' }, [parts.placeOf(game.progress)]),
         element('span', { className: 'game-time' }, [
           t('start.played', { time: playTime(game.seconds), begun: day(game.created), last: day(game.played) }),
         ]),

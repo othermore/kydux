@@ -5,6 +5,7 @@ import {
   chapterStandings,
   chapterThemeOf,
   courseStart,
+  goOnAt,
   itemHash,
   knownApi,
   levelAfter,
@@ -158,5 +159,80 @@ describe('the theme a screen opens to (D192, D314)', () => {
   it("is the chapter's for the map and the start screen, whatever story the child read last", () => {
     expect(chapterThemeOf(course, 'story:d')).toBe('the-familiar');
     expect(chapterThemeOf(course, 'level:c')).toBe('the-familiar');
+  });
+});
+
+describe('a saved game on a course that has grown (D356)', () => {
+  // The course a game was made on, and the same course with two stops put in before the
+  // place the child had reached, as chapter 2 grows in sprint 61.
+  const before: Course = {
+    chapters: [
+      { id: '01', items: ['story:the-letter', 'lesson:a', 'level:b'] },
+      { id: '02', items: ['story:c', 'lesson:old', 'level:d', 'lesson:e', 'level:f'] },
+      { id: '03', items: ['lesson:g', 'level:h'] },
+      { id: '04', items: ['lesson:i', 'level:j', 'level:k'] },
+      { id: '05', items: ['story:l'] },
+    ],
+    opening: 'story:the-letter',
+  };
+  const grown: Course = {
+    ...before,
+    chapters: [
+      before.chapters[0]!,
+      { id: '02', items: ['story:c', 'lesson:new', 'level:new-level', 'level:d', 'lesson:e', 'level:f'] },
+      ...before.chapters.slice(2),
+    ],
+  };
+  /** A game in chapter 4, made on the course before: every stop up to lesson i done. */
+  const inChapter4 = () => ({
+    ...defaultProgress(),
+    wizard: { name: 'Ana', gender: 'girl' as const, look: 'teal' },
+    stories: { c: { read: true } },
+    lessons: { a: { read: true }, old: { read: true }, e: { read: true }, g: { read: true }, i: { read: true } },
+    levels: { b: { won: true, stars: 3 }, d: { won: true, stars: 2 }, f: { won: true, stars: 3 }, h: { won: true, stars: 1 } },
+    current: 'level:j',
+  });
+
+  it('shows the stops put in as not done and open, and closes nothing reached', () => {
+    const progress = inChapter4();
+    expect(stopState(grown, 'lesson:new', progress)).toBe('open');
+    expect(stopState(grown, 'level:new-level', progress)).toBe('open');
+    for (const item of ['story:c', 'level:d', 'lesson:e', 'level:f', 'lesson:g', 'level:h', 'lesson:i']) {
+      expect(stopState(grown, item, progress)).toBe('done');
+    }
+    expect(stopState(grown, 'level:j', progress)).toBe('open');
+    expect(stopState(grown, 'level:k', progress)).toBe('locked');
+    expect(stopState(grown, 'story:l', progress)).toBe('locked');
+  });
+
+  it('keeps the chapter the child had reached as the current one', () => {
+    const standings = chapterStandings(grown, inChapter4(), 3);
+    expect(standings.map(({ id, finished, locked, current }) => ({ id, finished, locked, current }))).toEqual([
+      { id: '01', finished: true, locked: false, current: false },
+      { id: '02', finished: false, locked: false, current: false },
+      { id: '03', finished: true, locked: false, current: false },
+      { id: '04', finished: false, locked: false, current: true },
+      { id: '05', finished: false, locked: true, current: false },
+    ]);
+    // The chapter's stars count the level put in, once it is played.
+    expect(standings[1]).toMatchObject({ stars: 5, starsMost: 9 });
+  });
+
+  it('goes on where the game was, when the course has that stop open', () => {
+    expect(goOnAt(grown, inChapter4())).toBe('level:j');
+    expect(goOnAt(before, inChapter4())).toBe('level:j');
+  });
+
+  it('goes on at the first stop not done when the stop kept is no more, or is locked', () => {
+    const gone = { ...inChapter4(), current: 'lesson:old' };
+    expect(goOnAt(grown, gone)).toBe('lesson:new');
+    const locked = { ...inChapter4(), current: 'level:k' };
+    expect(goOnAt(grown, locked)).toBe('lesson:new');
+  });
+
+  it('never goes on at the opening, and starts a new game at the course start', () => {
+    const fresh = { ...defaultProgress(), wizard: { name: 'Ana', gender: 'girl' as const, look: 'teal' } };
+    expect(goOnAt(grown, fresh)).toBe('lesson:a');
+    expect(goOnAt(grown, { ...fresh, current: 'story:the-letter' })).toBe('lesson:a');
   });
 });

@@ -1,6 +1,8 @@
 // The level screen: the scene with the goals over its corner, the editor
 // beside it with a handle between the two, Run, Stop, Restart and the speed,
-// and the card saying how a run went. It is a view of a RunController (D29):
+// and the card saying how a run went. The editor keeps five lines of code over the
+// hints' box and the card, which fold to one line each, and the line that runs and the
+// line an answer names stay in its sight (D363, D366). It is a view of a RunController (D29):
 // it makes the DOM once, renders every snapshot the controller gives, and
 // each button calls the controller. The start card opens the level every time its
 // screen opens (D248), after the screen's guide the first time the first level opens
@@ -32,6 +34,7 @@ import { type GoalsPanel, type GoalsShape, goalsPanel, takeShape } from './goals
 import { clampSplit, setSplit, splitAt } from './look';
 import { type Asked, ask } from './ask';
 import { offered } from './complete';
+import { foldButton } from './fold';
 import { type ButtonIcon, buttonIcon } from './icons';
 import { type GivenChip, programLists, type ProgramLists } from './lists';
 import { type ApiTable, familiarVar, heldObjects, notebookEntries, notebookPanel } from './notebook';
@@ -262,8 +265,19 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   });
   notebookButton.setAttribute('aria-controls', 'notebook');
   notebookButton.setAttribute('aria-expanded', 'false');
-  const hintsBox = element('section', { className: 'hints', hidden: true });
+  // The hints' box (D363): the hints in a list of their own, which scrolls inside the box
+  // on a wide page while the fold's button stays at the box's corner; folded, a line in
+  // the list's place says how many are taken.
+  const hintsList = element('div', { className: 'hints-list' });
+  let hintsFolded = false;
+  const hintsFold = foldButton(
+    'hints-fold',
+    { fold: () => t('level.hints_fold'), unfold: () => t('level.hints_unfold') },
+    () => foldHints(!hintsFolded),
+  );
+  const hintsBox = element('section', { className: 'hints', hidden: true }, [hintsList, hintsFold.node]);
   hintsBox.setAttribute('aria-live', 'polite');
+  const hintsLine = element('p', { className: 'hints-folded' });
   const speed = element('select', { id: 'speed' });
   for (const value of SPEEDS) {
     speed.append(element('option', { value: String(value) }, [`${value}×`]));
@@ -581,12 +595,42 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   const allHints = () => text.hints ?? [];
   let hintsShown = kept.hints ?? 0;
   let hintsOffered = kept.tried === true || hintsShown > 0;
+  // The list's edges fade where a hint lies past them, and a list that scrolls is reached
+  // by the keys (D363). The hints' own boxes are measured, not the list's scroll, which
+  // counts their margins.
+  const hintEdges = () => {
+    const shown = hintsList.getBoundingClientRect();
+    const first = hintsList.firstElementChild?.getBoundingClientRect();
+    const last = hintsList.lastElementChild?.getBoundingClientRect();
+    const above = first !== undefined && first.top < shown.top - 1;
+    const below = last !== undefined && last.bottom > shown.top + hintsList.clientHeight + 1;
+    hintsList.classList.toggle('more-above', above);
+    hintsList.classList.toggle('more-below', below);
+    if (above || below) hintsList.tabIndex = 0;
+    else hintsList.removeAttribute('tabindex');
+  };
+  // The list stands on the newest hint: its top at the list's top, the browser holding it
+  // to the most the list can scroll. The list's own scrollTop is set, never
+  // scrollIntoView, which may scroll the page. A list not laid out yet, as a level's that
+  // opens with its hints kept, stands once it is.
+  let standing = false;
+  const standOnNewest = () => {
+    const newest = hintsList.lastElementChild;
+    standing = newest !== null && hintsList.clientHeight === 0;
+    if (newest && !standing) {
+      hintsList.scrollTop += newest.getBoundingClientRect().top - hintsList.getBoundingClientRect().top;
+    }
+    hintEdges();
+  };
+  hintsList.addEventListener('scroll', hintEdges);
+  const hintsSized = new ResizeObserver(() => (standing ? standOnNewest() : hintEdges()));
+  hintsSized.observe(hintsList);
   const renderHints = () => {
     const hints = allHints();
     hint.hidden = hints.length === 0;
     hint.disabled = !hintsOffered || hintsShown >= hints.length;
     hintsBox.hidden = hintsShown === 0;
-    hintsBox.replaceChildren(
+    hintsList.replaceChildren(
       ...hints.slice(0, hintsShown).map((said, index) =>
         element('p', { className: 'hint' }, [
           element('strong', {}, [t('level.hint_n', { n: index + 1, total: hints.length })]),
@@ -595,11 +639,31 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
         ]),
       ),
     );
+    hintsLine.textContent = t('level.hints_folded', { n: hintsShown, total: hints.length });
+    hintsFold.show(hintsFolded);
+    standOnNewest();
   };
+  // The fold of the hints' box (D363), the child's alone; the line that says how many are
+  // taken is in the page only while the box is folded.
+  const foldHints = (folded: boolean) => {
+    hintsFolded = folded;
+    hintsBox.classList.toggle('folded', folded);
+    if (folded) hintsBox.insertBefore(hintsLine, hintsFold.node);
+    else hintsLine.remove();
+    hintsFold.show(folded);
+    if (!folded) standOnNewest();
+  };
+  // A click on the folded box, anywhere on it, unfolds it; on the unfolded box only its
+  // button folds it, so that a hint's words can be selected.
+  hintsBox.addEventListener('click', (event) => {
+    if (hintsFolded && !(event.target instanceof Element && event.target.closest('.fold'))) foldHints(false);
+  });
   hint.addEventListener('click', () => {
     if (hintsShown < allHints().length) analytics.hinted(loaded.id, hintsShown + 1);
     hintsShown = Math.min(hintsShown + 1, allHints().length);
     progress.setHints(loaded.id, hintsShown);
+    // A hint taken unfolds the box, which stands on it (D363).
+    if (hintsFolded) foldHints(false);
     renderHints();
   });
   renderHints();
@@ -617,6 +681,12 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
   // when the controller's do.
   let shownOutcome: Outcome | null = null;
   let shownLines: [number | null, number | null] = [null, null];
+  // The line an answer names stays in the editor's sight whenever the editor's height
+  // changes while it is marked, a box folded or unfolded among the changes (D363).
+  const editorSized = new ResizeObserver(() => {
+    if (shownLines[1] !== null) editor.showLine(shownLines[1]);
+  });
+  editorSized.observe(editorParent);
 
   const render = (snapshot: RunSnapshot, force = false) => {
     restartNote.hidden = !snapshot.restarting;
@@ -673,6 +743,11 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
     if (snapshot.runningLine !== shownLines[0] || snapshot.errorLine !== shownLines[1]) {
       editor.setRunningLine(snapshot.runningLine);
       editor.setErrorLine(snapshot.errorLine);
+      // The line that runs is kept in the editor's sight (D366), and the line an answer
+      // names is brought into it once the answer is in the page, the editor lower by then
+      // (D363). Nothing moves when the run ends and its mark goes.
+      if (snapshot.runningLine !== null && snapshot.runningLine !== shownLines[0]) editor.showLine(snapshot.runningLine);
+      if (snapshot.errorLine !== null && snapshot.errorLine !== shownLines[1]) editor.showLine(snapshot.errorLine);
       shownLines = [snapshot.runningLine, snapshot.errorLine];
     }
   };
@@ -961,6 +1036,8 @@ export function levelScreen(parts: LevelScreenParts): LevelScreen {
       mapShown?.destroy();
       for (const unsubscribe of stopped) unsubscribe();
       stopped = [];
+      hintsSized.disconnect();
+      editorSized.disconnect();
       controller.destroy();
       scene?.destroy();
       lists?.destroy();

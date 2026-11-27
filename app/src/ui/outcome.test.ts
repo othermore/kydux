@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { initLanguage } from '../i18n';
-import { explanationText, outcomeText } from './outcome';
+import { explanationText, type Outcome, outcomeCard, outcomeText } from './outcome';
 
 const english = { languages: ['en'], storage: null };
 const spanish = { languages: ['es'], storage: null };
@@ -152,5 +152,152 @@ describe("a first variable's mistakes (D349)", () => {
     expect(said('search_word_kept', { name: 'book', variable: 'tesoro' })).toBe(
       'Aquí no hay nada que se llame `book`. Lo que encontraste con la palabra "book" lo guardaste en `tesoro`: usa esa variable. (línea 2)',
     );
+  });
+});
+
+/** The least of a page the card is made of, for a test with no browser: elements with
+ * their children, classes, attributes and click listeners. A click reaches only the
+ * element clicked. */
+class FakeElement {
+  readonly children: (FakeElement | string)[] = [];
+  readonly dataset: Record<string, string> = {};
+  readonly attributes = new Map<string, string>();
+  hidden = false;
+  title = '';
+  private classes = new Set<string>();
+  private listeners: ((event: { target: FakeElement }) => void)[] = [];
+  readonly classList = {
+    contains: (name: string) => this.classes.has(name),
+    toggle: (name: string, on = !this.classes.has(name)) => {
+      if (on) this.classes.add(name);
+      else this.classes.delete(name);
+      return on;
+    },
+  };
+
+  constructor(readonly tagName: string) {}
+
+  get className(): string {
+    return [...this.classes].join(' ');
+  }
+
+  set className(value: string) {
+    this.classes = new Set(value.split(/\s+/).filter(Boolean));
+  }
+
+  get id(): string {
+    return this.attributes.get('id') ?? '';
+  }
+
+  set id(value: string) {
+    this.attributes.set('id', value);
+  }
+
+  get textContent(): string {
+    return this.children.map((child) => (typeof child === 'string' ? child : child.textContent)).join('');
+  }
+
+  set textContent(value: string) {
+    this.replaceChildren(value);
+  }
+
+  append(...nodes: (FakeElement | string)[]): void {
+    this.children.push(...nodes);
+  }
+
+  replaceChildren(...nodes: (FakeElement | string)[]): void {
+    this.children.length = 0;
+    this.children.push(...nodes);
+  }
+
+  setAttribute(name: string, value: unknown): void {
+    this.attributes.set(name, String(value));
+  }
+
+  getAttribute(name: string): string | null {
+    return this.attributes.get(name) ?? null;
+  }
+
+  addEventListener(type: string, listener: (event: { target: FakeElement }) => void): void {
+    if (type === 'click') this.listeners.push(listener);
+  }
+
+  click(): void {
+    for (const listener of this.listeners) listener({ target: this });
+  }
+
+  /** The element of this one's tree with the id, or null. */
+  byId(id: string): FakeElement | null {
+    if (this.id === id) return this;
+    for (const child of this.children) {
+      const found = typeof child === 'string' ? null : child.byId(id);
+      if (found) return found;
+    }
+    return null;
+  }
+}
+
+describe("the answer's fold (D363)", () => {
+  const page = globalThis as { document?: unknown };
+  beforeEach(() => {
+    initLanguage(spanish);
+    page.document = {
+      createElement: (tag: string) => new FakeElement(tag),
+      createElementNS: (_space: string, tag: string) => new FakeElement(tag),
+      documentElement: { lang: 'es' },
+      dispatchEvent: () => true,
+    };
+  });
+  afterEach(() => {
+    delete page.document;
+  });
+
+  const parts = (card: ReturnType<typeof outcomeCard>) => {
+    const node = card.node as unknown as FakeElement;
+    const fold = node.byId('outcome-fold');
+    if (!fold) throw new Error('the card has no fold button');
+    return { node, fold };
+  };
+
+  it('has no fold for Python that could not start, which is shown unfolded', () => {
+    const card = outcomeCard();
+    const { node, fold } = parts(card);
+    card.show({ kind: 'incomplete', met: 0, total: 1 });
+    fold.click();
+    expect(card.folded).toBe(true);
+    card.show({ kind: 'failed' });
+    expect(fold.hidden).toBe(true);
+    expect(card.folded).toBe(false);
+    expect(node.classList.contains('folded')).toBe(false);
+  });
+
+  it('folds by its button; another outcome comes unfolded, the same one drawn again keeps its fold', () => {
+    const card = outcomeCard();
+    const { node, fold } = parts(card);
+    const first: Outcome = { kind: 'incomplete', met: 0, total: 1 };
+    card.show(first);
+    expect(fold.hidden).toBe(false);
+    expect(fold.getAttribute('aria-expanded')).toBe('true');
+    expect(fold.title).toBe('Plegar la respuesta');
+    fold.click();
+    expect(card.folded).toBe(true);
+    expect(node.classList.contains('folded')).toBe(true);
+    expect(fold.getAttribute('aria-expanded')).toBe('false');
+    expect(fold.getAttribute('aria-label')).toBe('Desplegar la respuesta');
+    // Drawn again in another language: still folded, its button in that language.
+    initLanguage(english);
+    card.show(first);
+    expect(card.folded).toBe(true);
+    expect(fold.title).toBe('Unfold the answer');
+    // The answer of another run.
+    card.show({ kind: 'caught' });
+    expect(card.folded).toBe(false);
+    expect(node.classList.contains('folded')).toBe(false);
+    expect(fold.title).toBe('Fold the answer');
+    // Hidden by a new run, and shown again: unfolded.
+    fold.click();
+    card.hide();
+    card.show(first);
+    expect(card.folded).toBe(false);
   });
 });

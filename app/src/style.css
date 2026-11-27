@@ -615,8 +615,9 @@ footer a {
 }
 
 .outcome {
+  position: relative;
   margin-top: 10px;
-  padding: 10px 14px;
+  padding: 10px 44px 10px 14px;
   border: 1px solid var(--ink-line);
   border-radius: var(--radius);
   border-left: 6px solid var(--muted);
@@ -634,8 +635,9 @@ footer a {
 }
 
 .hints {
+  position: relative;
   margin-top: 8px;
-  padding: 8px 14px;
+  padding: 8px 44px 8px 14px;
   border-radius: 6px;
   border-left: 6px solid #f2b705;
   background: #fff9db;
@@ -643,6 +645,77 @@ footer a {
 
 .hint {
   margin: 4px 0;
+}
+
+/* The hints' list fades at an edge past which more hints lie, as the lists' rows do
+   (D346, D363). */
+.hints-list.more-above {
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+}
+
+.hints-list.more-below {
+  mask-image: linear-gradient(to top, transparent 0, #000 18px);
+}
+
+.hints-list.more-above.more-below {
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+/* The hints' box and the answer fold to one line each by a button at their top right
+   corner (D363): a chevron in the box's own ink, pointing down while the box is
+   unfolded and turned to point right while it is folded. A folded box unfolds at a click
+   anywhere on it. Folded, the hints' box says how many hints are taken, and the answer
+   is its first words on one line, what the code printed not shown. */
+.hints > .fold,
+.outcome > .fold {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  background: none;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+.hints > .fold:hover,
+.hints > .fold:focus-visible,
+.outcome > .fold:hover,
+.outcome > .fold:focus-visible {
+  border-color: currentColor;
+  opacity: 1;
+}
+
+.folded > .fold .icon {
+  transform: rotate(-90deg);
+}
+
+.hints.folded,
+.outcome.folded {
+  cursor: pointer;
+}
+
+.hints.folded > .hints-list,
+.outcome.folded > .outcome-printed {
+  display: none;
+}
+
+.hints-folded {
+  margin: 0;
+  font-weight: 700;
+}
+
+.outcome.folded .outcome-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .hint code {
@@ -3882,5 +3955,49 @@ a.stop-body:focus-visible {
 
   .speed {
     font-size: calc(15px * var(--fit, 1));
+  }
+}
+
+/* The editor keeps five lines of code under the hints and the answer (D363). On a page
+   wider than 800 px it is never lower than five lines and its frame, 7.6 times the
+   code's letter times --fit (D359); the hints' box gives way, down to four times the
+   code's letter, its list scrolling inside it, and the lists, the buttons and the answer
+   keep their heights. In a window too low even for that, the editor's column scrolls
+   inside the level, and the page stays the window's height (D38). A phone's or a
+   tablet's narrow page keeps its own layout, which scrolls. */
+@media (min-width: 801px) {
+  .editor {
+    min-height: calc(var(--editor-font-size, 16px) * 7.6 * var(--fit, 1));
+  }
+
+  .hints {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    min-height: calc(var(--editor-font-size, 16px) * 4 * var(--fit, 1));
+  }
+
+  .hints-list {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .hints.folded {
+    flex-shrink: 0;
+    min-height: 0;
+  }
+
+  /* The column's sides keep room for a button's gold ring, which its scroll would cut;
+     its content keeps its width. */
+  .workbench {
+    overflow-y: auto;
+    margin: 0 -4px;
+    padding: 0 4px;
+  }
+
+  .program-lists,
+  .buttons,
+  .outcome {
+    flex-shrink: 0;
   }
 }

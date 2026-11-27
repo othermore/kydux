@@ -44,16 +44,20 @@ export function buttonIcon(name: ButtonIcon, size = 18): SVGSVGElement {
   return svg;
 }
 
-function icon(paths: string[], size: number): SVGSVGElement {
+/** The chevron of a box's fold (D363), in a 16 by 16 box: it points down; the style
+ * turns it to point right while the box is folded. */
+const FOLD_PATHS = ['M3.5 6l4.5 4.5L12.5 6'];
+
+function icon(paths: string[], size: number, box = 24, stroke = 2): SVGSVGElement {
   const svg = document.createElementNS(SVG, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('viewBox', `0 0 ${box} ${box}`);
   svg.setAttribute('width', String(size));
   svg.setAttribute('height', String(size));
   svg.setAttribute('class', 'icon');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('fill', 'none');
   svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-width', String(stroke));
   svg.setAttribute('stroke-linecap', 'round');
   svg.setAttribute('stroke-linejoin', 'round');
   for (const d of paths) {
@@ -72,4 +76,10 @@ export function pencilIcon(size = 22): SVGSVGElement {
 /** A gear, `size` pixels square, hidden from a screen reader. */
 export function gearIcon(size = 26): SVGSVGElement {
   return icon(GEAR_PATHS, size);
+}
+
+/** The chevron of a box's fold (D363), 16 pixels square, hidden from a screen reader:
+ * the button says what it does in its label. */
+export function foldIcon(): SVGSVGElement {
+  return icon(FOLD_PATHS, 16, 16, 2.4);
 }

@@ -1,10 +1,12 @@
 // What a run came to, said to the child: a card under the editor. An outcome
-// is data; the card says it in the language of the moment.
+// is data; the card says it in the language of the moment. The card folds to its first
+// words by a button at its corner, and the answer of another run comes unfolded (D363).
 
 import { blockedText, toldText, toldWhole } from '../engine/words';
 import { t } from '../i18n';
 import type { ErrorInfo, Explanation } from '../runtime/protocol';
 import { element } from './dom';
+import { foldButton } from './fold';
 import { withCode } from './words';
 
 /** What a run came to. For a level played in several ways (D51), `won` is every way
@@ -180,11 +182,15 @@ function outcomeWords(outcome: Outcome, own: Record<string, string> = {}): strin
 
 export interface OutcomeCard {
   node: HTMLElement;
-  /** Says what the run came to, and what the child's code printed, if anything. */
+  /** Says what the run came to, and what the child's code printed, if anything. Another
+   * outcome than the one shown comes unfolded; the same one, drawn again in another
+   * language, keeps its fold (D363). */
   show(outcome: Outcome, printed?: string): void;
   hide(): void;
   /** What the card says now, or null while it is hidden. */
   readonly current: Outcome | null;
+  /** Whether the card is folded to its first words (D363). */
+  readonly folded: boolean;
 }
 
 /** The card; `different` gives the level's words for what is different this time, in
@@ -199,18 +205,41 @@ export function outcomeCard(
   reload.addEventListener('click', () => location.reload());
   const printedLabel = element('p', { className: 'printed-label' });
   const printedText = element('pre', { className: 'printed' });
-  const printedBox = element('div', { hidden: true }, [printedLabel, printedText]);
+  const printedBox = element('div', { className: 'outcome-printed', hidden: true }, [printedLabel, printedText]);
+  // Folded, the card is its words on one line, cut with an ellipsis, and what the code
+  // printed is not shown (D363).
+  let folded = false;
+  const fold = foldButton(
+    'outcome-fold',
+    { fold: () => t('level.answer_fold'), unfold: () => t('level.answer_unfold') },
+    () => setFolded(!folded),
+  );
   const node = element('section', { className: 'outcome', hidden: true }, [
     text,
     printedBox,
     reload,
+    fold.node,
   ]);
+  const setFolded = (to: boolean) => {
+    folded = to;
+    node.classList.toggle('folded', to);
+    fold.show(to);
+  };
+  // A click on the folded card, anywhere on it, unfolds it; on the unfolded card only its
+  // button folds it, so that its words can be selected.
+  node.addEventListener('click', (event) => {
+    if (folded && !(event.target instanceof Element && event.target.closest('.fold'))) setFolded(false);
+  });
   let lastPrinted = '';
   node.setAttribute('role', 'status');
   let current: Outcome | null = null;
   return {
     node,
     show(outcome, printed = lastPrinted) {
+      // Python that could not start does not fold: its button to load the page again
+      // stays in sight.
+      const foldable = outcome.kind !== 'failed';
+      if (outcome !== current || !foldable) folded = false;
       current = outcome;
       lastPrinted = printed;
       text.replaceChildren(...withCode(outcomeText(outcome, different(), own())));
@@ -219,6 +248,8 @@ export function outcomeCard(
       printedBox.hidden = printed === '';
       reload.textContent = t('level.reload');
       reload.hidden = outcome.kind !== 'failed';
+      fold.node.hidden = !foldable;
+      setFolded(folded);
       node.dataset.kind = outcome.kind;
       node.hidden = false;
     },
@@ -230,6 +261,9 @@ export function outcomeCard(
     },
     get current() {
       return current;
+    },
+    get folded() {
+      return folded;
     },
   };
 }

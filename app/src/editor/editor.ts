@@ -1,7 +1,9 @@
 // The child's editor: CodeMirror with Python, four spaces to an indent, the
 // line being played lit, and the line of an error marked, each also in the
 // gutter. A line too long for the editor wraps, and its wrapped part hangs under
-// the line's first character that is not a space (D223).
+// the line's first character that is not a space (D223). A line out of the editor's
+// sight is brought into it on asking, the line that runs and the line an answer
+// names (D363, D366).
 
 import {
   autocompletion,
@@ -19,7 +21,15 @@ import {
   indentUnit,
   syntaxHighlighting,
 } from '@codemirror/language';
-import { EditorState, type Extension, Prec, RangeSet, StateEffect, StateField } from '@codemirror/state';
+import {
+  EditorState,
+  type Extension,
+  Prec,
+  RangeSet,
+  StateEffect,
+  StateField,
+  type TransactionSpec,
+} from '@codemirror/state';
 import {
   Decoration,
   type DecorationSet,
@@ -41,6 +51,11 @@ export interface Editor {
   setRunningLine(line: number | null): void;
   /** Marks a line, 1-based, as the one an error came from; null for none. */
   setErrorLine(line: number | null): void;
+  /** Brings a line, 1-based, into the editor's sight when it is not whole inside it,
+   * scrolling by the least, with a line of margin where the code has one (D363, D366).
+   * A line in sight, or one the document does not have, moves nothing; neither the
+   * cursor nor the focus moves. */
+  showLine(line: number): void;
   /** Puts `text` on a line of its own after the cursor's line, and the cursor after it. */
   insertLine(text: string): void;
   focus(): void;
@@ -95,6 +110,22 @@ function markedLine(kind: 'running' | 'error') {
     return line === null ? RangeSet.empty : RangeSet.of([marker.range(state.doc.line(line).from)]);
   };
   return { set, field, extension: [field, decorations] as Extension, markers };
+}
+
+/** The scroll that brings a line, 1-based, into sight by the least, `margin` pixels
+ * clear of the editor's edge, or null for a line the document does not have. It moves no
+ * selection (D363, D366). */
+export function lineScroll(state: EditorState, line: number, margin: number): TransactionSpec | null {
+  if (!Number.isInteger(line) || line < 1 || line > state.doc.lines) return null;
+  return { effects: EditorView.scrollIntoView(state.doc.line(line).from, { y: 'nearest', yMargin: margin }) };
+}
+
+/** Whether a line, 1-based, of the document lies whole inside what the editor shows. */
+function wholeInSight(view: EditorView, line: number): boolean {
+  const block = view.lineBlockAt(view.state.doc.line(line).from);
+  const top = view.documentTop + block.top;
+  const shown = view.scrollDOM.getBoundingClientRect();
+  return top >= shown.top - 1 && top + block.height <= shown.top + view.scrollDOM.clientHeight + 1;
 }
 
 /** How many columns a line's leading spaces take, a tab to the next stop of four. */
@@ -235,6 +266,10 @@ export function createEditor(parent: HTMLElement, options: EditorOptions): Edito
     },
     setErrorLine(line) {
       view.dispatch({ effects: error.set.of(line) });
+    },
+    showLine(line) {
+      const scroll = lineScroll(view.state, line, view.defaultLineHeight);
+      if (scroll && !wholeInSight(view, line)) view.dispatch(scroll);
     },
     insertLine(text) {
       const line = view.state.doc.lineAt(view.state.selection.main.head);

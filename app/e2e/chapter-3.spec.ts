@@ -10,7 +10,7 @@
 import { mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
-import { gotoTesting, MARTA, type SeededWizard, seedWizard, storyNext } from './helpers';
+import { gotoTesting, MARTA, nextLessonPage, type SeededWizard, seedWizard, storyNext } from './helpers';
 import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/chapter-3/', import.meta.url));
@@ -206,7 +206,7 @@ test.describe('the map, opened by its spell (D134)', () => {
     await page.goto('/#lesson/the-cells');
     // The lesson drawn before its pages are counted: a slow load is not its last page.
     await expect(page.locator('.lesson-page')).toBeVisible();
-    while ((await page.locator('#lesson-next').count()) > 0) await page.locator('#lesson-next').click();
+    while ((await page.locator('#lesson-next').count()) > 0) await nextLessonPage(page);
     // Its third page, the map's word, holds no block (D174), and goes on to the level.
     await expect(page.locator('.lesson-run')).toHaveCount(0);
     await expect(page.locator('#lesson-try')).toHaveText('Go on');

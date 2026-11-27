@@ -111,3 +111,48 @@ export function levelText(id: string, lang: 'en' | 'es'): {
 export function shown(text: string): string {
   return text.replace(/[`*]/g, '');
 }
+
+/** A lesson's page left as a child leaves it (D354): its block's test done, if it has
+ * one not done yet (run; a change run; the given variable renamed and run; and then the
+ * name changed in one line and run, for the error), then its forward button pressed. */
+export async function nextLessonPage(page: Page): Promise<void> {
+  await doLessonTest(page);
+  await page.locator('#lesson-next, #lesson-try').first().click();
+}
+
+/** A lesson's page's test done as a child does it (D354), if it has one not done yet. */
+export async function doLessonTest(page: Page): Promise<void> {
+  const block = page.locator('.lesson-run').first();
+  if ((await block.count()) > 0 && (await block.getAttribute('data-passed')) !== 'true') {
+    const test = (await block.getAttribute('data-test')) ?? 'try';
+    const editor = block.locator('.cm-content');
+    const runIt = async () => {
+      await block.locator('.lesson-run-button').click();
+      await expect(block).toHaveAttribute('data-state', 'done', { timeout: 90_000 });
+    };
+    const write = async (code: string) => {
+      await editor.click();
+      await page.keyboard.press('ControlOrMeta+A');
+      await page.keyboard.insertText(code);
+    };
+    const given = await editor.evaluate((node) => (node as HTMLElement & { cmView?: unknown }).innerText);
+    const name = /^\s*([A-Za-z_]\w*)\s*=(?!=)/m.exec(given)?.[1] ?? 'x';
+    const renamed = given.replace(new RegExp(`\\b${name}\\b`, 'g'), `${name}_mio`);
+    if (test === 'try') await runIt();
+    else if (test === 'change') {
+      await write(`${given.trimEnd()}\n# ${name}`);
+      await runIt();
+    } else {
+      await write(renamed);
+      await runIt();
+      if (test === 'rename_error') {
+        const lines = renamed.trimEnd().split('\n');
+        const last = lines.length - 1;
+        lines[last] = (lines[last] ?? '').replace(`${name}_mio`, `${name}_otro`);
+        await write(lines.join('\n'));
+        await runIt();
+      }
+    }
+    await expect(block).toHaveAttribute('data-passed', 'true');
+  }
+}

@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { finishStory, seedWizard, storyNext, storySaid } from './helpers';
+import { finishStory, nextLessonPage, seedWizard, storyNext, storySaid } from './helpers';
 
 test.use({ locale: 'en-US' });
 
@@ -125,7 +125,7 @@ test('the scene draws the look chosen, and the words follow a girl in Spanish', 
   await page.locator('#wizard-done').click();
   await expect(page).toHaveURL(/#story\/at-the-gate$/);
   await page.goto('/#lesson/what-a-program-is');
-  await page.locator('#lesson-next').click();
+  await nextLessonPage(page);
   await expect(page.locator('.lesson-page')).toContainText('a tu maga');
   await page.goto('/#level/the-corridor');
   await page.locator('#start').click();

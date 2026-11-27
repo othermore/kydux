@@ -12,7 +12,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Locator, type Page, test } from '@playwright/test';
-import { MARTA, type SeededWizard, seedWizard } from './helpers';
+import { MARTA, nextLessonPage, type SeededWizard, seedWizard } from './helpers';
 
 const CONTENT = fileURLToPath(new URL('../../content/tips/', import.meta.url));
 const PABLO: SeededWizard = { name: 'Pablo', gender: 'boy', look: 'amber' };
@@ -199,8 +199,8 @@ for (const [lang, locale, wizard] of [
       // how-much's third page holds its block, a walk that prints nothing: the page
       // says what the walk did.
       await page.goto('/#lesson/how-much');
-      await page.locator('#lesson-next').click();
-      await page.locator('#lesson-next').click();
+      await nextLessonPage(page);
+      await nextLessonPage(page);
       const run = page.locator('.lesson-run-button').first();
       await run.click();
       const block = page.locator('.lesson-run').first();

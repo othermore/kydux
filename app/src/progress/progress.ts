@@ -239,6 +239,20 @@ export function markGuided(): void {
   });
 }
 
+/** The pages of a lesson whose test is done, counted from 0 (D354). */
+export function testedPages(lessonId: string): number[] {
+  return store.load().lessons[lessonId]?.tested ?? [];
+}
+
+/** A lesson's page whose test is done: it stays done whatever the code becomes (D354). */
+export function markTested(lessonId: string, page: number): void {
+  if (testedPages(lessonId).includes(page)) return;
+  change((progress) => {
+    const lesson = progress.lessons[lessonId] ?? {};
+    progress.lessons[lessonId] = { ...lesson, tested: [...(lesson.tested ?? []), page].sort((a, b) => a - b) };
+  });
+}
+
 export function markRead(lessonId: string): void {
   change((progress) => {
     progress.lessons[lessonId] = { ...progress.lessons[lessonId], read: true };

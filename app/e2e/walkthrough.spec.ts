@@ -11,7 +11,7 @@
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
-import { MARTA, seedWizard } from './helpers';
+import { MARTA, nextLessonPage, seedWizard } from './helpers';
 import { ciTimes } from './support';
 
 const chapter = process.env.KYDUX_WALKTHROUGH ?? '';
@@ -101,7 +101,7 @@ async function lesson(page: Page, id: string): Promise<void> {
   let number = 1;
   await lessonPage(page, id, number);
   while ((await page.locator('#lesson-next').count()) > 0) {
-    await page.locator('#lesson-next').click();
+    await nextLessonPage(page);
     number += 1;
     await lessonPage(page, id, number);
   }

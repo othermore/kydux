@@ -6,6 +6,7 @@
 // window (D134).
 
 import { forWizard, t } from '../i18n';
+import type { LessonRun } from './lessontest';
 import type { LevelJson, RunResult, WorldResult } from '../runtime/protocol';
 import type { RuntimeLike } from './controller';
 import { element } from './dom';
@@ -136,24 +137,32 @@ export interface LessonRunner {
 /** What is shown of a page's block. */
 export interface RunBlock {
   node: HTMLElement;
+  /** Says under the block what the page's test still asks, and brings it into sight
+   * (D354); null takes it away. */
+  ask(words: string | null): void;
   destroy(): void;
 }
 
 let blocks = 0;
 
-/** A block of code on a page: its editor, its Run button and what it says. */
-export function runBlock(code: string, runner: LessonRunner): RunBlock {
+/** A block of code on a page: its editor, its Run button and what it says; `onRun` is told
+ * each run, its code and how it ended (D354). */
+export function runBlock(code: string, runner: LessonRunner, onRun?: (run: LessonRun) => void): RunBlock {
   blocks += 1;
   const editorParent = element('div', { className: 'lesson-editor' });
   const run = element('button', { type: 'button', className: 'lesson-run-button big-button' }, [t('level.run')]);
   run.id = `lesson-run-${blocks}`;
   const printed = element('pre', { className: 'printed lesson-printed', hidden: true });
   const said = element('p', { className: 'lesson-said', hidden: true });
+  // What the page's test still asks (D354), where a run's result shows.
+  const asked = element('p', { className: 'lesson-asked', hidden: true });
+  asked.setAttribute('role', 'status');
   const node = element('div', { className: 'lesson-run' }, [
     editorParent,
     element('div', { className: 'lesson-run-bar' }, [run]),
     printed,
     said,
+    asked,
   ]);
   node.setAttribute('aria-live', 'polite');
   let plan: PlanWindow | null = null;
@@ -165,9 +174,11 @@ export function runBlock(code: string, runner: LessonRunner): RunBlock {
     node.dataset.state = 'running';
     printed.hidden = true;
     said.hidden = true;
+    asked.hidden = true;
+    const ran = editor.getDoc();
     try {
       const level = await runner.level();
-      const result = await runner.runtime.run(editor.getDoc(), level);
+      const result = await runner.runtime.run(ran, level);
       const kinds = (id: unknown): string | null => {
         const things = (level.things as { id: string; kind: string }[] | undefined) ?? [];
         return things.find((thing) => thing.id === id)?.kind ?? null;
@@ -176,6 +187,9 @@ export function runBlock(code: string, runner: LessonRunner): RunBlock {
       // How the block ended, for the tests: a lesson's block may end in the error it is
       // about, explained as its result (D272).
       node.dataset.ended = result.world ? firstWay(result.world).status : result.status;
+      const error = result.world ? firstWay(result.world).error : (result.error ?? null);
+      const ended = result.world ? firstWay(result.world).status === 'error' : result.status === 'error';
+      onRun?.({ code: ran, error: ended, ...(error?.explanation ? { explained: error.explanation.kind } : {}) });
       printed.textContent = answer.printed.replace(/\n$/, '');
       printed.hidden = answer.printed === '';
       // An explanation's names in backquotes shown as code, as on the cards.
@@ -205,6 +219,11 @@ export function runBlock(code: string, runner: LessonRunner): RunBlock {
   run.addEventListener('click', () => void go());
   return {
     node,
+    ask(words) {
+      asked.replaceChildren(...withCode(words ?? ''));
+      asked.hidden = words === null;
+      if (words !== null) asked.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
     destroy() {
       plan?.dismiss();
       editor.destroy();

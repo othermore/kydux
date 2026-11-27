@@ -52,7 +52,9 @@ export interface Progress {
   /** Null until the child has made one. */
   wizard: Wizard | null;
   settings: Settings;
-  lessons: Record<string, { read?: boolean }>;
+  /** The lessons read, and the pages each has had its test done on, counted from 0
+   * (D354). */
+  lessons: Record<string, { read?: boolean; tested?: number[] }>;
   /** The stories read to their end (D56, D74). */
   stories: Record<string, { read?: boolean }>;
   /** Whether the screen's guide has been shown, done or skipped (D68). */
@@ -213,6 +215,14 @@ export function readProgress(value: unknown): Progress | null {
     if (!isObject(read)) continue;
     for (const [id, item] of Object.entries(read)) {
       if (isObject(item)) progress[key][id] = { read: item.read === true };
+    }
+  }
+  if (isObject(value.lessons)) {
+    for (const [id, item] of Object.entries(value.lessons)) {
+      const tested = isObject(item) ? item.tested : undefined;
+      if (Array.isArray(tested) && tested.every((page) => isCount(page))) {
+        progress.lessons[id] = { ...progress.lessons[id], tested: [...new Set(tested as number[])] };
+      }
     }
   }
   if (isObject(value.levels)) {

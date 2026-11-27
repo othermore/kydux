@@ -178,6 +178,21 @@ describe('the helpers', () => {
     expect(readProgress({ ...saved, program: { level: 'Not a level', code: 'x' } })?.program).toBeUndefined();
   });
 
+  it("keep a lesson's pages whose test is done, whatever is read after, in an older saved game too (D354)", () => {
+    progress.markTested('a-name-for-a-value', 1);
+    progress.markTested('a-name-for-a-value', 0);
+    progress.markTested('a-name-for-a-value', 1);
+    expect(progress.testedPages('a-name-for-a-value')).toEqual([0, 1]);
+    progress.markRead('a-name-for-a-value');
+    expect(progress.load().lessons['a-name-for-a-value']).toEqual({ read: true, tested: [0, 1] });
+    expect(readProgress({ version: PROGRESS_VERSION, lessons: { old: { read: true } } })?.lessons.old).toEqual({
+      read: true,
+    });
+    expect(readProgress({ version: PROGRESS_VERSION, lessons: { old: { tested: [-1] } } })?.lessons.old).toEqual({
+      read: false,
+    });
+  });
+
   it('leave a program an older saved game kept as it was, and add none (D351)', () => {
     const saved = defaultProgress();
     saved.levels.a = { won: true, stars: 1, code: 'wizard.move_right(6)\n' };

@@ -7,7 +7,7 @@
 import { mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, type Page, test } from '@playwright/test';
-import { skipGuide, storyNext, storySaid } from './helpers';
+import { nextLessonPage, skipGuide, storyNext, storySaid } from './helpers';
 import { ciTimes } from './support';
 
 const SHOTS = fileURLToPath(new URL('./shots/', import.meta.url));
@@ -100,15 +100,15 @@ for (const [lang, words] of Object.entries(WORDS)) {
     // The first lesson, page by page.
     await expect(page.locator('.lesson-page h1')).toHaveText(words.lesson);
     await shoot(page, 'lesson-first-page');
-    await page.locator('#lesson-next').click();
+    await nextLessonPage(page);
     await shoot(page, 'lesson-second-page');
-    await page.locator('#lesson-next').click();
+    await nextLessonPage(page);
     await shoot(page, 'lesson-last-page');
 
     // Try it: the gate. The first time, the screen's guide comes first (D68, D258): its
     // first step, then skipped; then the start card with the friend's words, the editor
     // empty (D63).
-    await page.locator('#lesson-try').click();
+    await nextLessonPage(page);
     await expect(page.locator('.guide')).toHaveAttribute('data-step', 'scene', { timeout: ciTimes(30_000) });
     await shoot(page, 'guide');
     await skipGuide(page);

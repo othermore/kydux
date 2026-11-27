@@ -60,13 +60,15 @@ def error_info(
     error: BaseException, level: Level | None = None, code: str | None = None
 ) -> ErrorInfo:
     """An error as the page shows it: Python's own words and their explanation in the
-    child's; a run with no level, a lesson's, explains an index past a list's end
-    only (D198)."""
+    child's; a run with no level explains an index past a list's end (D198) and a name
+    the program has not, as a level's run does (D354)."""
     message = error.msg if isinstance(error, SyntaxError) else str(error)
     if level is not None:
         explanation = explain(error, level, code).to_dict()
     elif isinstance(error, IndexError):
         explanation = index_explanation(error, code).to_dict()
+    elif isinstance(error, NameError):
+        explanation = {"kind": "unknown_name", "params": {"name": str(error.name or "")}}
     else:
         explanation = None
     return ErrorInfo(python_name(error), message, child_line(error), explanation)

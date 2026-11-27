@@ -2,18 +2,23 @@
 // page, and on the last page the button that marks the lesson read and opens what
 // comes next: Try it, where a level comes next for the example to be tried in;
 // Go on, before another lesson or a story, and for a lesson with no example
-// (D56). Reaching the last page marks it read. A lesson is drawn as its teacher
-// speaking, the figure beside the words (D67). A page's code runs on the page itself,
-// in the lesson's level (lessonrun.ts, D142).
+// (D56). A lesson is drawn as its teacher speaking, the figure beside the words (D67). A
+// page's code runs on the page itself, in the lesson's level (lessonrun.ts, D142). On a
+// first reading, a page with code to try is left once its test is done (D354): its
+// forward button, pressed before, leaves the page where it is and says under the block
+// what is missing; Back always works. Reaching the last page marks the lesson read, once
+// that page's test is done.
 
 import { marked } from 'marked';
 import { itemHash } from '../content/course';
-import { type Lesson, pageParts } from '../content/lessons';
+import { type Lesson, type LessonTest, pageParts } from '../content/lessons';
+import { debugging } from '../engine/debugging';
 import { characterName, t } from '../i18n';
 import * as progress from '../progress/progress';
 import { element } from './dom';
 import { portrait, portraitOf } from './portraits';
 import { type LessonRunner, type RunBlock, runBlock } from './lessonrun';
+import { type LessonRun, lessonTestDue } from './lessontest';
 import type { Screen } from './screen';
 
 export interface LessonScreenParts {
@@ -29,6 +34,22 @@ export interface LessonScreenParts {
   reload: () => Promise<Lesson>;
   /** How its code runs on the page, in the level after it; none with no level after it. */
   runner?: LessonRunner;
+}
+
+/** What a page's test still asks, in the child's words (D354). */
+function askedWords(key: string): string {
+  switch (key) {
+    case 'lesson.not_run':
+      return t('lesson.not_run');
+    case 'lesson.trial_not_started':
+      return t('lesson.trial_not_started');
+    case 'lesson.trial_not_changed':
+      return t('lesson.trial_not_changed');
+    case 'lesson.trial_not_renamed':
+      return t('lesson.trial_not_renamed');
+    default:
+      return t('lesson.trial_error_not_seen');
+  }
 }
 
 export function lessonScreen(parts: LessonScreenParts): Screen {
@@ -49,6 +70,27 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
   };
 
   const markRead = () => progress.markRead(lesson.id);
+  // A page's test is asked on a first reading (D354): not of a lesson read before, nor of
+  // one read again from a level, nor in the tester's mode.
+  let asks = false;
+  const tested = new Set<number>();
+  // The runs of each page's block in this visit, and its test.
+  const runs = new Map<number, LessonRun[]>();
+  const testOf = (at: number): { test: LessonTest; code: string } | null => {
+    const part = pageParts(lesson.pages[at] ?? '').find((one) => 'code' in one);
+    return part && 'code' in part ? { test: part.test, code: part.code } : null;
+  };
+  /** What the page's test still asks, or null when the page may be left. */
+  const due = (at: number): string | null => {
+    const block = testOf(at);
+    if (!asks || !block || tested.has(at)) return null;
+    return lessonTestDue(block.test, block.code, runs.get(at) ?? []);
+  };
+  const passed = (at: number) => {
+    tested.add(at);
+    progress.markTested(lesson.id, at);
+    if (at === lesson.pages.length - 1) markRead();
+  };
   // Try it leads to a level, where the example is tried; a lesson followed by
   // another lesson has nothing to try yet, and goes on to it.
   const tries = () => lesson.tryCode !== null && (parts.next?.startsWith('level:') ?? false);
@@ -68,7 +110,8 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
 
   const draw = () => {
     const last = page === lesson.pages.length - 1;
-    if (last) markRead();
+    if (last && due(page) === null) markRead();
+    const shown = page;
     document.title = t('level.page_title', { title: lesson.title });
     const article = element('article', { className: 'lesson-page' });
     for (const block of blocks) block.destroy();
@@ -81,7 +124,17 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
         words.innerHTML = marked.parse(part.markdown, { async: false });
         article.append(...words.children);
       } else if (parts.runner) {
-        const block = runBlock(part.code, parts.runner);
+        const block = runBlock(part.code, parts.runner, (run) => {
+          runs.set(shown, [...(runs.get(shown) ?? []), run]);
+          if (asks && !tested.has(shown) && lessonTestDue(part.test, part.code, runs.get(shown) ?? []) === null) {
+            passed(shown);
+            block.ask(null);
+            block.node.dataset.passed = 'true';
+          }
+        });
+        // The page's test and whether it is done, for the tests.
+        block.node.dataset.test = part.test;
+        if (due(shown) === null) block.node.dataset.passed = 'true';
         blocks.push(block);
         article.append(block.node);
       } else {
@@ -105,6 +158,12 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
           t('lesson.next'),
         ]);
     forward.addEventListener('click', () => {
+      // A page whose test is not done stays, and says what is missing (D354).
+      const missing = due(page);
+      if (missing !== null) {
+        blocks[0]?.ask(askedWords(missing));
+        return;
+      }
       if (last) tryIt();
       else {
         page += 1;
@@ -144,6 +203,8 @@ export function lessonScreen(parts: LessonScreenParts): Screen {
     mount: () => {
       // A lesson read again from a level: the child is still at the level.
       if (!parts.backTo) progress.setCurrent(`lesson:${lesson.id}`);
+      asks = !debugging() && !parts.backTo && progress.load().lessons[lesson.id]?.read !== true;
+      for (const at of progress.testedPages(lesson.id)) tested.add(at);
       draw();
     },
     async relabel() {

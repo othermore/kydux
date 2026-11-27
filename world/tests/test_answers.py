@@ -94,6 +94,19 @@ def test_a_find_not_kept_is_no_advice_where_nothing_is_to_find():
     assert result.advice == []
 
 
+def test_a_lesson_s_block_explains_a_name_the_program_has_not():
+    """D354: the page of `a-name-for-a-value` that asks for the error knows it by its kind,
+    in the level after the lesson as with no level."""
+    from kydux_world.run import run_script
+
+    code = "dulces = 12\nprint(caramelos)\n"
+    in_level = run("the-reading-room", code)
+    assert in_level.error.explanation == {"kind": "unknown_name", "params": {"name": "caramelos"}}
+    alone = run_script(code)
+    unknown = {"kind": "unknown_name", "params": {"name": "caramelos"}}
+    assert alone["error"]["explanation"] == unknown
+
+
 def test_an_example_gives_the_wizard_the_thing_the_code_keeps():
     """D345: the example of how a method is used names the child's own variable that keeps
     a found thing, or else a variable, never a word to search with."""

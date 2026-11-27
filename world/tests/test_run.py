@@ -18,7 +18,8 @@ def test_an_error_names_its_type_message_and_the_child_s_line():
         "type": "NameError",
         "message": "name 'y' is not defined",
         "line": 2,
-        "explanation": None,
+        # A name the program has not, explained as a level's run does (D354).
+        "explanation": {"kind": "unknown_name", "params": {"name": "y"}},
     }
 
 

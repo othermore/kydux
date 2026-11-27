@@ -12,9 +12,9 @@ A line that is only `wizard.find_nearest("book")` finds the book and forgets it 
 To keep it, we put a variable and `=` in front: `treasure = wizard.find_nearest("book")`. You can give it any name you like. I, for one, call it `treasure` because, to a librarian, every book is a treasure!
 
 ---
-## Two different words
+## The game's word and the variable
 
-That line holds two words that are not the same kind of word. `"book"`, in quotes, is the game's word: it says what kind of thing to look for, and must be written exactly so. `book` without quotes means nothing to the program.
+In that line, one word is the game's and the other is not. `"book"`, in quotes, is the game's word: it says what kind of thing to look for, and must be written exactly so, with its quotes.
 
 But `treasure` is the variable, and its name is chosen by whoever writes the program: `dusty_one` or `my_find` would do just as well. From that line on, the book is in that variable and we can use it in other places.
 

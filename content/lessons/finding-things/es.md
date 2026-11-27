@@ -12,9 +12,9 @@ Una línea que solo sea `wizard.find_nearest("book")` encuentra el libro y lo ol
 Para guardarlo, ponemos delante una variable y `=`: `tesoro = wizard.find_nearest("book")`. Puedes darle el nombre que quieras. Yo, por ejemplo, la llamo `tesoro` porque, para una bibliotecaria, ¡cada libro es un tesoro!
 
 ---
-## Dos palabras distintas
+## La palabra del juego y la variable
 
-Esa línea tiene dos palabras que no son el mismo tipo de palabra. `"book"`, entre comillas, es la palabra del juego: dice qué tipo de cosa buscar, y debe escribirse exactamente así. `book` sin comillas no significa nada para el programa.
+En esa línea, una palabra es del juego y la otra no. `"book"`, entre comillas, es la palabra del juego: dice qué tipo de cosa buscar, y debe escribirse exactamente así, con sus comillas.
 
 En cambio, `tesoro` es la variable, y su nombre lo elige quien escribe el programa: `libro_viejo` o `mi_hallazgo` servirían igual de bien. A partir de esa línea, el libro está en esa variable y podemos usarla en otros sitios.
 

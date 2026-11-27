@@ -3,6 +3,9 @@
   "goals": [
     "A trial of one of the six kinds in the circle."
   ],
+  "goals_short": [
+    "Make a trial."
+  ],
   "starting_code": "# Describe your kind of familiar with `class` and `(Familiar)`, empty for now, with `pass` under it.\n\n# Make one creature of that class and keep it in a variable.\n\n# Call it into the circle with `cast` and `minka`.\n\n",
   "hints": [
     "The six kinds in the book are `Fox`, `Crow`, `Bat`, `Hare`, `Mouse` and `Frog`: one of them is your class's name.",

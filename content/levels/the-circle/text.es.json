@@ -3,6 +3,9 @@
   "goals": [
     "Una prueba de uno de los seis tipos en el círculo."
   ],
+  "goals_short": [
+    "Crea una prueba."
+  ],
   "starting_code": "# Describe tu tipo de familiar con `class` y `(Familiar)`, vacío por ahora, con `pass` debajo.\n\n# Haz una criatura de esa clase y guárdala en una variable.\n\n# Llámala al círculo con `cast` y `minka`.\n\n",
   "hints": [
     "Los seis tipos del libro son `Fox`, `Crow`, `Bat`, `Hare`, `Mouse` y `Frog`: uno de ellos es el nombre de tu clase.",

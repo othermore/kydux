@@ -6,6 +6,12 @@
     "Stand in front of it.",
     "Take the shortest way: fewer than 8 steps in all."
   ],
+  "goals_short": [
+    "",
+    "",
+    "",
+    "Go in fewer than 8 steps."
+  ],
   "starting_code": "eldras_key = wizard.find_nearest(\"key\")\nsteps = eldras_key.distance_to(wizard)\nwizard.move_left(steps)\nwizard.pick_up()\n\n# Take the steps you walked from the five to the door, and keep the rest in a variable.\n\n# Walk left the rest, to the door, with `move_left`.\n\n# Open it with `open`.\n",
   "hints": [
     "The door is five steps from the start: the rest is five less the steps you already walked, `5 - steps`.",

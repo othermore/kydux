@@ -4,6 +4,10 @@
     "Camina hasta la boca del túnel, la casilla (15, 3).",
     "Abre el mapa con su hechizo."
   ],
+  "goals_short": [
+    "Camina hasta la casilla (15, 3).",
+    ""
+  ],
   "starting_code": "# Camina a la derecha hasta la columna del túnel con `move_right`.\n\n# Sube hasta su boca con `move_up`.\n",
   "hints": [
     "Mira el mapa: estamos en la casilla (1, 12) y queremos ir a la (15, 3). ¿Cuánto cambia cada número?",

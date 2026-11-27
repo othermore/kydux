@@ -5,6 +5,11 @@
     "Guarda el número de pasos en una variable y camina con ella.",
     "Escribe el número una sola vez en todo el programa."
   ],
+  "goals_short": [
+    "",
+    "Usa una variable para los pasos.",
+    "Escribe el número solo una vez."
+  ],
   "starting_code": "# Los comentarios como este te dicen qué escribir debajo. ¡Léelos todos!\n\n# Guarda el número 2 en una variable. El nombre lo eliges tú.\n\n# Camina a la izquierda con `move_left` y tu variable entre los paréntesis.\n\n# Ve hacia arriba con `move_up` y la misma variable.\n\n# Ve a la derecha con `move_right` y la misma variable, hasta la puerta.\n",
   "hints": [
     "Una línea que guarda un número se escribe poniendo el nombre de la variable, luego `=` y después el número.",

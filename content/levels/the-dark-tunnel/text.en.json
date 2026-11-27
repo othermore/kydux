@@ -4,6 +4,10 @@
     "Walk out at the tunnel's exit: look for it on the map.",
     "Check which cell you are on with `position`."
   ],
+  "goals_short": [
+    "Find the tunnel's exit.",
+    "See which cell you are on."
+  ],
   "starting_code": "# Open the map with its spell and look for the exit.\n\n# Print where you are with `position` and `print`.\n\n# Walk up to the exit's row with `move_up`.\n\n# Walk to the right to the exit with `move_right`.\n",
   "hints": [
     "Cast *orvim* to see the exit on the map!",

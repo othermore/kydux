@@ -4,6 +4,10 @@
     "Tu familiar en el cuarto olvidado, en (13, 3).",
     "No choca con nada."
   ],
+  "goals_short": [
+    "Lleva a tu familiar al cuarto.",
+    ""
+  ],
   "starting_code": "# Manda a {familiar} con `go_to` a la primera esquina del pasadizo: 10, 8.\n\n# Con `go_to`, por el pasadizo hasta 13, 8.\n\n# Con `go_to`, hacia arriba hasta el cuarto: 13, 3.\n\n",
   "hints": [
     "El pasadizo sube, gira a la derecha y vuelve a subir: tiene dos esquinas antes del cuarto.",

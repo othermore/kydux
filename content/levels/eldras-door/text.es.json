@@ -6,6 +6,12 @@
     "Quédate delante de ella.",
     "Ve por el camino más corto: menos de 8 pasos en total."
   ],
+  "goals_short": [
+    "",
+    "",
+    "",
+    "Ve en menos de 8 pasos."
+  ],
   "starting_code": "llave_de_eldra = wizard.find_nearest(\"key\")\npasos = llave_de_eldra.distance_to(wizard)\nwizard.move_left(pasos)\nwizard.pick_up()\n\n# Resta de los cinco pasos hasta la puerta los que ya has caminado, y guarda el resto en una variable.\n\n# Camina a la izquierda el resto, hacia la puerta, con `move_left`.\n\n# Ábrela con `open`.\n",
   "hints": [
     "La puerta está a cinco pasos del inicio: el resto son cinco menos los pasos que ya has caminado, `5 - pasos`.",

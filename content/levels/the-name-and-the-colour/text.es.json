@@ -3,6 +3,9 @@
   "goals": [
     "Una prueba con su nombre y un color de su tipo."
   ],
+  "goals_short": [
+    "Haz una prueba completa."
+  ],
   "starting_code": "class {familiar_class}(Familiar):\n    pass\n\n# Haz {familiar_a_kind} y guárdal{familiar:o|a} en una variable.\n\n# Dale su nombre, con `.name`.\n\n# Dale su color, con `.color`.\n\n# Llámal{familiar:o|a} con `minka`.\n\n",
   "hints": [
     "Primero, el objeto: el nombre de tu clase con paréntesis, guardado en una variable.",

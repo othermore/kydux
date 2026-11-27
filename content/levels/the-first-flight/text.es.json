@@ -4,6 +4,10 @@
     "Llega a la piedra blanca.",
     "Aterriza en la piedra blanca antes de que el programa termine."
   ],
+  "goals_short": [
+    "",
+    "Aterriza en la piedra blanca."
+  ],
   "starting_code": "# Camina hasta el final del embarcadero con `move_right`.\n\n# Lanza la palabra que levanta la escoba con `cast`.\n\n# Vuela hasta la piedra con `move_right`.\n",
   "hints": [
     "Hasta el final del embarcadero hay 8 pasos. ¡Camina hasta allí primero!",

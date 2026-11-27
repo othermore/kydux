@@ -4,6 +4,10 @@
     "Di cuántas escobas hay en el suelo, con `say`.",
     "Imprime una lista con `print`."
   ],
+  "goals_short": [
+    "Di cuántas escobas hay.",
+    ""
+  ],
   "starting_code": "# Encuentra las escobas del suelo con `find_all`.\n# Imprime la lista con `print`.\n# Di cuántas hay con `say` y `len`.\n",
   "hints": [
     "Las escobas colgadas se ven muy bien, ¡así que solo tenemos que contar las que están en el suelo!",

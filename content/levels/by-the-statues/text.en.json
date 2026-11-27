@@ -5,6 +5,11 @@
     "Do not let Dask see you.",
     "End right on the mark, with a second `if`."
   ],
+  "goals_short": [
+    "Reach the mark.",
+    "",
+    "End on the mark."
+  ],
   "starting_code": "# If Dask looks up, walk down two cells with `move_down`.\n\n# Walk right with `move_right`.\n\n# Walk down with `move_down`.\n",
   "hints": [
     "We can check which way Dask is looking with `facing`!",

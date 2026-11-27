@@ -3,6 +3,9 @@
   "goals": [
     "A trial with its name and a colour of its kind."
   ],
+  "goals_short": [
+    "Make a whole trial."
+  ],
   "starting_code": "class {familiar_class}(Familiar):\n    pass\n\n# Make one {familiar_kind} and keep it in a variable.\n\n# Give it its name, with `.name`.\n\n# Give it its colour, with `.color`.\n\n# Call it with `minka`.\n\n",
   "hints": [
     "First, the object: your class's name with brackets, kept in a variable.",

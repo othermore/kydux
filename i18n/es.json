@@ -773,7 +773,9 @@
     "timeline": "Después de ejecutar un programa, puedes arrastrar la barra debajo de la escena para repasar lo que pasó momento a momento y descubrir qué falló.",
     "zoom": "Usa los botones *+* y *−* (o la rueda del ratón) para acercar y alejar la escena. Si no ves a tu {mago|maga}, el botón *Buscar a {mi mago|mi maga}* {lo|la} vuelve a poner a la vista.",
     "lesson": "En una lección con un ejemplo de código, puedes cambiarlo y pulsar el botón *Ejecutar*, debajo de él, para ver allí mismo qué hace tu cambio.",
-    "map": "El botón *Mapa* abre el mapa. Desde allí puedes volver a abrir cualquier parada a la que ya hayas llegado para jugarla otra vez, y ver las estrellas de cada nivel ganado."
+    "map": "El botón *Mapa* abre el mapa. Desde allí puedes volver a abrir cualquier parada a la que ya hayas llegado para jugarla otra vez, y ver las estrellas de cada nivel ganado.",
+    "comments": "Acuérdate de leer los comentarios del código para saber qué hacer. Una línea que empieza por `#` es un comentario: el ordenador se la salta.",
+    "lists": "Encima de tu programa ves las variables. Las que ya tienes son las que vienen en el nivel o las que tú has creado. Y las que están por encontrar, son las cosas que puedes buscar para guardar en una variable."
   },
   "familiars": {
     "Fox": {

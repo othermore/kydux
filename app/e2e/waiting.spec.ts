@@ -19,6 +19,29 @@ const CONTENT = fileURLToPath(new URL('../../content/', import.meta.url));
 const ES = JSON.parse(readFileSync(new URL('../../i18n/es.json', import.meta.url), 'utf8'));
 const LETTER: string[] = JSON.parse(readFileSync(`${CONTENT}stories/the-letter/text.es.json`, 'utf8')).steps;
 const SHOTS = 'e2e/shots/waiting/';
+const CHAPTERS = ['01-arrival', '02-the-library'].map(
+  (id) => JSON.parse(readFileSync(`${CONTENT}chapters/${id}/chapter.json`, 'utf8')).items as string[],
+);
+
+/** A game that has reached the reading room, the first level with the lists (D357): every
+ * stop before its lesson done. Its tips are all twelve. */
+async function seedReadingRoom(page: Page): Promise<void> {
+  const all = CHAPTERS.flat();
+  const done = all.slice(0, all.indexOf('level:the-reading-room')).map((item) => item.split(':'));
+  const read = (kind: string) => Object.fromEntries(done.filter(([k]) => k === kind).map(([, id]) => [id, { read: true }]));
+  const progress = {
+    version: 1,
+    wizard: MARTA,
+    guided: true,
+    stories: read('story'),
+    lessons: read('lesson'),
+    levels: Object.fromEntries(done.filter(([k]) => k === 'level').map(([, id]) => [id, { won: true, stars: 3 }])),
+  };
+  await page.addInitScript((kept) => {
+    if (!localStorage.getItem('kydux.games')) localStorage.setItem('kydux.progress', kept);
+    localStorage.removeItem('kydux.tips-off');
+  }, JSON.stringify(progress));
+}
 
 test.use({ locale: 'es-ES', viewport: { width: 1280, height: 800 } });
 
@@ -47,41 +70,45 @@ test.describe('a tip while a screen loads', () => {
     await expect(page.locator('#waiting button')).toHaveCount(0);
   }
 
-  // The tallest tip of each language, the zoom's, three lines of words: the picture as
-  // large as the window lets, and the view never scrolled (D239).
+  // The tallest tip of each language, the one with the most words, in a game that has
+  // reached the reading room and so is given every tip: the picture as large as the
+  // window lets, pinned up, and the view never scrolled either way (D239, D358).
   for (const [lang, locale] of [
     ['es', 'es-ES'],
     ['en', 'en-US'],
   ] as const) {
+    const said = JSON.parse(readFileSync(new URL(`../../i18n/${lang}.json`, import.meta.url), 'utf8')).tips as Record<string, string>;
+    const keys = Object.keys(said);
+    const tallest = keys.reduce((most, key) => ((said[key] ?? '').length > (said[most] ?? '').length ? key : most));
     for (const [width, height, least] of [
-      [1280, 800, 720],
-      [1024, 700, 480],
-      // No smaller than before the bar (D249).
-      [1366, 650, 458],
-      [390, 844, 0],
+      [1280, 800, 600],
+      [1024, 700, 430],
+      [1366, 650, 340],
+      [900, 600, 250],
+      [390, 844, 240],
     ] as const) {
       test.describe(`in ${lang} at ${width} by ${height}`, () => {
         test.use({ locale, viewport: { width, height } });
 
         test('the tallest tip: its picture large, the page not scrolled (D239)', async ({ page }) => {
-          await seedWizard(page, MARTA, { tips: true });
-          // The tip before the zoom's was the last shown: the zoom's comes next.
-          await page.addInitScript(() => localStorage.setItem('kydux.tip', '6'));
+          await seedReadingRoom(page);
+          // The tip before the tallest was the last shown: the tallest comes next.
+          await page.addInitScript((last) => localStorage.setItem('kydux.tip', String(last)), keys.indexOf(tallest) - 1);
+          // The start screen first, which knows the course: the game's tips are all there.
+          await page.goto('/#start');
+          await expect(page.locator('#continue')).toBeVisible();
           await page.goto('/#level/the-moving-key');
-          await expect(page.locator('#waiting')).toHaveAttribute('data-tip', 'zoom', { timeout: ciTimes(1_500) });
+          await expect(page.locator('#waiting')).toHaveAttribute('data-tip', tallest, { timeout: ciTimes(1_500) });
           const picture = page.locator('.waiting-tip-picture');
           await expect.poll(() => picture.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(960);
+          // The picture's box as drawn, turned in its frame (D358).
           const drawn = (await picture.boundingBox())?.width ?? 0;
-          if (least > 0) expect(drawn).toBeGreaterThanOrEqual(least);
-          else {
-            const room = await page
-              .locator('.waiting-tip-box')
-              .evaluate((box) => box.clientWidth - Number.parseFloat(getComputedStyle(box).paddingLeft) * 2);
-            expect(Math.abs(drawn - room)).toBeLessThan(2);
-          }
+          expect(drawn).toBeGreaterThanOrEqual(least);
           const scrolls = await page.evaluate(() => (document.scrollingElement?.scrollHeight ?? 0) - window.innerHeight);
           expect(scrolls).toBeLessThanOrEqual(0);
-          if (lang === 'es' && least > 0) await page.screenshot({ path: `${SHOTS}tip-${width}x${height}.png` });
+          const sideways = await page.evaluate(() => (document.scrollingElement?.scrollWidth ?? 0) - window.innerWidth);
+          expect(sideways).toBeLessThanOrEqual(0);
+          if (lang === 'es') await page.screenshot({ path: `${SHOTS}tip-${width}x${height}.png` });
           if (lang === 'es') console.log(`tip picture at ${width}x${height}: ${drawn.toFixed(1)} px`);
         });
       });
@@ -138,6 +165,38 @@ test.describe('a tip while a screen loads', () => {
     await expect(page.locator('#waiting')).toHaveAttribute('data-tip', /./, { timeout: ciTimes(5_000) });
     await expect(page.locator('#waiting-tip')).toBeVisible();
     await expect(page.locator('.waiting-tip-box img')).toHaveCount(0);
+    // Neither frame nor pin (D358).
+    await expect(page.locator('.tip-photo')).toHaveCount(0);
+    await expect(page.locator('.tip-pin')).toHaveCount(0);
+  });
+
+  test("a tip's picture is a photograph pinned up, turned one way and the next tip the other (D358)", async ({ page }) => {
+    await seedWizard(page, MARTA, { tips: true });
+    await page.addInitScript(() => localStorage.setItem('kydux.tip', '2'));
+    // The scene's code held back: the first tip stays up, and the next comes after it.
+    await delay(page, '**/assets/scene-*.js', ciTimes(14_000));
+    await page.goto('/#level/the-moving-key');
+    const waiting = page.locator('#waiting');
+    await expect(waiting).toHaveAttribute('data-tip', 'dot', { timeout: ciTimes(1_500) });
+    const photo = page.locator('.tip-photo');
+    await expect(photo).toHaveCount(1);
+    await expect(photo.locator('.waiting-tip-picture')).toHaveCount(1);
+    await expect(photo.locator('.tip-pin')).toHaveCount(1);
+    /** The photograph's turn in degrees, from its computed transform; the words' too. */
+    const turn = (selector: string) =>
+      page.locator(selector).evaluate((node) => {
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(node).transform);
+        return (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI;
+      });
+    const first = await turn('.tip-photo');
+    expect(Math.abs(Math.abs(first) - 2)).toBeLessThan(0.05);
+    expect(await turn('#waiting-tip')).toBe(0);
+    // The picture takes no click, and shows the plain cursor.
+    expect(await photo.evaluate((node) => getComputedStyle(node).pointerEvents)).toBe('none');
+    await page.screenshot({ path: `${SHOTS}tip-pinned.png` });
+    await expect(waiting).toHaveAttribute('data-tip', 'hint', { timeout: ciTimes(12_000) });
+    const second = await turn('.tip-photo');
+    expect(Math.sign(second)).toBe(-Math.sign(first));
   });
 
   test("the visit's first wait shows a tip with its picture at once, and the level opens by itself (D221)", async ({

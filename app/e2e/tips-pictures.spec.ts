@@ -51,14 +51,14 @@ function framed(boxes: { x: number; y: number; width: number; height: number }[]
 }
 
 /** Writes the page round `around` as the tip's picture in `lang`. */
-async function picture(page: Page, lang: string, key: string, around: Locator[]): Promise<void> {
+async function picture(page: Page, lang: string, key: string, around: Locator[], margin = 24): Promise<void> {
   const boxes = [];
   for (const locator of around) {
     const box = await locator.boundingBox();
     if (box) boxes.push(box);
   }
   expect(boxes.length).toBeGreaterThan(0);
-  const shot = await page.screenshot({ clip: framed(boxes) });
+  const shot = await page.screenshot({ clip: framed(boxes, margin) });
   // Made small and written as a webp by the page's own canvas, at the best quality
   // that weighs less than MOST_BYTES.
   const webp = await page.evaluate(
@@ -183,6 +183,29 @@ for (const [lang, locale, wizard] of [
       await picture(page, lang, 'zoom', [frame]);
       await page.goto('/#settings');
       await picture(page, lang, 'keys', [page.locator('#settings-keys')]);
+    });
+
+    test("a level's comments, and the two lists over the editor (D357)", async ({ page }) => {
+      // The dark note's editor: the comment of its starting code and the lines under it.
+      await openLevel(page, 'the-dark-note');
+      const lines = page.locator('.cm-line');
+      await picture(page, lang, 'comments', [lines.nth(0), lines.nth(4)]);
+      // The lost book with one line typed at the program's end: Tienes with wizard and the
+      // typed variable with its value, Por encontrar with "book"; no part of the scene,
+      // the editor widened over it first.
+      await openLevel(page, 'the-lost-book');
+      for (let turn = 0; turn < 5; turn += 1) {
+        await page.locator('#split').focus();
+        await page.keyboard.press('ArrowLeft');
+      }
+      await page.locator('.cm-content').click();
+      await page.keyboard.press('ControlOrMeta+End');
+      await page.keyboard.press('Enter');
+      const typed = lang === 'es' ? 'pasos' : 'steps';
+      await page.keyboard.type(`${typed} = 4`);
+      await expect(page.locator(`#have-chips [data-name="${typed}"]`)).toHaveAttribute('data-value', '4');
+      await expect(page.locator('#find-chips [data-name="book"]')).toBeVisible();
+      await picture(page, lang, 'lists', [page.locator('#program-lists'), lines.nth(2)], 6);
     });
 
     test('the map, and a lesson whose example is run on its page', async ({ page }) => {

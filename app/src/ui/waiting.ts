@@ -17,7 +17,9 @@
 // (main.ts), and, as each tip comes up, for the one after it. The browser tests turn the
 // tips off with a key no setting shows, read once as the page opens.
 
+import { type Course, items, LISTS_FROM, stopState } from '../content/course';
 import { readingMs } from '../engine/bubble';
+import type { Progress } from '../progress/store';
 import { currentLanguage, t } from '../i18n';
 import { element } from './dom';
 import { markSvg } from './mark';
@@ -27,8 +29,38 @@ import { contentUrl } from '../content/address';
 export const GRACE = 2000;
 /** How long a tip is up before the next, and the most a ready screen waits under it. */
 export const TIP_TIME = 10_000;
-/** The tips, by their key under `tips.`, in the order they are shown. */
-export const TIPS = ['notebook', 'spells', 'click', 'dot', 'hint', 'keys', 'timeline', 'zoom', 'lesson', 'map'] as const;
+/** The tips, by their key under `tips.`, in the order they are shown; a tip told from a
+ * stop (TIP_FROM) comes after every tip told always, so that leaving it out moves no
+ * other tip's number (D357). */
+export const TIPS = [
+  'notebook',
+  'spells',
+  'click',
+  'dot',
+  'hint',
+  'keys',
+  'timeline',
+  'zoom',
+  'lesson',
+  'map',
+  'comments',
+  'lists',
+] as const;
+/** The tips told only from a stop of the course on (D357): among a child's tips when, in
+ * the game being played, that stop is open or done. */
+export const TIP_FROM: Readonly<Record<string, string>> = { lists: LISTS_FROM };
+
+/** The tips of the game being played (D357): every tip told always, and each tip told
+ * from a stop the game has open or done; none told from a stop where no game is in play
+ * or the course is not known. */
+export function tipsOf(course: Course | null, progress: Progress | null): string[] {
+  return TIPS.filter((key) => {
+    const from = TIP_FROM[key];
+    if (from === undefined) return true;
+    if (!course || !progress?.wizard) return false;
+    return stopState(course, from, progress) !== 'locked' && items(course).includes(from);
+  });
+}
 /** Where the browser keeps the last tip shown, and the key that turns the tips off. */
 export const LAST_TIP = 'kydux.tip';
 export const TIPS_OFF = 'kydux.tips-off';
@@ -52,10 +84,11 @@ const turnedOff = (() => {
   }
 })();
 
-/** The tip after the last one shown, kept in the browser. */
+/** The tip after the last one shown, kept in the browser; the first after the last, and
+ * after a number past the game's tips (D357). */
 export function nextTip(storage: Kept | null, count: number): number {
   const last = Number.parseInt(storage?.getItem(LAST_TIP) ?? '', 10);
-  return Number.isInteger(last) && last >= 0 ? (last + 1) % count : 0;
+  return Number.isInteger(last) && last >= 0 && last + 1 < count ? last + 1 : 0;
 }
 
 export interface WaitOptions {
@@ -65,8 +98,10 @@ export interface WaitOptions {
   /** Whether a tip is due at once, with no grace (D221). */
   due?: boolean;
   storage?: Kept | null;
-  /** The tips' keys, the page's own unless a test gives others. */
-  keys?: readonly string[];
+  /** The tips' keys, the page's own unless a test gives others; read each time a tip is
+   * due when given as a function, so that a wait begun before the course is known tells
+   * a tip told from a stop once it is (D357). */
+  keys?: readonly string[] | (() => readonly string[]);
   /** A tip comes up, by its key, with its picture loaded, or null where it failed. */
   onTip?: (key: string, picture: HTMLImageElement | null) => void;
   /** A tip's picture loaded and decoded, or null where it fails (D246); the tip comes up
@@ -87,7 +122,6 @@ export function readFor(ms: number): number {
 /** One wait for a screen, its clock and its tips. */
 export class Wait {
   private readonly storage: Kept | null;
-  private readonly keys: readonly string[];
   private shownAt: number | null = null;
   private readMs = TIP_TIME;
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -98,8 +132,13 @@ export class Wait {
 
   constructor(private readonly options: WaitOptions) {
     this.storage = options.storage === undefined ? browserStorage() : options.storage;
-    this.keys = options.keys ?? TIPS;
     if (options.tips && this.keys.length > 0) this.timer = setTimeout(() => this.tip(), options.due ? 0 : GRACE);
+  }
+
+  /** The tips of the game being played, as they are now. */
+  private get keys(): readonly string[] {
+    const keys = this.options.keys;
+    return typeof keys === 'function' ? keys() : (keys ?? TIPS);
   }
 
   /** A tip is due now (D221): the screen's scene is known to be a new one. */
@@ -234,18 +273,59 @@ export function tipPictureLoaded(key: string, language = currentLanguage()): Pro
   return loaded;
 }
 
-/** The picture of the tip due next asked for ahead, when the page makes Python (D246,
- * D341). */
-export function askNextTip(): void {
-  if (turnedOff) return;
-  const key = TIPS[nextTip(browserStorage(), TIPS.length)] ?? TIPS[0];
+/** The picture of the tip due next among the game's tips asked for ahead, when the page
+ * makes Python (D246, D341, D357). */
+export function askNextTip(keys: readonly string[] = TIPS): void {
+  if (turnedOff || keys.length === 0) return;
+  const key = keys[nextTip(browserStorage(), keys.length)] ?? keys[0] ?? TIPS[0];
   void tipPictureLoaded(key);
+}
+
+const SVG = 'http://www.w3.org/2000/svg';
+
+/** A drawing pin the game draws (D358): its round head in the page's rose, a small shine
+ * on it, and a short shadow under it; no file of art. */
+function pin(): SVGSVGElement {
+  const svg = document.createElementNS(SVG, 'svg');
+  svg.setAttribute('viewBox', '0 0 32 32');
+  svg.setAttribute('class', 'tip-pin');
+  svg.setAttribute('aria-hidden', 'true');
+  const shape = (name: string, attributes: Record<string, string>) => {
+    const node = document.createElementNS(SVG, name);
+    for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+    svg.append(node);
+  };
+  shape('ellipse', { cx: '18', cy: '22', rx: '9', ry: '4.5', fill: 'rgb(43 37 51 / 28%)' });
+  shape('circle', { cx: '15', cy: '14', r: '10', fill: 'var(--rose)' });
+  shape('circle', { cx: '15', cy: '14', r: '10', fill: 'none', stroke: 'var(--rose-deep)', 'stroke-width': '1.5' });
+  shape('ellipse', { cx: '11.5', cy: '10.5', rx: '3.6', ry: '2.4', fill: 'rgb(255 255 255 / 70%)' });
+  return svg;
+}
+
+/** Which way a tip's photograph is turned (D358): to the left at an even place in the
+ * order of the tips, to the right at the next. */
+export function turnOf(key: string): 'left' | 'right' {
+  const place = (TIPS as readonly string[]).indexOf(key);
+  return place % 2 === 0 ? 'left' : 'right';
+}
+
+/** A tip's picture shown as what it is, a photograph of the game pinned up (D358): in a
+ * plain light frame with a lifted shadow, a little turned, a pin at its top edge's
+ * middle; it takes no click. The picture is the element loaded first (D246). */
+export function pinnedPhoto(picture: HTMLImageElement, key: string): HTMLElement {
+  const photo = element('div', { className: 'tip-photo' }, [picture, pin()]);
+  photo.dataset.turn = turnOf(key);
+  return photo;
 }
 
 /** The waiting view: the mark and Loading… in a row, the bar under them (D249), and the
  * tip's place, hidden until a tip comes up with its picture loaded, then the picture
- * over its words (D246). */
-export function waitingView(tips: boolean, due = false): Waiting {
+ * over its words (D246), shown as a photograph pinned up (D358). */
+export function waitingView(
+  tips: boolean,
+  due = false,
+  keys: readonly string[] | (() => readonly string[]) = TIPS,
+): Waiting {
   const words = element('p', { id: 'waiting-tip', className: 'waiting-tip' });
   words.setAttribute('aria-live', 'polite');
   const tip = element('figure', { className: 'waiting-tip-box', hidden: true }, [words]);
@@ -259,13 +339,14 @@ export function waitingView(tips: boolean, due = false): Waiting {
   const wait = new Wait({
     tips: tips && !turnedOff,
     due,
+    keys,
     reading: (key) => readingMs(t(`tips.${key}`).replace(/[*`]/g, '')),
     picture: (key) => tipPictureLoaded(key),
-    // The loaded picture over the words, in the same frame; the words alone where it
-    // failed, with no room kept for it.
+    // The loaded picture, pinned up, over the words, which stay straight; the words alone
+    // where it failed, with no frame, no pin and no room kept for it.
     onTip: (key, picture) => {
       words.replaceChildren(...tipNodes(t(`tips.${key}`)));
-      tip.replaceChildren(...(picture ? [picture] : []), words);
+      tip.replaceChildren(...(picture ? [pinnedPhoto(picture, key)] : []), words);
       tip.hidden = false;
       node.dataset.tip = key;
     },

@@ -3386,17 +3386,52 @@ a.stop-body:focus-visible {
   display: none;
 }
 
-/* As large as the window lets (D239): the box's width, 800 px at most, and never so
-   large that the page scrolls: its width also follows the window's height, less the
-   rest of the page at its tallest tip, three lines of words, measured at 351 px at
-   1024 by 700: the header, the row of the mark and Loading…, the bar, the card's
-   paddings, gap and words, the view's foot and the footer. */
+/* A tip's picture as a photograph pinned up (D358): a plain light border all round, the
+   corners nearly square, a lifted shadow, turned two degrees, left at an even place in
+   the order and right at the next; a pin at the middle of its top edge; it takes no
+   click. */
+.tip-photo {
+  --frame: 10px;
+
+  position: relative;
+  margin-top: 10px;
+  padding: var(--frame);
+  border-radius: 2px;
+  background: #fdfaf2;
+  box-shadow: var(--shadow-lifted);
+  transform: rotate(-2deg);
+  pointer-events: none;
+  cursor: default;
+  user-select: none;
+}
+
+.tip-photo[data-turn='right'] {
+  transform: rotate(2deg);
+}
+
+.tip-pin {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translateX(-50%);
+}
+
+/* As large as the window lets (D239): 800 px wide at most, the frame inside the box's
+   width, and never so large that the page scrolls: its width also follows the window's
+   height, less the rest of the page at its tallest tip, the lists', measured at 456 px
+   at 900 by 600 in Spanish, its words on most lines, with the frame, the turn and the
+   pin counted: the header, the row of the mark and Loading…, the bar, the card's
+   paddings and gap, the photograph's frame, pin and turned corners, the words, the
+   view's foot and the footer. */
 .waiting-tip-picture {
-  width: min(100%, 800px, calc((100vh - 352px) * 16 / 9));
+  display: block;
+  width: min(calc(100vw - 130px), 800px, calc((100vh - var(--tip-rest, 456px)) * 16 / 9));
   height: auto;
   aspect-ratio: 16 / 9;
   object-fit: contain;
-  border-radius: var(--radius);
+  border-radius: 1px;
   background: var(--paper-warm);
 }
 

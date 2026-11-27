@@ -773,7 +773,9 @@
     "timeline": "After running a program, you can drag the bar under the scene to go over what happened moment by moment and find out what went wrong.",
     "zoom": "Use the *+* and *−* buttons (or the mouse wheel) to bring the scene nearer or farther. If you lose sight of your wizard, the *Find my wizard* button brings them back into view.",
     "lesson": "In a lesson with an example of code, you can change it and press the *Run* button under it to see right there what your change does.",
-    "map": "The *Map* button opens the map. From there you can open again any stop you have already reached, to play it once more, and see the stars of every level you have won."
+    "map": "The *Map* button opens the map. From there you can open again any stop you have already reached, to play it once more, and see the stars of every level you have won.",
+    "comments": "Remember to read the comments in the code to know what to do. A line that begins with `#` is a comment: the computer skips it.",
+    "lists": "Over your program you see the variables. The ones you already have are the ones that come with the level or the ones you have made. And the ones still to find are the things you can look for to keep in a variable."
   },
   "familiars": {
     "Fox": {

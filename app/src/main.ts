@@ -55,7 +55,7 @@ import { showCookieNotice } from './ui/cookies';
 import { pictured } from './ui/pictured';
 import type { Screen } from './ui/screen';
 import type { StoryJoin, StoryScreenParts } from './ui/story';
-import { askNextTip, type Wait, waitingView } from './ui/waiting';
+import { askNextTip, tipsOf, type Wait, waitingView } from './ui/waiting';
 import { debugging } from './engine/debugging';
 import { lookOf } from './engine/looks';
 import { listenForMusic, music } from './engine/music';
@@ -521,7 +521,7 @@ function fetchBehind(): void {
   if (fetchedBehind) return;
   fetchedBehind = true;
   python();
-  if (!newcomer()) askNextTip();
+  if (!newcomer()) askNextTip(tipsOf(courseKnown, progress.load()));
 }
 
 /** The code the other screens need, fetched in idle time once the first screen shows,
@@ -640,6 +640,7 @@ async function showStart(content: HTMLElement): Promise<void> {
   // each saved game is.
   const course = await loadCourse();
   courseForTitles ??= course;
+  courseKnown ??= course;
   const continueTo = continueTarget(course);
   // Where each saved game is: its item's number and title, or the course's start.
   const places = new Map(
@@ -807,7 +808,15 @@ function route(): void {
   waiting?.wait.dispose();
   const scene = sceneOfRoute(courseKnown, wanted);
   const tipDue = !waitedBefore || (scene !== null && scene !== lastScene);
-  const view = waitingView(!first && !newcomer(), !first && tipDue);
+  // The game's tips: a tip told from a stop once the course is known (D357).
+  if (!courseKnown) {
+    void loadCourse()
+      .then((course) => {
+        courseKnown ??= course;
+      })
+      .catch(() => {});
+  }
+  const view = waitingView(!first && !newcomer(), !first && tipDue, () => tipsOf(courseKnown, progress.load()));
   waitedBefore = true;
   const content = element('main', { className: 'content' }, [view.node]);
   const waited = { content, wait: view.wait, scene };

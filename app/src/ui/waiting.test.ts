@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GRACE, LAST_TIP, nextTip, readFor, TIP_TIME, TIPS, Wait } from './waiting';
+import { defaultProgress } from '../progress/store';
+import { GRACE, LAST_TIP, nextTip, readFor, TIP_FROM, TIP_TIME, TIPS, tipsOf, Wait } from './waiting';
 
 /** A browser's storage, in memory. */
 function kept(): Pick<Storage, 'getItem' | 'setItem'> & { data: Map<string, string> } {
@@ -268,3 +269,47 @@ describe('the tips (D214)', () => {
   });
 });
 
+
+describe('the tips of the game being played (D357)', () => {
+  const course = {
+    chapters: [
+      { id: '01', items: ['story:the-letter', 'lesson:a', 'level:b'] },
+      { id: '02', items: ['story:c', 'lesson:a-name-for-a-value', 'level:the-reading-room', 'level:d'] },
+    ],
+    opening: 'story:the-letter',
+  };
+  const game = (done: string[]) => ({
+    ...defaultProgress(),
+    wizard: { name: 'Ana', gender: 'girl' as const, look: 'teal' },
+    stories: Object.fromEntries(done.filter((i) => i.startsWith('story:')).map((i) => [i.slice(6), { read: true }])),
+    lessons: Object.fromEntries(done.filter((i) => i.startsWith('lesson:')).map((i) => [i.slice(7), { read: true }])),
+    levels: Object.fromEntries(done.filter((i) => i.startsWith('level:')).map((i) => [i.slice(6), { won: true }])),
+  });
+
+  it('holds twelve, a tip told from a stop after every tip told always', () => {
+    expect(TIPS).toHaveLength(12);
+    const told = TIPS.map((key) => key in TIP_FROM);
+    expect(told.indexOf(true)).toBe(TIPS.length - Object.keys(TIP_FROM).length);
+    expect(TIP_FROM).toEqual({ lists: 'level:the-reading-room' });
+  });
+
+  it('gives a game that has not reached the reading room eleven tips, and one that has twelve', () => {
+    expect(tipsOf(course, game(['lesson:a', 'level:b', 'story:c']))).toEqual(TIPS.filter((key) => key !== 'lists'));
+    expect(tipsOf(course, game(['lesson:a', 'level:b', 'story:c', 'lesson:a-name-for-a-value']))).toEqual([...TIPS]);
+    expect(tipsOf(course, game(['lesson:a', 'level:b', 'story:c', 'lesson:a-name-for-a-value', 'level:the-reading-room']))).toEqual([
+      ...TIPS,
+    ]);
+    // No game in play, or no course known: the tips told always.
+    expect(tipsOf(null, game([]))).toEqual(TIPS.filter((key) => key !== 'lists'));
+    expect(tipsOf(course, defaultProgress())).toEqual(TIPS.filter((key) => key !== 'lists'));
+  });
+
+  it('follows a number kept past the game\'s tips by the first, and moves no other number', () => {
+    const storage = kept();
+    storage.setItem(LAST_TIP, '11');
+    expect(nextTip(storage, 11)).toBe(0);
+    storage.setItem(LAST_TIP, '9');
+    expect(nextTip(storage, 11)).toBe(10);
+    expect(nextTip(storage, 12)).toBe(10);
+  });
+});

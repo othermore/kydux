@@ -201,8 +201,9 @@ def test_a_lesson_s_try_says_how_its_block_runs_and_only_a_block_has_one(path):
 NOTHING_TO_TRY = {
     "the-right-place": 2,
     "words": 2,
-    "things-to-carry": 2,
+    "things-to-carry": 1,
     "your-first-spell": 2,
+    "each-thing-its-methods": 3,
     "giving-things": 3,
     "keys-and-doors": 2,
     "fendra": 2,
@@ -726,6 +727,9 @@ METAPHORS = {
 #: What says it in the ordinary sense, of no programming idea, or recalls it once in
 #: parentheses, as the owner allows the second time.
 MAY_SAY = {"story:the-letter", "story:the-tower", "level:the-lost-book"}
+#: A request, not a question: the first instruction asks the wizard for a method (D350),
+#: as the Spanish *le pide* does, and a child may ask for a hint.
+REQUESTS = re.compile(r"asks your wizard for|ask for a hint", re.I)
 
 
 @pytest.mark.parametrize("lang", LANGUAGES)
@@ -735,7 +739,7 @@ def test_a_metaphor_stands_only_where_its_idea_is_first_explained(lang):
     for item, text in every_text(lang):
         if item in MAY_SAY:
             continue
-        found = METAPHORS[lang].search(text)
+        found = METAPHORS[lang].search(REQUESTS.sub("", text))
         assert not found, f"{item}, {lang}: {found.group(0)}"
 
 
@@ -838,6 +842,9 @@ INNOCENT_WAYS = [
     "Hay una manera de encontrar",
     "a way to find all the things",
     "came down that way",
+    "the way is three stretches",
+    "The way to the wand bank",
+    "the game's way of writing",
 ]
 WAY_WORD = re.compile(r"\b(ways?|maneras?)\b", re.IGNORECASE)
 
@@ -919,7 +926,10 @@ GOES_ON = re.compile(r"[^.:!?]$")
 )
 def test_a_comment_of_a_starting_code_is_one_line_a_sentence(path):
     """D223: no sentence of a comment is cut into several `#` lines to fit a width; the
-    editor wraps a line that does not fit."""
+    editor wraps a line that does not fit. The fallen book's comment on `reveal` is the
+    one sentence given on two lines, as its text was handed over (sprint 61)."""
+    if path.parent.name == "the-fallen-book":
+        return
     lines = json.loads(path.read_text(encoding="utf-8")).get("starting_code", "").split("\n")
     for line, after in zip(lines, lines[1:], strict=False):
         said, next_said = line.strip().removeprefix("#").strip(), after.strip()
@@ -958,7 +968,7 @@ def test_a_long_program_is_given_as_comments_one_for_each_instruction(level, lan
         "move_right",
         "move_up",
         "move_down",
-        "broom.untie",
+        "untie",
     )
     for name in names:
         if name == "find_all" and level == "the-nearest-broom":
@@ -975,3 +985,125 @@ def test_the_opening_tells_its_first_two_steps_over_its_still():
     assert story["opening"] is True
     stills = [step.get("still", False) for step in story["steps"]]
     assert stills == [True, True, False, False, False]
+
+
+#: What a thing's attributes are taught by: chapter 3's lesson `where-i-am` (D342).
+ATTRIBUTES = ("wizard.items", "door.locked")
+
+
+def test_no_level_or_lesson_of_chapter_2_teaches_a_thing_s_attributes():
+    """D342: `wizard.items` and `door.locked` are chapter 3's, taught with `position`."""
+    path = CONTENT / "chapters" / "02-the-library"
+    for item in chapter(path)["items"]:
+        kind, _, item_id = item.partition(":")
+        if kind == "level":
+            api = level_json(item_id)["api"]
+            assert not set(ATTRIBUTES) & set(api), f"{item_id} teaches {api}"
+        elif kind == "lesson":
+            teaches = json.loads(
+                (CONTENT / "lessons" / item_id / "lesson.json").read_text(encoding="utf-8")
+            )["teaches"]
+            assert not set(ATTRIBUTES) & set(teaches), f"{item_id} teaches {teaches}"
+
+
+def assigned_kinds(code: str) -> set[str]:
+    """The names a program assigns that are a kind of thing (D345): `book = ...`, a
+    loop's `for key in ...`."""
+    from kydux_world.level import THING_KINDS
+
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return set()
+    return {
+        node.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Name)
+        and isinstance(node.ctx, ast.Store)
+        and node.id in THING_KINDS
+    }
+
+
+def programs_given() -> list[tuple[str, str]]:
+    """Every program the course gives or shows: each level's starting code in every
+    language and its solutions, and every lesson's blocks."""
+    found = []
+    for path in sorted((CONTENT / "levels").glob("*/level.json")):
+        level = path.parent
+        for program in [level / "solution.py", *sorted((level / "solutions").glob("*.py"))]:
+            found.append((f"{level.name}/{program.name}", program.read_text(encoding="utf-8")))
+        for lang in LANGUAGES:
+            text = json.loads((level / f"text.{lang}.json").read_text(encoding="utf-8"))
+            found.append((f"{level.name}/text.{lang}", text["starting_code"]))
+    for path in LESSONS:
+        for lang in LANGUAGES:
+            text = for_wizard((path / f"{lang}.md").read_text(encoding="utf-8"), "girl")
+            for code in BLOCK.findall(text):
+                found.append((f"{path.name}/{lang}.md", code))
+    return found
+
+
+@pytest.mark.parametrize(("where", "code"), programs_given(), ids=lambda v: v[:60])
+def test_no_program_keeps_a_find_under_its_search_word(where, code):
+    """D345: no starting code, solution or lesson's block assigns to a name that is a
+    kind of thing, `book`, `key`, `broom`, `door`, in either language."""
+    assert not assigned_kinds(code), f"{where} assigns {assigned_kinds(code)}"
+
+
+@pytest.mark.parametrize("path", sorted((CONTENT / "levels").glob("*/level.json")))
+def test_no_program_names_a_thing_by_its_id_unless_it_is_a_variable(path):
+    """D344: a solution, another solution or a wrong program names a found thing by the
+    variable it kept it in, never by the thing's id; a search word written as a name, the
+    mistake a wrong program may show, is not an id."""
+    from kydux_world.level import THING_KINDS
+
+    level = Level.from_directory(path.parent)
+    ids = {thing.id for thing in level.things} - level.variables - set(THING_KINDS)
+    for program in sorted(path.parent.glob("**/*.py")):
+        if program.name == "goals.py":
+            continue
+        try:
+            tree = ast.parse(program.read_text(encoding="utf-8"))
+        except SyntaxError:
+            # A wrong program whose mistake is its form (D218).
+            continue
+        assigned = {
+            n.id
+            for n in ast.walk(tree)
+            if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)
+        }
+        named = {
+            n.id for n in ast.walk(tree) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load)
+        }
+        assert not (named & ids) - assigned, f"{program.relative_to(CONTENT)} names {named & ids}"
+
+
+#: The kinds of `to_find` each level of 2.3's table says (D344); `the-night-walk` says
+#: none, its key picked up on the way.
+TO_FIND = {
+    "the-fallen-book": ["book"],
+    "the-lost-book": ["book"],
+    "the-book-returned": ["book"],
+    "eldras-room": ["book"],
+    "the-hidden-key": ["key"],
+    "the-moving-key": ["key"],
+    "eldras-door": ["key"],
+    "the-three-doors": ["door"],
+    "the-dark-room": ["key"],
+    "the-forgotten-room": ["thread"],
+}
+
+
+def test_the_levels_say_what_is_to_find():
+    """D344: chapter 2 from the fallen book on, the three doors and the dark room, the
+    levels with brooms to find, and the forgotten room; the night walk says none."""
+    brooms = [
+        p.parent.name
+        for p in sorted((CONTENT / "levels").glob("*/solution.py"))
+        if re.search(r'find_(nearest|all)\("broom"\)', p.read_text(encoding="utf-8"))
+    ]
+    assert len(brooms) == 6
+    wanted = {**TO_FIND, **{level: ["broom"] for level in brooms}}
+    for path in sorted((CONTENT / "levels").glob("*/level.json")):
+        said = json.loads(path.read_text(encoding="utf-8")).get("to_find")
+        assert said == wanted.get(path.parent.name), f"{path.parent.name}: {said}"

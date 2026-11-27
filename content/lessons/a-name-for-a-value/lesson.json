@@ -1,0 +1,9 @@
+{
+  "id": "a-name-for-a-value",
+  "speaker": "wenna",
+  "teaches": [
+    "concept:print",
+    "concept:variables",
+    "concept:arithmetic"
+  ]
+}

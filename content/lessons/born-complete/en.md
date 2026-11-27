@@ -30,7 +30,7 @@ Now the object is made by giving it its data between the brackets: `Crow("Vesso"
 
 Here two crows are born, each with its data. Once you have tried it, take a piece of data out from between the brackets and see what Python says.
 
-```python try
+```python try change
 class Crow:
     def __init__(self, name, color):
         self.name = name

@@ -83,8 +83,8 @@
   "error": {
     "unknown_name": "Aquí no hay nada que se llame `{name}`.",
     "suggestion": "¿Querías decir `{suggestion}`?",
-    "read_only": "No puedes cambiar `{object}.{name}` tú mismo. Lo cambia una acción.",
-    "not_called": "`{name}` es una acción. Una acción se hace con paréntesis detrás, como `{example}`.",
+    "read_only": "No puedes cambiar `{object}.{name}` tú mismo. Lo cambia un método.",
+    "not_called": "`{name}` es un método. Un método se usa con paréntesis detrás, como `{example}`.",
     "unclosed": "Esta línea abre un `{what}` que nunca se cierra.",
     "missing_colon": "Una línea que empieza por `{keyword}` termina con `:`.",
     "indentation": "Las líneas de dentro de un `while`, un `if` o un `for` necesitan cuatro espacios delante.",
@@ -93,8 +93,8 @@
     "no_such_module": "En la biblioteca del colegio no hay ningún libro llamado `{name}`.",
     "other": "Python dice: {type}: {message}",
     "line": " (línea {line})",
-    "unknown_action": "`{object}` no conoce ninguna acción llamada `{name}`.",
-    "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Lo que `{object}` puede hacer está en su cuaderno.",
+    "unknown_action": "`{object}` no tiene ningún método llamado `{name}`.",
+    "no_new_attribute": "No puedes darle a `{object}` algo nuevo llamado `{name}`. Sus métodos y sus atributos están en el cuaderno.",
     "no_knot": "Esta escoba no tiene nudo, así que no hay nada que desatar, y el programa se para aquí. Antes de quitarle el nudo a una escoba, mira si lo tiene.",
     "no_landing": "Aquí no hay dónde posar la escoba, así que el programa se para aquí, todavía en el aire. Aterriza donde haya suelo.",
     "index_range": "La lista no tiene tantos: tiene {count}, y pediste el {asked}.º",
@@ -105,7 +105,7 @@
     "no_attribute": "Este objeto no tiene nada que se llame `{name}`.",
     "object_arguments": "Para hacer un `{name}` hacen falta {wanted} datos entre los paréntesis, y le has dado {given}.",
     "method_arguments": "`{name}` recibe {wanted} datos entre los paréntesis, y le has dado {given}.",
-    "no_such_method": "{familiar} no sabe hacer `{name}`."
+    "no_such_method": "{familiar} no tiene ningún método llamado `{name}`."
   },
   "things": {
     "door": "la puerta",
@@ -146,8 +146,8 @@
     "locked": "No puedo abrir {thing}: está cerrada con llave y no tengo la llave.",
     "open": "No hace falta: {thing} ya está abierta.",
     "nothing": "Aquí no hay nada que coger.",
-    "unknown_action": "Todavía no conozco esta acción.",
-    "no_wand": "Todavía no conozco esta acción.",
+    "unknown_action": "Todavía no conozco este método.",
+    "no_wand": "Todavía no conozco este método.",
     "no_map": "Esa palabra está escrita en el mapa, y no llevo el mapa encima.",
     "unknown_spell": "No conozco ningún hechizo que se llame «{spell}».",
     "sealed": "No puedo abrir {thing} con la mano: está sellada, y necesita un hechizo.",
@@ -156,7 +156,7 @@
     "out_of_reach": "El hechizo no puede alcanzar {thing} desde aquí.",
     "not_carried": "No puedo dar {thing}: no está entre lo que llevo.",
     "nobody": "No hay nadie a mi lado para dárselo.",
-    "which_one": "Aquí hay varias cosas: {things}. Di cuál, como wizard.pick_up({first}).",
+    "which_one": "Aquí hay varias cosas. Di cuál: pon entre los paréntesis la variable donde la guardaste, como en wizard.pick_up(mi_llave).",
     "unheard": "Con el sello puesto, {thing} no oye ninguna palabra.",
     "not_my_dormitory": "No debería entrar en el dormitorio de {las chicas|los chicos}.",
     "door_leaf": "La hoja de la puerta abierta está delante.",
@@ -207,7 +207,7 @@
     "title": "El cuaderno {del mago|de la maga}",
     "open": "Cuaderno",
     "close": "Cerrar",
-    "actions": "Acciones",
+    "actions": "Métodos",
     "attributes": "Atributos",
     "nothing": "Todavía no hay nada que anotar aquí.",
     "wizard": {
@@ -217,15 +217,15 @@
       "move_down": "Camina hacia abajo, una casilla por paso. Se para ante una pared o una puerta cerrada.",
       "say": "Dice algo en voz alta.",
       "wait": "Se queda quiet{o|a} mientras el mundo sigue, un tick cada vez; wizard.wait(2) espera dos.",
-      "pick_up": "Coge una cosa de la casilla {del mago|de la maga} o de una de al lado, y la lleva. Si hay varias, di cuál: wizard.pick_up(key).",
+      "pick_up": "Coge una cosa de la casilla {del mago|de la maga} o de una de al lado, y la lleva. Si hay varias, di cuál: wizard.pick_up(mi_llave).",
       "find_nearest": "Encuentra la cosa más cercana de un tipo, o None si no hay ninguna. Donde un sitio tiene partes, como la pared y la paja del cobertizo, solo busca en la parte donde está {el mago|la maga}.",
       "find_item": "Encuentra la cosa de un tipo que lleva {el mago|la maga}, o None si no lleva ninguna.",
-      "find_all": "Encuentra todas las cosas de un tipo y las da en una lista, de la más cercana a la más lejana, aunque algo las tape: brooms = wizard.find_all(\"broom\"); len(brooms) dice cuántas hay. Donde un sitio tiene partes, como la pared y la paja del cobertizo, solo busca en la parte donde está {el mago|la maga}.",
+      "find_all": "Encuentra todas las cosas de un tipo y las da en una lista, de la más cercana a la más lejana, aunque algo las tape: escobas = wizard.find_all(\"broom\"); len(escobas) dice cuántas hay. Donde un sitio tiene partes, como la pared y la paja del cobertizo, solo busca en la parte donde está {el mago|la maga}.",
       "has": "Dice si {el mago|la maga} lleva una cosa de un tipo.",
       "position": "La casilla en la que está {el mago|la maga}, en x e y, contando desde 0 desde la izquierda y desde arriba: print(wizard.position) la muestra.",
       "facing": "Hacia dónde mira {el mago|la maga}: up, down, left o right.",
       "items": "Las cosas que lleva {el mago|la maga}, en una lista; len(wizard.items) dice cuántas son.",
-      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. Lo que hace un hechizo depende de dónde está y de lo que tiene cerca; puede que no haga nada. Al hechizo fendra también se le da la cosa que debe traer: wizard.cast(\"fendra\", book). El hechizo orvim abre el mapa, si {el mago|la maga} lo lleva: wizard.cast(\"orvim\"). El hechizo drevo levanta la escoba, si {el mago|la maga} la lleva, y la vuelve a posar si se lanza en el aire: wizard.cast(\"drevo\").",
+      "cast": "Lanza un hechizo con la varita, que {el mago|la maga} tiene que llevar. Lo que hace un hechizo depende de dónde está y de lo que tiene cerca; puede que no haga nada. Al hechizo fendra también se le da la cosa que debe traer: wizard.cast(\"fendra\", otro_libro). El hechizo orvim abre el mapa, si {el mago|la maga} lo lleva: wizard.cast(\"orvim\"). El hechizo drevo levanta la escoba, si {el mago|la maga} la lleva, y la vuelve a posar si se lanza en el aire: wizard.cast(\"drevo\").",
       "give": "Le da una cosa que lleva a quien esté justo a su lado.",
       "sleep": "Se acuesta y duerme en una cama libre.",
       "distance_to": "Da el número de pasos desde {el mago|la maga} hasta un objeto.",
@@ -300,7 +300,7 @@
       "x": "El primer número de una casilla, su columna: cuántas casillas hay desde la izquierda, contando desde 0.",
       "y": "El segundo número de una casilla, su fila: cuántas casillas hay desde arriba, contando desde 0."
     },
-    "tab_actions": "Acciones",
+    "tab_actions": "Objetos",
     "tab_python": "Python",
     "tab_spells": "Hechizos y palabras",
     "spells": "Hechizos",
@@ -319,7 +319,7 @@
       "position": "La casilla en la que está la escoba, en x e y, o None cuando {el mago|la maga} la lleva.",
       "distance_to": "Da el número de pasos desde un objeto hasta {el mago|la maga}.",
       "reveal": "Hace que una cosa brille donde está, incluso a través de lo que la esconde, para que veas dónde se encuentra.",
-      "knotted": "True mientras la escoba lleva el hilo negro anudado entre las ramas: if broom.knotted:",
+      "knotted": "True mientras la escoba lleva el hilo negro anudado entre las ramas: if escoba.knotted:",
       "untie": "Desata el nudo de la escoba. {El mago|La maga} tiene que estar de pie sobre ella, y la escoba tiene que tener nudo: si no lo tiene, es un error."
     },
     "racer": {
@@ -338,7 +338,7 @@
       "move_up": "Tu familiar camina hacia arriba, una casilla por paso. Se para donde no puede pasar.",
       "move_down": "Tu familiar camina hacia abajo, una casilla por paso. Se para donde no puede pasar.",
       "pick_up": "Tu familiar recoge lo que hay en su casilla y lo lleva encima. Te lo da cuando minka lo trae de vuelta.",
-      "go_to": "La acción que le enseñaste tú: va a la casilla que le digas, primero la columna y luego la fila."
+      "go_to": "El método que le enseñaste tú: va a la casilla que le digas, primero la columna y luego la fila."
     }
   },
   "start": {
@@ -368,7 +368,7 @@
   },
   "map": {
     "here": "Estás aquí",
-    "back_level": "Volver al nivel",
+    "back_level": "✕ Volver al nivel",
     "leave_run": "Tu programa todavía se está ejecutando. ¿Salir del nivel?",
     "back": "Volver al inicio",
     "done": "hecho",
@@ -507,11 +507,11 @@
   "notebook_python": {
     "variables": {
       "does": "Una variable guarda un valor con un nombre: el nombre a la izquierda del `=`, el valor a la derecha.",
-      "example": "book = wizard.find_nearest(\"book\")"
+      "example": "tesoro = wizard.find_nearest(\"book\")"
     },
     "arithmetic": {
       "does": "Suman y restan números; el resultado es un número, para guardarlo o usarlo.",
-      "example": "total = 4 + 3\nrest = total - 2"
+      "example": "total = 4 + 3\nresto = total - 2"
     },
     "equal": {
       "does": "Compara dos valores: `True` cuando son iguales, `False` cuando no lo son.",
@@ -535,11 +535,11 @@
     },
     "for_range": {
       "does": "Un bucle: ejecuta las líneas metidas hacia dentro tantas veces como dice `range`.",
-      "example": "for step in range(3):\n    wizard.move_right(2)"
+      "example": "for vuelta in range(3):\n    wizard.move_right(2)"
     },
     "for_each": {
       "does": "Un bucle sobre una lista: ejecuta sus líneas una vez por cada elemento.",
-      "example": "for broom in brooms:\n    broom.untie()"
+      "example": "for escoba in escobas:\n    escoba.untie()"
     },
     "while": {
       "does": "Un bucle que ejecuta sus líneas una y otra vez mientras su expresión es `True`.",
@@ -554,7 +554,7 @@
       "example": "def quick_fly():\n    wizard.move_right(2)\n    wizard.move_up(2)\n\nquick_fly()"
     },
     "def_arguments": {
-      "does": "Los nombres entre los paréntesis del `def` son sus argumentos; una llamada les da sus valores en el mismo orden.",
+      "does": "Las variables entre los paréntesis del `def` son sus argumentos; una llamada les da sus valores en el mismo orden.",
       "example": "def saludar(nombre):\n    print(\"Hola\", nombre)\n\nsaludar(\"Teku\")"
     },
     "class": {
@@ -570,7 +570,7 @@
       "example": "vesso.name = \"Vesso\"\nprint(vesso.name)"
     },
     "init": {
-      "does": "`__init__` es la acción que Python hace él solo cada vez que nace un objeto de la clase, con los datos que le das entre los paréntesis.",
+      "does": "`__init__` es el método que Python ejecuta él solo cada vez que nace un objeto de la clase, con los datos que le das entre los paréntesis.",
       "example": "class Crow:\n    def __init__(self, name):\n        self.name = name\n\nvesso = Crow(\"Vesso\")"
     },
     "self": {
@@ -582,7 +582,7 @@
       "example": "class Fox(Familiar):\n    pass"
     },
     "methods": {
-      "does": "Un método es una acción de la clase: se escribe con `def` dentro de ella, su primer dato es `self` y se llama con el punto.",
+      "does": "Un método es una función de la clase: se escribe con `def` dentro de ella, su primer dato es `self` y se llama con el punto.",
       "example": "class Crow:\n    def hop(self, times):\n        print(\"hop\", times)\n\nvesso.hop(3)"
     }
   },
@@ -605,7 +605,7 @@
   },
   "spells": {
     "zelim": "rompe el sello de una puerta que tienes al lado.",
-    "fendra": "atrae a tu casilla la cosa que nombres, a tres casillas de distancia como máximo en línea recta.",
+    "fendra": "atrae a tu casilla la cosa que le des, a tres casillas de distancia como máximo en línea recta.",
     "kirra": "ilumina la sala oscura en la que estás.",
     "osto": "mantiene cerrado un rato un agujero que tienes al lado y que se abre en el suelo.",
     "orvim": "abre el mapa del niño travieso por el plano del sitio en el que estás, cada casilla con sus números, si llevas el mapa.",
@@ -733,7 +733,7 @@
     "notebook": "Abre el cuaderno para ver todas las instrucciones que puedes utilizar en tu programa.",
     "spells": "En el cuaderno, además, puedes ver todos los hechizos y palabras mágicas disponibles.",
     "click": "Si haces clic sobre una instrucción en el cuaderno, se escribe sola en el programa.",
-    "dot": "Si pones el nombre de un objeto seguido de un punto, te aparecen todas las cosas que tiene ese objeto para que no tengas que escribirlas.",
+    "dot": "Si pones una variable seguida de un punto, te aparecen todas las cosas que tiene ese objeto para que no tengas que escribirlas.",
     "hint": "Cuando tu programa no consigue ganar, ya puedes pulsar el botón *Pista*, debajo del programa. Cada vez que lo pulsas lees una pista más, ¡hasta tres!",
     "keys": "Para ejecutar tu programa pulsa Ctrl+Intro o Alt+R (Cmd+Intro u Opción+R en Mac). Y con Alt+N (Opción+N en Mac) puedes abrir y cerrar el cuaderno.",
     "timeline": "Después de ejecutar un programa, puedes arrastrar la barra debajo de la escena para repasar lo que pasó momento a momento y descubrir qué falló.",

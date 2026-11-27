@@ -1,4 +1,4 @@
-# An action of your own
+# A function of your own
 
 What if we want to do a special manoeuvre over and over? If we write `def quick_fly():` and, moved in under it, a few lines of code, we give those lines a name! Programmers call it a function.
 

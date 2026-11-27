@@ -942,7 +942,10 @@ def test_a_position_s_two_numbers_are_its_x_and_its_y():
         "map": ["#####", "#S.K#", "#####"],
         "things": [{"kind": "key", "id": "key", "marker": "K"}],
     }
-    result = run_code(Level.from_dict(level), "print(key.position.x, key.position.y)\n")
+    result = run_code(
+        Level.from_dict(level),
+        'mine = wizard.find_nearest("key")\nprint(mine.position.x, mine.position.y)\n',
+    )
     assert result.stdout == "3 1\n"
 
 

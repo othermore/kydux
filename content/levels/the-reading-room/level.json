@@ -1,0 +1,70 @@
+{
+  "id": "the-reading-room",
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [
+    7,
+    19
+  ],
+  "end": [
+    7,
+    17
+  ],
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        7,
+        16
+      ],
+      "art": "wenna_door",
+      "variable": false
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        8,
+        17
+      ],
+      "facing": "left"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        8,
+        19
+      ],
+      "facing": "left"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down"
+  ],
+  "goals": [
+    {
+      "kind": "reach",
+      "marker": "E"
+    },
+    {
+      "kind": "move_by_variable"
+    },
+    {
+      "kind": "numbers_under",
+      "count": 2,
+      "bonus": true
+    }
+  ],
+  "tick_limit": 40
+}

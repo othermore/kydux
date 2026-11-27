@@ -37,7 +37,8 @@ test.describe('the hidden key', () => {
 
   test('what the code prints shows in the card', async ({ page }) => {
     await run(page, 'wizard.move_down(2)\nwizard.move_left(8)\nwizard.pick_up()\nprint(wizard.items)');
-    await expect(page.locator('.printed')).toHaveText('[<key key carried>, <wand wand carried>]');
+    // A thing found is written by its kind alone, no variable of the program (D344).
+    await expect(page.locator('.printed')).toHaveText('[<key carried>, <wand carried>]');
   });
 
   test('a door too far away is not tried: the wizard thinks why, and nothing shakes', async ({
@@ -133,7 +134,7 @@ test('the hidden key in Spanish', async ({ browser }) => {
   await expect(page.locator('.goal[data-bonus="true"]')).toContainText('Extra:');
   const said = await run(page, 'wizard.mvoe_right(4)');
   expect(said).toBe(
-    'wizard no conoce ninguna acción llamada mvoe_right. ¿Querías decir move_right? (línea 1)',
+    'wizard no tiene ningún método llamado mvoe_right. ¿Querías decir move_right? (línea 1)',
   );
   await context.close();
 });
@@ -316,7 +317,7 @@ test.describe('chapter 2', () => {
     await page.locator('#start').click();
     await expect(page.locator('#run')).toBeEnabled({ timeout: ciTimes(90_000) });
     await page.locator('#speed').selectOption('4');
-    await run(page, 'book = wizard.find_item("book")\nwizard.give(book)');
+    await run(page, 'eldras_book = wizard.find_item("book")\nwizard.give(eldras_book)');
     await expect(page.locator('.outcome-text')).toContainText('There is no one beside me to give it to.');
   });
 });
@@ -385,7 +386,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
 
   test('fendra from the doorway brings the book it is told down, through the shelves', async ({ page }) => {
     await page.locator('#speed').selectOption('4');
-    await run(page, 'book = wizard.find_nearest("book")\nwizard.move_up()\nwizard.cast("fendra", book)\nwizard.pick_up()');
+    await run(page, 'other_book = wizard.find_nearest("book")\nwizard.move_up()\nwizard.cast("fendra", other_book)\nwizard.pick_up()');
     await expect(scene(page)).toHaveAttribute('data-carried', 'eldras_book,wand');
   });
 
@@ -396,7 +397,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.insertText(
-      'book = wizard.find_nearest("book")\nwizard.move_up()\nwizard.cast("fendra", book)\nwizard.pick_up()\nwizard.move_down()\nwizard.give(book)',
+      'other_book = wizard.find_nearest("book")\nwizard.move_up()\nwizard.cast("fendra", other_book)\nwizard.pick_up()\nwizard.move_down()\nwizard.give(other_book)',
     );
     // Every change of whether the book is carried and drawn, with its tick.
     await scene(page).evaluate((node) => {
@@ -470,7 +471,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
   test('fendra from the aisle cannot reach into the room (D129)', async ({ page }) => {
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('book = wizard.find_nearest("book")\nwizard.cast("fendra", book)');
+    await page.keyboard.insertText('other_book = wizard.find_nearest("book")\nwizard.cast("fendra", other_book)');
     await page.locator('#run').click();
     await expect(scene(page)).toHaveAttribute('data-thought', 'The spell cannot reach the book from here.', {
       timeout: ciTimes(15_000),
@@ -486,7 +487,7 @@ test.describe("Eldra's room (D46, D47, D49, D129)", () => {
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.wait(4)');
+    await page.keyboard.insertText('other_book = wizard.find_nearest("book")\nother_book.reveal()\nwizard.wait(4)');
     await page.locator('#run').click();
     await expect(scene(page)).toHaveAttribute('data-revealed', 'eldras_book', { timeout: ciTimes(30_000) });
     await page.waitForTimeout(ciTimes(400));

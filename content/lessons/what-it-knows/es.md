@@ -5,9 +5,9 @@ Un objeto sabe cosas de sí mismo: sus **atributos**. Los has mirado muchas vece
 ---
 ## Se escriben como se leen
 
-Un atributo se escribe igual que se lee, con el punto, y se le da su valor con `=`, como a cualquier nombre: `vesso.name = "Vesso"`.
+Un atributo se escribe igual que se lee, con el punto, y se le da su valor con `=`, como a cualquier variable: `vesso.name = "Vesso"`.
 
-El atributo es de ese objeto y de ningún otro. Y no es lo mismo que el nombre del programa: `vesso` es como tu programa llama al objeto; `vesso.name` es lo que el objeto sabe de sí mismo.
+El atributo es de ese objeto y de ningún otro. Y no es lo mismo que la variable: `vesso` es la variable donde tu programa guarda el objeto; `vesso.name` es lo que el objeto sabe de sí mismo.
 
 ---
 ## Un error que hay que ver
@@ -21,11 +21,11 @@ vesso.name = "Vesso"
 vesso.color = "black"
 print(vesso.name, vesso.color)
 
-other = Crow()
-print(other.name)
+otro = Crow()
+print(otro.name)
 ```
 
-La última línea da un error, y es justo el que hay que ver: `other` es otro objeto, y nadie le ha dado un nombre. El juego te lo explica así: «Este objeto no tiene nada que se llame `name`.»
+La última línea da un error, y es justo el que hay que ver: `otro` es otro objeto, y nadie le ha dado un nombre. El juego te lo explica así: «Este objeto no tiene nada que se llame `name`.»
 
 ---
 ## Dos atributos, y nada más

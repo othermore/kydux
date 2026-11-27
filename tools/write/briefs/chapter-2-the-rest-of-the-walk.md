@@ -9,7 +9,6 @@ outputs:
 context:
   - docs/dev/story.md
   - docs/dev/course.md
-  - content/lessons/what-things-know/en.md
   - content/lessons/the-distance/en.md
   - content/lessons/the-distance/es.md
   - content/lessons/fendra/en.md

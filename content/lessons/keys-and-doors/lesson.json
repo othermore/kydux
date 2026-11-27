@@ -1,7 +1,5 @@
 {
   "id": "keys-and-doors",
   "speaker": "wenna",
-  "teaches": [
-    "door.open"
-  ]
+  "teaches": []
 }

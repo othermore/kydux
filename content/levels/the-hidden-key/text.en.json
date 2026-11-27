@@ -14,5 +14,8 @@
   ],
   "intro": "The way goes on through that locked door. Its key fell under the big bookcase long ago, where no one can see it. Eldra's book is back with her, and no book lies in the aisle any more; this time it is the key that is out of sight. Find it, show where it is, pick it up, open the door, and go through.",
   "outro": "Well done! The door is open, and the top aisle is just ahead.",
-  "learned": "Now you know that a thing out of sight is there all the same for a program, and how a door opens with its key."
+  "learned": "Now you know that a thing out of sight is there all the same for a program, and how a door opens with its key.",
+  "told": {
+    "revealed": "Look! The key is behind that bookcase. We will have to go in between the two bookcases."
+  }
 }

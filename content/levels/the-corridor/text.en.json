@@ -9,7 +9,7 @@
     "Write one instruction on each line for every step you want to take.",
     "You will need the `move_down` method and the `move_left` method to reach the mark."
   ],
-  "intro": "The gate will not open yet! While we think, let us look around the meadow. Walk down the path and then onto the grass to reach that mark.",
+  "intro": "The gate will not open yet! While we think, let us look around the meadow. Walk down the path and then onto the grass to reach that mark. And if it does not work the first time, you can ask for a hint!",
   "outro": "Well done! The notebook is always there if you forget a method.",
   "learned": "Now you know what objects and methods are, and the four moves."
 }

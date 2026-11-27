@@ -35,7 +35,10 @@ shows whole at the level's start (D201), which holds the start, every marker and
 every thing; `familiar`, the familiar the level describes, calls or plays with
 (D260); `told`, what is said at the end of a run won (D264) and when a thing first
 lights (D355); `fault`, the
-explanation a fix level's given program stops with (D272); and `ways`, the ways the
+explanation a fix level's given program stops with (D272); `to_find`, the kinds of
+thing the child is asked to find, none of which is a variable until the program finds it
+and keeps it (D344), a door, a hole or a bed being one by its id otherwise unless it says
+`"variable": false`; and `ways`, the ways the
 level is played, each one the same program must win (D51). A level may
 come with goals of its own, in a goals.py beside level.json, whose source
 the loader passes as `goals_source`.
@@ -89,6 +92,11 @@ THING_KINDS = (
     "trail",
     "plate",
 )
+#: The kinds of thing a program starts with, by their ids, where the level does not ask
+#: for them to be found (D344): the doors, holes and beds of the place, and a plate in
+#: the floor, which the level names to the child by its id (D299); every other thing is
+#: found first and kept in a variable.
+VARIABLE_KINDS = ("door", "hole", "bed", "plate")
 #: The kinds that lie on cells of their own, one or two side by side (D150, D167).
 CELLED_KINDS = ("door", "hole")
 CARRIED_KINDS = ("key", "book", "wand", "potion", "map", "broom", "thread")
@@ -180,6 +188,9 @@ class ThingSpec:
     #: (D219).
     way: str | None = None
     colour: str | None = None
+    #: For a door, a hole or a bed, false where it is in the world and drawn, and no
+    #: variable of the program, with no chip and no page of the notebook (D344).
+    variable: bool = True
 
 
 @dataclass(frozen=True)
@@ -376,6 +387,8 @@ class Level:
     fault: str | None = None
     #: The way the wizard faces at tick 0, one of FACINGS (D286).
     facing: str = "down"
+    #: The kinds the level asks the child to find, which no thing of is a variable (D344).
+    to_find: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Level":
@@ -569,6 +582,7 @@ class Level:
             voices=_voices(data.get("voices"), shape),
             fault=_fault(data.get("fault"), level_id, kind),
             facing=facing,
+            to_find=_to_find(data.get("to_find", []), level_id, things),
         )
         told = _told(data.get("told"), level)
         level = replace(
@@ -653,9 +667,28 @@ class Level:
         """Inside the map and not a wall: a tile sight passes, shelves too (D46)."""
         return self.inside(position) and position not in self.walls
 
+    @property
+    def variables(self) -> frozenset[str]:
+        """The ids of the things a program starts with as variables (D344): each door,
+        hole, bed and plate that does not say `"variable": false` and whose kind the level
+        does not ask the child to find; never a thing of another kind, which the program
+        finds and keeps."""
+        return frozenset(
+            thing.id
+            for thing in self.things
+            if thing.kind in VARIABLE_KINDS
+            and thing.variable
+            and not thing.carried
+            and thing.kind not in self.to_find
+        )
+
     def ids(self) -> list[str]:
-        """The names of the level's things and actors, as the child's code knows them."""
-        return [t.id for t in self.things] + [a.id for a in self.actors]
+        """The names a program starts with, beside `wizard`: the things that are variables
+        and the actors who are no one's familiar (D344), which the explanations suggest
+        from."""
+        return [t.id for t in self.things if t.id in self.variables] + [
+            a.id for a in self.actors if a.kind != "familiar"
+        ]
 
 
 @dataclass(frozen=True)
@@ -776,6 +809,11 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         )
     if kind != "ring" and ("way" in spec or "colour" in spec):
         raise LevelError(f"{shape.level_id}: only a ring has a way and a colour")
+    variable = spec.get("variable", True)
+    if "variable" in spec and (variable is not False or kind not in VARIABLE_KINDS):
+        raise LevelError(
+            f"{shape.level_id}: only a {', a '.join(VARIABLE_KINDS)} says variable, and only false"
+        )
     covers = _covers(shape, spec, thing_id)
     pillow_side = _pillow_side(shape, spec, thing_id)
     position = shape.place(spec, thing_id)
@@ -799,7 +837,25 @@ def _thing(shape: _Shape, spec: dict[str, Any]) -> ThingSpec:
         zone=zone,
         way=way,
         colour=colour,
+        variable=variable,
     )
+
+
+def _to_find(value: Any, level_id: str, things: tuple[ThingSpec, ...]) -> tuple[str, ...]:
+    """The kinds a level asks the child to find (D344): kinds of thing, none twice, each
+    with a thing of it in the level, what the wizard carries and the scene's fixed things
+    counted."""
+    if not isinstance(value, list):
+        raise LevelError(f"{level_id}: to_find is a list of kinds of thing")
+    kinds = {thing.kind for thing in things}
+    for kind in value:
+        if kind not in THING_KINDS:
+            raise LevelError(f"{level_id}: to_find names {kind}, no kind of thing")
+        if value.count(kind) > 1:
+            raise LevelError(f"{level_id}: to_find names {kind} twice")
+        if kind not in kinds:
+            raise LevelError(f"{level_id}: to_find names {kind}, and the level has none")
+    return tuple(value)
 
 
 def _zones(value: Any, level_id: str) -> dict[str, frozenset[Position]]:

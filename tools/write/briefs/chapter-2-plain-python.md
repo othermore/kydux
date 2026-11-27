@@ -9,8 +9,6 @@ context:
   - docs/dev/course.md
   - content/lessons/how-much/es.md
   - content/lessons/words/es.md
-  - content/lessons/what-things-know/en.md
-  - content/lessons/what-things-know/es.md
   - content/lessons/giving-things/es.md
   - content/lessons/counting-with-names/es.md
 ---

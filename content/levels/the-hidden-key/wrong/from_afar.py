@@ -1,4 +1,4 @@
-key = wizard.find_nearest("key")
+my_key = wizard.find_nearest("key")
 wizard.move_down(2)
 wizard.move_left(8)
 wizard.pick_up()

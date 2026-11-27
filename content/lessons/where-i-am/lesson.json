@@ -2,6 +2,8 @@
   "id": "where-i-am",
   "speaker": "friend",
   "teaches": [
+    "wizard.items",
+    "door.locked",
     "wizard.position",
     "thing.position"
   ]

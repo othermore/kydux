@@ -48,7 +48,7 @@ print(not dask.facing == "up")
 
 Ahora puedes cambiar este pequeño programa. Imprime si Dask mira hacia abajo, y luego si no mira hacia abajo.
 
-```python try
+```python try change
 print(dask.facing == "down")
 print(not dask.facing == "down")
 ```

@@ -1,0 +1,77 @@
+{
+  "id": "the-fallen-book",
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [
+    7,
+    15
+  ],
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        7,
+        16
+      ],
+      "open": true,
+      "art": "wenna_door",
+      "variable": false
+    },
+    {
+      "kind": "book",
+      "id": "fallen_book",
+      "at": [
+        3,
+        15
+      ]
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        5,
+        17
+      ],
+      "facing": "right"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        9,
+        17
+      ],
+      "facing": "left"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "wizard.pick_up",
+    "wizard.find_nearest",
+    "thing.reveal"
+  ],
+  "to_find": [
+    "book"
+  ],
+  "goals": [
+    {
+      "kind": "uses",
+      "member": "reveal"
+    },
+    {
+      "kind": "collect",
+      "id": "fallen_book"
+    }
+  ],
+  "tick_limit": 40
+}

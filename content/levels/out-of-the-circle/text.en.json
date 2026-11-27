@@ -9,7 +9,7 @@
   "starting_code": "class {familiar_class}(Familiar):\n    def __init__(self, name, color):\n        self.name = name\n        self.color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\nwizard.cast(\"minka\", {familiar_var})\n\n# The plates on the floor are three objects: `moon`, `sun` and `star`. Each has its attribute `position`: `print(moon.position)` tells you which cell the moon is on.\n\n# Two steps down with `move_down`, and it is out of the circle.\n\n# Four steps to the left with `move_left`.\n\n# Five steps up with `move_up`, to the moon's plate.\n\n",
   "hints": [
     "Your familiar inherits from `Familiar` the same moves your `wizard` has.",
-    "A move is used with the dot, with your program's name for your familiar before it.",
+    "A move is used with the dot, with your familiar's variable before it.",
     "Three moves: two steps down, four to the left and five up."
   ],
   "intro": "Remember that while your familiar is in the circle, you can undo it and describe another. If you take it out, it will live.\n\nThink it over well before you take it out, and then take it to the moon's plate.",

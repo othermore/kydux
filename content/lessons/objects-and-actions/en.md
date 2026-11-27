@@ -1,4 +1,4 @@
-# Objects and actions
+# Objects and methods
 
 In a program, everything is an object. The characters, the things you find, a door, a book... they are all objects. Your wizard is an object too, the one we call `wizard`.
 

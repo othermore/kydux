@@ -184,6 +184,9 @@
     "broom.untie",
     "thing.distance_to"
   ],
+  "to_find": [
+    "broom"
+  ],
   "goals": [
     {
       "kind": "untied",

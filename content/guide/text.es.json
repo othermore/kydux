@@ -18,7 +18,7 @@
     },
     "notebook": {
       "title": "El cuaderno",
-      "text": "Este botón abre el *Cuaderno*. Allí hay una lista de lo que {el mago|la maga} puede hacer, cada acción con un ejemplo, y al hacer clic en un ejemplo se pone directamente en el editor."
+      "text": "Este botón abre el *Cuaderno*. Allí hay una lista de lo que {el mago|la maga} puede hacer, cada método con un ejemplo, y al hacer clic en un ejemplo se pone directamente en el editor."
     },
     "hint": {
       "title": "El botón Pista",

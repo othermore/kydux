@@ -20,7 +20,7 @@ A broom whose `x` is smaller than your wizard's is to its left; greater, to its 
 
 Here `True` means the broom is to the left. Try putting 12 in `broom_x` and run it again!
 
-```python try
+```python try change
 my_x = 9
 broom_x = 6
 print(broom_x < my_x)
@@ -29,11 +29,11 @@ print(broom_x < my_x)
 ---
 ## Which subtraction
 
-With the `move_` functions, like `move_left()`, you can move 0 or more steps. If you give it a negative number, like in `wizard.move_left(-3)`, the game does not accept it and tells you that `move_left` is not used like that.
+With the `move_` methods, like `move_left()`, you can move 0 or more steps. If you give it a negative number, like in `wizard.move_left(-3)`, the game does not accept it and tells you that `move_left` is not used like that.
 
 So to move to a position from where we are, we first need to see whether we have to move left or right. Then we can work out the greater number less the smaller number, and get a number of steps that is positive. We can do it with the `if` and the `else` you already know.
 
-```python try
+```python try change
 my_x = 9
 broom_x = 6
 if broom_x < my_x:

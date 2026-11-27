@@ -7,7 +7,6 @@ context:
   - docs/dev/course.md
   - content/lessons/notes/*.md
   - content/lessons/words/*.md
-  - content/lessons/what-things-know/*.md
   - content/lessons/true-or-false/*.md
   - content/lessons/if/*.md
   - content/lessons/else/*.md

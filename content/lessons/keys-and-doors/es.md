@@ -1,8 +1,6 @@
 # Llaves y puertas
 
-Una puerta es un objeto y tiene su propio método: `door.open()`.
-
-Pero una puerta solo se abre para {un mago|una maga} que esté justo a su lado. ¡Y si la puerta está cerrada con llave, solo se abrirá cuando lleves su llave encima!
+Ya sabes que una puerta es un objeto con su propio método, `door.open()`, y que solo se abre para {un mago|una maga} que esté justo a su lado. ¡Pero algunas puertas están cerradas con llave, y una puerta cerrada solo se abrirá cuando lleves su llave encima!
 
 ---
 ## Cosas ocultas

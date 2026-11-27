@@ -101,14 +101,36 @@ export function familiarsListed(
   return Object.entries(table.kinds).map(([kind, offered]) => ({ kind, colours: colours ? [...offered] : [] }));
 }
 
-/** What the child's code holds in a level: the wizard, then its things and actors, and
- * in a level with a familiar, the familiar by its name (D266); someone else's familiar
- * is not the child's to name. */
+/** The kinds of thing a program starts with by their ids (D344), as
+ * kydux_world.level.VARIABLE_KINDS: every other thing is found first and kept. */
+export const VARIABLE_KINDS: readonly string[] = ['door', 'hole', 'bed', 'plate'];
+
+/** The kinds a level asks the child to find (D344), `to_find` of its level.json. */
+export function toFind(level: LevelJson): string[] {
+  const kinds = level.to_find;
+  return Array.isArray(kinds) ? kinds.filter((kind): kind is string => typeof kind === 'string') : [];
+}
+
+/** The things a program starts with as variables (D344), as kydux_world's
+ * `Level.variables`: each door, hole, bed and plate that does not say `"variable": false` and
+ * whose kind the level does not ask the child to find. */
+export function variableThings(level: LevelJson): { id: string; kind: string }[] {
+  const things = (level.things as { id: string; kind: string; variable?: boolean }[] | undefined) ?? [];
+  const finding = toFind(level);
+  return things.filter(
+    (thing) => VARIABLE_KINDS.includes(thing.kind) && thing.variable !== false && !finding.includes(thing.kind),
+  );
+}
+
+/** What the child's code holds in a level (D344): the wizard, then its doors, holes, beds
+ * and plates that are variables and its actors, and in a level with a familiar, the familiar by
+ * its name (D266); someone else's familiar is not the child's to name, and no other
+ * thing is a variable until the program finds it and keeps it. */
 export function heldObjects(level: LevelJson, table: ApiTable): { name: string; role: string }[] {
   const listed = (key: string) => (level[key] as { id: string; kind: string }[] | undefined) ?? [];
   return [
     { name: 'wizard', role: 'wizard' },
-    ...listed('things').map((t) => ({ name: t.id, role: roleOf(t.kind, table) })),
+    ...variableThings(level).map((t) => ({ name: t.id, role: roleOf(t.kind, table) })),
     ...listed('actors')
       .filter((a) => a.kind !== 'familiar')
       .map((a) => ({ name: a.id, role: roleOf(a.kind, table) })),

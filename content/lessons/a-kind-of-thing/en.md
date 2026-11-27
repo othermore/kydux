@@ -17,7 +17,7 @@ class Crow:
 ---
 ## The object
 
-To have things of a class, we must build them, like conjuring a creature. A thing made with the class is an **object**. You make one by writing the class's name with brackets, and you keep it with a name, like any value.
+To have things of a class, we must build them, like conjuring a creature. A thing made with the class is an **object**. You make one by writing the class's name with brackets, and you keep it in a variable, like any value.
 
 ```python try
 class Crow:

@@ -59,14 +59,14 @@ describe('an error explained', () => {
   it('is said in the child\'s words, with a suggestion and the line', () => {
     initLanguage(english);
     expect(outcomeText({ kind: 'error', error: misspelt })).toBe(
-      '`wizard` does not know an action called `mvoe_right`. Did you mean `move_right`? (line 2)',
+      '`wizard` has no method called `mvoe_right`. Did you mean `move_right`? (line 2)',
     );
   });
 
   it('is said in Spanish', () => {
     initLanguage(spanish);
     expect(outcomeText({ kind: 'error', error: misspelt })).toBe(
-      '`wizard` no conoce ninguna acción llamada `mvoe_right`. ¿Querías decir `move_right`? (línea 2)',
+      '`wizard` no tiene ningún método llamado `mvoe_right`. ¿Querías decir `move_right`? (línea 2)',
     );
   });
 

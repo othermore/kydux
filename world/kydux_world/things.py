@@ -86,7 +86,13 @@ class Thing(Child):
             where = "carried"
         else:
             where = f"at {self._k_position.x}, {self._k_position.y}"
-        return f"<{self._k_spec.kind} {self._k_spec.id} {where}>"
+        return f"<{self._k_spec.kind}{self._k_named()} {where}>"
+
+    def _k_named(self) -> str:
+        """The thing's id after a space when it is a variable of the program, as the
+        child's code knows it; nothing for a thing found and kept, which the program
+        knows by the child's own variable (D344): `<book at 3, 15>`."""
+        return f" {self._k_spec.id}" if self._k_spec.id in self._k_world.level.variables else ""
 
     @property
     def kind(self) -> str:
@@ -199,7 +205,7 @@ class Door(Thing):
             if self._k_seal
             else "closed"
         )
-        return f"<door {self._k_spec.id} {state}>"
+        return f"<door{self._k_named()} {state}>"
 
     def _k_beside(self, position: Position) -> bool:
         """Whether a tile lies next to a cell of the doorway and not in it (D150)."""

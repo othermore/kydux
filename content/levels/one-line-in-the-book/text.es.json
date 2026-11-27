@@ -12,5 +12,5 @@
   ],
   "intro": "En el libro de Arvelia cada familiar se debe conjurar en una sola línea. Por eso debemos tener todo lo demás en la descripción.\n\nCambia tu clase para que el familiar se conjure en una sola línea, ya completo con nombre y color.",
   "outro": "Mira: {friend_familiar}, la liebre de {friend}, sale del círculo. Es el primer familiar de la clase que vive.",
-  "learned": "Ahora sabes que `__init__` es la acción que la clase ejecuta ella sola cuando nace un objeto, que `self` es el objeto que nace, y que cualquiera puede usar tu clase sin leer tu programa si sabe qué recibe `__init__`."
+  "learned": "Ahora sabes que `__init__` es el método que la clase ejecuta ella sola cuando nace un objeto, que `self` es el objeto que nace, y que cualquiera puede usar tu clase sin leer tu programa si sabe qué recibe `__init__`."
 }

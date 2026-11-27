@@ -1,0 +1,17 @@
+{
+  "title": "Entre las mesas",
+  "goals": [
+    "Llega hasta la puerta.",
+    "Guarda el número de pasos en una variable y camina con ella.",
+    "Escribe el número una sola vez en todo el programa."
+  ],
+  "starting_code": "# Los comentarios como este te dicen qué escribir debajo. ¡Léelos todos!\n\n# Guarda el número 2 en una variable. El nombre lo eliges tú.\n\n# Camina a la izquierda con `move_left` y tu variable entre los paréntesis.\n\n# Ve hacia arriba con `move_up` y la misma variable.\n\n# Ve a la derecha con `move_right` y la misma variable, hasta la puerta.\n",
+  "hints": [
+    "Una línea que guarda un número se escribe poniendo el nombre de la variable, luego `=` y después el número.",
+    "La variable va donde iría el número, entre los paréntesis de cada movimiento.",
+    "Los tres tramos son de dos pasos cada uno. Con `pasos = 2` puedes definir una variable `pasos`, y luego usarla en los tres movimientos, como en `wizard.move_left(pasos)`."
+  ],
+  "intro": "La puerta está más allá de las mesas. Como ordeno mis mesas con cuidado, el camino tiene tres tramos de la misma longitud, dos pasos cada uno: a la izquierda, arriba y a la derecha. No quiero que escribas el número `2` tres veces: guárdalo en una variable y usa esa variable las veces que te haga falta.",
+  "outro": "¡Muy bien! Ya hemos llegado a la puerta.",
+  "learned": "Ahora sabes qué es una variable y que puede ser el argumento de un método."
+}

@@ -5,9 +5,9 @@ An object knows things about itself: its **attributes**. You have looked at them
 ---
 ## Written as they are read
 
-An attribute is written just as it is read, with the dot, and it is given its value with `=`, like any name: `vesso.name = "Vesso"`.
+An attribute is written just as it is read, with the dot, and it is given its value with `=`, like any variable: `vesso.name = "Vesso"`.
 
-The attribute belongs to that object and to no other. And it is not the same as the program's name: `vesso` is what your program calls the object; `vesso.name` is what the object knows of itself.
+The attribute belongs to that object and to no other. And it is not the same as the variable: `vesso` is the variable your program keeps the object in; `vesso.name` is what the object knows of itself.
 
 ---
 ## An error to see

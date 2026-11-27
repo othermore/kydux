@@ -9,8 +9,6 @@ context:
   - docs/dev/course.md
   - content/stories/at-the-library/text.en.json
   - content/stories/at-the-library/text.es.json
-  - content/lessons/what-things-know/en.md
-  - content/lessons/what-things-know/es.md
   - content/lessons/fendra/en.md
   - content/lessons/fendra/es.md
 ---

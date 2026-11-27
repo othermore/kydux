@@ -693,13 +693,16 @@ class World:
         return [ring for ring in order if ring not in passed]
 
     def namespace(self) -> dict[str, Any]:
-        """What the child's code holds: the wizard, and the level's things and actors by
-        id; not what the wizard holds from the start, which the code asks for with
-        `find_item` (D123), so that no name is put into the program unseen. Someone else's
-        familiar is not among them: its name is told only to those it is trusted to
-        (D266). In a level with a familiar, the world's `Familiar` (D260), and in a living
-        level the familiar itself, by its name in small letters (D269)."""
-        things = {name: thing for name, thing in self.things.items() if not thing._k_spec.carried}
+        """What the child's code holds (D344): the wizard, the level's actors by id, and
+        its doors, holes, beds and plates by id, but a kind the level asks to find and a
+        thing that says it is no variable; no other thing, a key, a book, a broom, which
+        the program finds with `find_nearest`, `find_all` or `find_item` and keeps (D123),
+        so that no name is put into the program unseen. Someone else's familiar is not
+        among them: its name is told only to those it is trusted to (D266). In a level
+        with a familiar, the world's `Familiar` (D260), and in a living level the familiar
+        itself, by its name in small letters (D269)."""
+        variables = self.level.variables
+        things = {name: thing for name, thing in self.things.items() if name in variables}
         actors = {name: a for name, a in self.actors.items() if a._k_spec.kind != "familiar"}
         found: dict[str, Any] = {"wizard": self.wizard, **things, **actors}
         if self.Familiar is not None:

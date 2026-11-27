@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import { levelText, seedWizard } from './helpers';
 import { ciTimes } from './support';
@@ -213,4 +215,67 @@ test('the start screen in Spanish', async ({ browser }) => {
   await page.locator('#language').selectOption('en');
   await expect(page.locator('#continue')).toHaveText('Continue game');
   await context.close();
+});
+
+/** The stops of a chapter as content/ has them. */
+function chapterItems(id: string): string[] {
+  const path = fileURLToPath(new URL(`../../content/chapters/${id}/chapter.json`, import.meta.url));
+  return (JSON.parse(readFileSync(path, 'utf8')) as { items: string[] }).items;
+}
+
+/** The six stops sprint 61 put into chapter 2 (D342). */
+const NEW_IN_CHAPTER_2 = [
+  'lesson:a-name-for-a-value',
+  'level:the-reading-room',
+  'lesson:each-thing-its-methods',
+  'level:wennas-door',
+  'lesson:finding-things',
+  'level:the-fallen-book',
+];
+
+test('a game saved on the course before chapter 2 grew goes on where it was, and closes nothing (D356)', async ({
+  page,
+}) => {
+  // Every stop done up to chapter 4's second level, as on the course of 0.1.3: chapter 2
+  // with its lesson of eight pages and none of the six stops put in since.
+  const chapter2 = chapterItems('02-the-library').filter((item) => !NEW_IN_CHAPTER_2.includes(item));
+  chapter2.splice(chapter2.indexOf('level:the-lost-book'), 0, 'lesson:what-things-know');
+  const done = [
+    ...chapterItems('01-arrival'),
+    ...chapter2,
+    ...chapterItems('03-passages'),
+    ...chapterItems('04-the-broom').slice(0, 4),
+  ];
+  const progress: Record<string, Record<string, object>> = { story: {}, lesson: {}, level: {} };
+  for (const item of done) {
+    const [kind, id] = item.split(':') as [string, string];
+    progress[kind]![id] = kind === 'level' ? { won: true, stars: 3 } : { read: true };
+  }
+  const kept = JSON.stringify({
+    version: 1,
+    wizard: { name: 'Marta', gender: 'girl', look: 'teal' },
+    stories: progress.story,
+    lessons: progress.lesson,
+    levels: progress.level,
+    current: 'level:the-shed',
+  });
+  await page.addInitScript((document) => {
+    if (!localStorage.getItem('kydux.games')) localStorage.setItem('kydux.progress', document);
+  }, kept);
+  await page.goto('/');
+  await expect(page.locator('#continue')).toHaveAttribute('href', '#level/the-shed');
+  await page.locator('#map-link').click();
+  await expect(page.locator('.map-chapter[data-chapter="04-the-broom"]')).toHaveAttribute('data-current', 'true');
+  await expect(page.locator('.map-chapter[data-current="true"]')).toHaveCount(1);
+  const chapter = page.locator('.map-chapter[data-chapter="02-the-library"]');
+  await expect(chapter).not.toHaveAttribute('data-finished', 'true');
+  for (const item of NEW_IN_CHAPTER_2) {
+    await expect(page.locator(`.stop[data-item="${item}"]`)).toHaveAttribute('data-state', 'open');
+  }
+  // Nothing reached is closed: every stop of chapters 1 to 3 is done.
+  for (const id of ['01-arrival', '02-the-library', '03-passages']) {
+    for (const item of chapterItems(id).filter((one) => !NEW_IN_CHAPTER_2.includes(one))) {
+      await expect(page.locator(`.stop[data-item="${item}"]`)).toHaveAttribute('data-state', 'done');
+    }
+  }
 });

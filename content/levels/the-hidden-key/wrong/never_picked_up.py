@@ -1,5 +1,5 @@
-key = wizard.find_nearest("key")
-key.reveal()
+my_key = wizard.find_nearest("key")
+my_key.reveal()
 wizard.move_down(2)
 wizard.move_left(8)
 wizard.move_right(8)

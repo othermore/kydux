@@ -11,7 +11,7 @@ La primera línea es la condición. La línea de debajo, metida hacia dentro con
 
 Dask mira hacia arriba ahora mismo, así que este programa imprime ambas líneas. Cambia `"up"` por `"down"` y ejecútalo de nuevo, y solo se imprimirá la casilla, porque la condición ya no es `True`.
 
-```python try
+```python try change
 if dask.facing == "up":
     print("Mirando hacia arriba")
 print("Posición:", wizard.position)
@@ -30,7 +30,7 @@ La tecla de borrar, que está encima del Intro y suele tener una flecha hacia la
 
 Puedes probarlo {tú mismo|tú misma}. Prueba a poner el cursor al principio de la última línea y pulsar Tab. Verás que la línea se mueve dentro del `if`, y si lo ejecutas ya no se imprimirá. Si borras los espacios y vuelves a ejecutar, la línea sí se imprimirá.
 
-```python try
+```python try change
 if dask.facing == "down":
     print("Dask mira hacia abajo")
 print("Esta línea está fuera del if")

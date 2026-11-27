@@ -323,7 +323,7 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('key = wizard.find_nearest("key")\nkey.reveal()\nwizard.wait(4)');
+    await page.keyboard.insertText('my_key = wizard.find_nearest("key")\nmy_key.reveal()\nwizard.wait(4)');
     await page.locator('#run').click();
     await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'key', { timeout: ciTimes(30_000) });
     await page.screenshot({ path: `${SHOTS}revealed.png` });
@@ -337,7 +337,7 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('#speed').selectOption('1');
     await page.locator('.cm-content').click();
     await page.keyboard.press('ControlOrMeta+A');
-    await page.keyboard.insertText('book = wizard.find_nearest("book")\nbook.reveal()\nwizard.move_up(2)\nwizard.move_right(4)\nwizard.move_up(4)\nwizard.move_left(6)');
+    await page.keyboard.insertText('eldras_book = wizard.find_nearest("book")\neldras_book.reveal()\nwizard.move_right(8)\nwizard.move_up(4)\nwizard.move_left(6)');
     await page.locator('#run').click();
     await expect(page.locator('#scene')).toHaveAttribute('data-revealed', 'old_book', { timeout: ciTimes(30_000) });
     await expect(page.locator('#scene')).toHaveAttribute('data-state', 'done', { timeout: ciTimes(60_000) });
@@ -371,8 +371,8 @@ test.describe('in the library (D85, D86, D51)', () => {
     await page.locator('#speed').selectOption('4');
     const bonus = page.locator('#star-reasons li', { hasText: 'The extra goal met' });
     const back = [
-      'key = wizard.find_nearest("key")',
-      'steps = key.distance_to(wizard)',
+      'eldras_key = wizard.find_nearest("key")',
+      'steps = eldras_key.distance_to(wizard)',
       'wizard.move_left(steps)',
       'wizard.pick_up()',
       'wizard.move_right(steps)',
@@ -499,49 +499,58 @@ test.describe('the lessons run plain Python on their pages (D170)', () => {
     return page.locator('.lesson-printed').innerText();
   }
 
-  for (const [locale, page3, said, names] of [
-    ['en-US', 'Page 3 of 8', 'Hello', ['age', 'name']],
-    ['es-ES', 'Página 3 de 8', 'Hola', ['edad', 'nombre']],
+  for (const [locale, page1, said, names] of [
+    ['en-US', 'Page 1 of 5', 'Hello', ['age', 'name']],
+    ['es-ES', 'Página 1 de 5', 'Hola', ['edad', 'nombre']],
   ] as const) {
-    test(`what things know prints a number, a sum and a string, with no wizard (${locale})`, async ({ browser }) => {
-      const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
-      const page = await context.newPage();
-      await page.goto('/#lesson/what-things-know');
-      await expect(page.locator('.lesson-page')).toBeVisible();
-      await page.locator('#lesson-next').click();
-      await page.locator('#lesson-next').click();
-      await expect(page.locator('#lesson-page')).toHaveText(page3);
-      await expect(page.locator('.lesson-run .cm-content')).not.toContainText('wizard');
-      expect(await printed(page)).toBe(`7\n5\n${said}`);
-      await page.screenshot({ path: `${SHOTS}what-things-know-${locale}.png` });
-      // Changed, it prints what it is changed to.
-      expect(await printed(page, 'print(10 + 20)\nprint("Teku")')).toBe('30\nTeku');
-      // Its last page, the eighth, keeps the nearest door, the one Wenna has just opened,
-      // and prints its attribute: it is not locked (D174).
-      for (let turn = 0; turn < 5; turn += 1) await page.locator('#lesson-next').click();
-      await expect(page.locator('#lesson-next')).toHaveCount(0);
-      expect(await printed(page)).toBe('False');
-      await context.close();
-    });
-
-    test(`what things know keeps a number and a string in variables, and adds two into a third (${locale})`, async ({
+    test(`a name for a value prints a number, a sum and a string, then keeps them in variables, with no wizard (${locale})`, async ({
       browser,
     }) => {
       const context = await browser.newContext({ locale, viewport: { width: 1280, height: 800 } });
       const page = await context.newPage();
-      await page.goto('/#lesson/what-things-know');
+      await page.goto('/#lesson/a-name-for-a-value');
       await expect(page.locator('.lesson-page')).toBeVisible();
-      // Its fifth page is the variable's, its sixth the sum's.
-      for (let turn = 0; turn < 4; turn += 1) await page.locator('#lesson-next').click();
-      for (const name of names) await expect(page.locator('.lesson-run .cm-content')).toContainText(`${name} =`);
+      await expect(page.locator('#lesson-page')).toHaveText(page1);
       await expect(page.locator('.lesson-run .cm-content')).not.toContainText('wizard');
-      expect(await printed(page)).toBe('9\nMarta');
-      await page.screenshot({ path: `${SHOTS}what-things-know-variable-${locale}.png` });
+      expect(await printed(page)).toBe(`7\n5\n${said}`);
+      await page.screenshot({ path: `${SHOTS}a-name-for-a-value-${locale}.png` });
+      // Changed, it prints what it is changed to.
+      expect(await printed(page, 'print(10 + 20)\nprint("Teku")')).toBe('30\nTeku');
+      // Its second page keeps a number and a string in variables.
       await page.locator('#lesson-next').click();
-      expect(await printed(page)).toBe('7');
-      await page.screenshot({ path: `${SHOTS}what-things-know-sum-${locale}.png` });
-      expect(await printed(page, 'a = 4\nb = 3\ntotal = a - b\nprint(total)')).toBe('1');
+      for (const name of names) await expect(page.locator('.lesson-run .cm-content')).toContainText(`${name} =`);
+      expect(await printed(page)).toBe('9\nMarta');
+      await page.screenshot({ path: `${SHOTS}a-name-for-a-value-variable-${locale}.png` });
       await context.close();
     });
   }
+
+  test('counting with variables adds two variables into a third (D133)', async ({ page }) => {
+    await page.goto('/#lesson/counting-with-names');
+    await expect(page.locator('.lesson-page')).toBeVisible();
+    expect(await printed(page)).toBe('7');
+    expect(await printed(page, 'a = 4\nb = 3\ntotal = a - b\nprint(total)')).toBe('1');
+  });
+});
+
+test.describe('the first variable (D343, D355)', () => {
+  test.use({ locale: 'en-US' });
+  test.beforeEach(({ page }) => seedWizard(page, MARTA));
+
+  test('in the reading room, the walk with 2 typed three times reaches the door and does not win', async ({ page }) => {
+    await open(page, 'the-reading-room');
+    const said = await run(page, 'wizard.move_left(2)\nwizard.move_up(2)\nwizard.move_right(2)');
+    expect(said).toMatch(/^Not yet: 1 of 2 goals met/);
+    await expect(page.locator('#scene')).toHaveAttribute('data-wizard', '7,17');
+    await expect(page.locator('.goal').nth(0)).toHaveAttribute('data-mark', 'met');
+    await expect(page.locator('.goal').nth(1)).not.toHaveAttribute('data-mark', 'met');
+  });
+
+  test('in the hidden key, the friend says where it is when it lights', async ({ page }) => {
+    await open(page, 'the-hidden-key');
+    await page.locator('#speed').selectOption('1');
+    await run(page, 'my_key = wizard.find_nearest("key")\nmy_key.reveal()');
+    await expect(page.locator('#scene')).toHaveAttribute('data-told', 'mate:revealed');
+    await page.locator('.scene-frame').screenshot({ path: `${SHOTS}hidden-key-friend.png` });
+  });
 });

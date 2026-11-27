@@ -6,12 +6,12 @@
   "starting_code": "class {familiar_class}(Familiar):\n    def __init__(name, color):\n        name = name\n        color = color\n\n{familiar_var} = {familiar_class}(\"{familiar}\", \"{familiar_color}\")\n{mate_var} = {familiar_class}(\"{mate_familiar}\", \"{mate_color}\")\nwizard.cast(\"minka\", {familiar_var})\nwizard.cast(\"minka\", {mate_var})\n",
   "hints": [
     "Lo primero que recibe `__init__` es siempre el objeto que nace.",
-    "Con `self` en su sitio, las pruebas salen sin nombre: `name = name` guarda el nombre solo dentro de la acción, no en el objeto.",
-    "Dos arreglos: `self` el primero entre los paréntesis de `__init__`, y `self.` delante de los dos nombres que se guardan."
+    "Con `self` en su sitio, las pruebas salen sin nombre: `name = name` guarda el nombre solo dentro del método, no en el objeto.",
+    "Dos arreglos: `self` el primero entre los paréntesis de `__init__`, y `self.` delante de los dos atributos que se guardan."
   ],
   "intro": "Me rindo: esto se me da fatal, no me sale ninguno bien. Deja que me copie de tu descripción, y tendré un familiar igual, pero de otro color.\n\nTe he copiado en mi pizarra a toda prisa y he añadido mi línea. El mío se llamará *(bajito)* {mate_familiar}. Mejor lanza tú el conjuro también, que a mí hoy no me sale nada.",
   "outro": "Una sola clase, y dos familiares, cada uno con su nombre y su color. ¡Gracias, {wizard}!",
-  "learned": "Ahora sabes los dos despistes que todo el mundo tiene con una clase: uno que Python avisa, cuando falta `self`, y otro que nadie avisa, un nombre guardado solo dentro de la acción; y que una clase hace tantos objetos como hagan falta, cada uno con sus datos.",
+  "learned": "Ahora sabes los dos despistes que todo el mundo tiene con una clase: uno que Python avisa, cuando falta `self`, y otro que nadie avisa, un nombre guardado solo dentro del método; y que una clase hace tantos objetos como hagan falta, cada uno con sus datos.",
   "told": {
     "won": "Ese. Ese sí.",
     "two_familiars": "¡Alto! Con dos familiares basta: uno para ti y otro para {mate}."

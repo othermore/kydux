@@ -44,24 +44,36 @@ const ROOMS = {
 };
 
 describe('the notebook', () => {
-  it('holds the wizard, then the level\'s things, each with its role', () => {
+  it("holds the wizard, then the level's doors, each with its role, and no thing to be found (D344)", () => {
     expect(heldObjects(ROOMS, TABLE)).toEqual([
       { name: 'wizard', role: 'wizard' },
-      { name: 'silver_key', role: 'key' },
       { name: 'left_door', role: 'door' },
-      { name: 'book', role: 'thing' },
+    ]);
+  });
+
+  it('holds no door that says it is no variable, nor one of a kind to find (D344)', () => {
+    const doors = [
+      { kind: 'door', id: 'door', variable: false },
+      { kind: 'door', id: 'left_door' },
+      { kind: 'bed', id: 'bed' },
+      { kind: 'hole', id: 'hole' },
+    ];
+    expect(heldObjects({ id: 'one', things: doors }, TABLE).map((one) => one.name)).toEqual([
+      'wizard',
+      'left_door',
+      'bed',
+      'hole',
+    ]);
+    expect(heldObjects({ id: 'one', things: doors, to_find: ['door'] }, TABLE).map((one) => one.name)).toEqual([
+      'wizard',
+      'bed',
+      'hole',
     ]);
   });
 
   it('shows only what the level teaches, each example with the object\'s own name', () => {
     const entries = notebookEntries(ROOMS, TABLE).map((e) => `${e.object}: ${e.example}`);
-    expect(entries).toEqual([
-      'wizard: wizard.move_right(3)',
-      'silver_key: silver_key.position',
-      'left_door: left_door.position',
-      'left_door: left_door.open()',
-      'book: book.position',
-    ]);
+    expect(entries).toEqual(['wizard: wizard.move_right(3)', 'left_door: left_door.position', 'left_door: left_door.open()']);
   });
 
   it('gives a thing\'s members to doors and keys through thing.<member>', () => {

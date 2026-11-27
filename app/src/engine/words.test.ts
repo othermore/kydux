@@ -30,14 +30,14 @@ describe('blockedText', () => {
     );
   });
 
-  it('says why an action could not be done, with the thing named', () => {
+  it('says why a method could not be done, with the thing named', () => {
     initLanguage(english);
     expect(blockedText('far', 'door')).toBe('I cannot reach the door from here.');
     expect(blockedText('locked', 'door')).toBe(
       'I cannot open the door: it is locked, and I have no key for it.',
     );
     expect(blockedText('nothing', null)).toBe('There is nothing here to pick up.');
-    expect(blockedText('unknown_action', null)).toBe('I do not know this action yet.');
+    expect(blockedText('unknown_action', null)).toBe('I do not know this method yet.');
   });
 
   it('says it in Spanish, with the article the thing takes', () => {
@@ -48,10 +48,10 @@ describe('blockedText', () => {
 
   it('says why a spell or a door would not do (D42, D43)', () => {
     initLanguage(english);
-    expect(blockedText('no_wand', null)).toBe('I do not know this action yet.');
+    expect(blockedText('no_wand', null)).toBe('I do not know this method yet.');
     expect(blockedText('unknown_spell', null, { spell: 'abra' })).toBe('I do not know a spell called “abra”.');
-    expect(blockedText('which_one', null, { things: ['book', 'key'] })).toBe(
-      'There are several things here: book, key. Say which, like wizard.pick_up(book).',
+    expect(blockedText('which_one', null, { things: ['old_book', 'key'] })).toBe(
+      'There are several things here. Say which: put between the brackets the variable you kept it in, like wizard.pick_up(my_key).',
     );
     expect(blockedText('sealed', 'door')).toBe(
       'I cannot open the door by hand: it is sealed, and needs a spell.',

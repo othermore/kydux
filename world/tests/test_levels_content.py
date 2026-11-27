@@ -41,11 +41,69 @@ def roles(level: Level) -> dict[str, str]:
     return found
 
 
+def _found_kind(value: ast.AST, lists: dict[str, str]) -> str | None:
+    """The kind of thing a value of the program holds, read from how it was found: a
+    `find_nearest` or `find_item` with its word in quotes, an element of a list a
+    `find_all` gave."""
+    if (
+        isinstance(value, ast.Call)
+        and isinstance(value.func, ast.Attribute)
+        and value.func.attr in ("find_nearest", "find_item")
+        and value.args
+        and isinstance(value.args[0], ast.Constant)
+    ):
+        return str(value.args[0].value)
+    if isinstance(value, ast.Subscript) and isinstance(value.value, ast.Name):
+        return lists.get(value.value.id)
+    return None
+
+
+def _found_list(value: ast.AST) -> str | None:
+    if (
+        isinstance(value, ast.Call)
+        and isinstance(value.func, ast.Attribute)
+        and value.func.attr == "find_all"
+        and value.args
+        and isinstance(value.args[0], ast.Constant)
+    ):
+        return str(value.args[0].value)
+    return None
+
+
+def kept(tree: ast.AST) -> dict[str, str]:
+    """The role of every variable the program keeps a found thing in (D344): `x =
+    wizard.find_nearest("key")`, an element of a `find_all` list, a loop's variable over
+    one, so that what a kept thing is asked is checked as an id's was (D23)."""
+    lists: dict[str, str] = {}
+    found: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target = node.targets[0]
+            if isinstance(target, ast.Name):
+                listed = _found_list(node.value)
+                if listed:
+                    lists[target.id] = listed
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target = node.targets[0]
+            kind = _found_kind(node.value, lists)
+            if isinstance(target, ast.Name) and kind:
+                found[target.id] = api.role_of(kind)
+        elif isinstance(node, ast.For) and isinstance(node.target, ast.Name):
+            kind = _found_list(node.iter) or (
+                lists.get(node.iter.id) if isinstance(node.iter, ast.Name) else None
+            )
+            if kind:
+                found[node.target.id] = api.role_of(kind)
+    return found
+
+
 def outside_api(level: Level, code: str) -> list[str]:
     """The `name.member` uses in the code that the level does not teach."""
-    held = roles(level)
+    tree = ast.parse(code)
+    held = {**roles(level), **kept(tree)}
     found = []
-    for node in ast.walk(ast.parse(code)):
+    for node in ast.walk(tree):
         if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
             role = held.get(node.value.id)
             if role is not None and not api.allows(level.api, role, node.attr):

@@ -1,4 +1,4 @@
 for step in range(2):
-    door = wizard.find_nearest("door")
-    door.open()
+    next_door = wizard.find_nearest("door")
+    next_door.open()
     wizard.move_up(4)

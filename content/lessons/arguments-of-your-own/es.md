@@ -1,8 +1,8 @@
 # Argumentos propios
 
-Entre los paréntesis del `def` van nombres, que son los argumentos de la función. Al llamarla le damos valores en el mismo orden, ¡exactamente como `move_right(3)` recibe su 3!
+Entre los paréntesis del `def` van variables, que son los argumentos de la función. Al llamarla les damos valores en el mismo orden, ¡exactamente como `move_right(3)` recibe su 3!
 
-Dentro de la función, esos nombres valen los valores que les dimos. Por eso, ¡la misma función sirve para cosas parecidas pero no iguales, como pasar por dos aros a distancias distintas!
+Dentro de la función, esas variables guardan los valores que les dimos. Por eso, ¡la misma función sirve para cosas parecidas pero no iguales, como pasar por dos aros a distancias distintas!
 
 ```python try
 def saludar(nombre):

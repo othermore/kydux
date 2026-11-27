@@ -47,13 +47,14 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.items",
-    "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
     "thing.reveal",
     "wizard.find_item",
     "wizard.give"
+  ],
+  "to_find": [
+    "book"
   ],
   "goals": [
     {

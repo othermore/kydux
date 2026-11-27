@@ -133,6 +133,9 @@
     "familiar.pick_up",
     "thing.position"
   ],
+  "to_find": [
+    "thread"
+  ],
   "goals": [
     {
       "kind": "collect",

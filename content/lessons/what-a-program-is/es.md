@@ -11,7 +11,7 @@ En este juego, el ordenador hace todo por ti. Tú solo le das las instrucciones,
 
 Tu {mago|maga} eres tú en el juego. En cada nivel el juego muestra una marca redonda en el suelo, que palpita suavemente: es el lugar al que tu {mago|maga} debe llegar.
 
-Nuestra primera instrucción será `wizard.move_right()`. Esto le dice a tu {mago|maga} que dé un paso a la derecha. ¡Muy pronto te enseñaré qué significa cada parte de esa instrucción!
+Nuestra primera instrucción será `wizard.move_right()`. Le pide a tu {mago|maga} una acción (un método; luego te explico esa palabra): dar un paso a la derecha. ¡Muy pronto te enseñaré qué significa cada parte de esa instrucción!
 
 ---
 ## Pruébalo

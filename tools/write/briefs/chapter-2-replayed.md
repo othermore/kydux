@@ -35,8 +35,6 @@ context:
   - content/stories/at-the-library/text.es.json
   - content/lessons/the-right-place/en.md
   - content/lessons/the-right-place/es.md
-  - content/lessons/what-things-know/en.md
-  - content/lessons/what-things-know/es.md
   - content/lessons/keys-and-doors/en.md
   - content/lessons/keys-and-doors/es.md
   - content/levels/your-bed/text.en.json

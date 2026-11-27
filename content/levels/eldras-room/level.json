@@ -65,8 +65,6 @@
     "wizard.move_left",
     "wizard.move_up",
     "wizard.move_down",
-    "wizard.items",
-    "door.locked",
     "wizard.pick_up",
     "wizard.find_nearest",
     "wizard.find_item",
@@ -75,6 +73,9 @@
     "thing.reveal",
     "thing.distance_to",
     "wizard.cast"
+  ],
+  "to_find": [
+    "book"
   ],
   "goals": [
     {

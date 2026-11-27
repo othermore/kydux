@@ -198,6 +198,9 @@
     "wizard.find_all",
     "wizard.say"
   ],
+  "to_find": [
+    "broom"
+  ],
   "goals": [
     {
       "kind": "say",

@@ -18,8 +18,6 @@ outputs:
   - content/lessons/kirra-and-osto/es.md
 context:
   - docs/dev/story.md
-  - content/lessons/what-things-know/en.md
-  - content/lessons/what-things-know/es.md
   - content/lessons/counting-with-names/es.md
   - content/lessons/fendra/es.md
 ---

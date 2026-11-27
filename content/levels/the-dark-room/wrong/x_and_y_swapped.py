@@ -1,7 +1,7 @@
 wizard.cast("kirra")
-key = wizard.find_nearest("key")
-right = key.position.y - wizard.position.y
-down = key.position.x - wizard.position.x
+my_key = wizard.find_nearest("key")
+right = my_key.position.y - wizard.position.y
+down = my_key.position.x - wizard.position.x
 wizard.move_right(right)
 wizard.move_down(down)
 wizard.pick_up()

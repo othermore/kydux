@@ -27,13 +27,17 @@ design:
 - **A variable holds a value the program cannot know when it is written,
   or uses more than once.** A key that lies in a different place each
   time the level is played (D51) asks for `steps = key.distance_to(wizard)`,
-  and the same `steps` walks there and back. Giving a name to a number
-  the child could simply type, as in `steps = 3` for `move_right(3)`, is
-  forced, and is never the way a variable is introduced.
+  and the same `steps` walks there and back. The first variable a child
+  writes holds a number its walk uses three times, and the level asks for
+  a move by a variable (D343). Giving a name to a number used once, as in
+  `steps = 3` for one `move_right(3)`, is forced, and is never the way a
+  variable is introduced.
 - **A method that gives something back is taught on something the wizard
   cannot see.** `find_nearest` earns its place when the key lies hidden
   behind a bookcase and `reveal` shows its outline; on a thing in plain
   sight the child would walk to it and never see why the method exists.
+  One short practice on a book in sight comes first, with the line that
+  finds it written, for the method called on a variable alone (D343).
 - **A method with a precondition is taught by a level that breaks it,
   or by the hint of the level that needs it.** A door opened from across
   the room is refused, and the hint says a door listens only to who
@@ -44,13 +48,27 @@ design:
   both.
 - **A lesson teaches one idea, and its practice needs that idea alone.**
   A lesson that would teach two ideas is two lessons, each with its
-  practice: finding a thing and revealing it, then giving it. Rule given
-  by the owner on 2026-10-29, when the lost book's practice asked for
-  three ideas at once.
+  practice: a variable, then a method of another object, then finding a
+  thing and revealing it, then giving it (D342). Rule given by the owner
+  on 2026-10-29, when the lost book's practice asked for three ideas at
+  once.
 - **A practice's starting code guides the child in comments**, one a
   step, in the child's words, naming the method of each step and never
   writing the program; the child writes the line under each comment
-  (the owner, 2026-10-29).
+  (the owner, 2026-10-29). A practice whose one new thing is a later
+  line may come with the line before it written (D343).
+- **What is to be found is found by the program, and kept in a variable
+  with a name that is not its search word.** A key, a book or a broom is
+  no variable until the program finds it and keeps it (D344); the texts,
+  the starting codes and the solutions never keep a find in a variable
+  named as its kind, `book`, `key`, `broom`, in either language, so that
+  the word in quotes and the variable are two things to the child, and
+  the first level with no line written asks for a name of the child's own
+  (D345). Rule given by the owner on 2026-11-25.
+- **A page with code is passed by trying it.** On a first reading, a
+  lesson's page with code to try is left once its block has been run, and
+  where the page asks for a change or another name, once that has been
+  run (D354). Rule given by the owner on 2026-11-25.
 - **Two things are never hidden in the same place**, and a figure that
   appears in a story has a reason to be there that the story says (the
   owner, 2026-10-29).
@@ -78,7 +96,9 @@ design:
   for it, then an example with numbers. A program looks at an attribute and sees
   where it stands; it never asks. A metaphor stands only where its idea is first
   explained, with its programming word beside it; after that the programming word,
-  recalled once in parentheses at most. The game's doing is shown, not told. An outro
+  recalled once in parentheses at most. So *a name for a value* is said in the one
+  lesson that first explains a variable and *variable* everywhere after it, and
+  *method* from chapter 1's second lesson on (D350). The game's doing is shown, not told. An outro
   tells what the three see next. Every page that shows code lets the child run it
   (D142). Rule given by the owner on 2026-11-07.
 
@@ -165,12 +185,17 @@ morning both go to the library for a school wand, the mate having none
 and the wizard only the friend's spare; Wenna, the librarian, opens her
 door to them and teaches on the way, and Eldra, a ghost, has lost her
 books. The ideas, each where its level needs it (*How a level earns its
-idea*, above): what a thing knows, an attribute; an action that gives
-something back, kept under a name, a variable, on a thing the wizard
-cannot see; a door and its key; a number the program cannot know when it
-is written, the steps to a key that is never twice in the same place,
-kept under a name and used twice; a spell that reaches. The wizard
-carries the friend's lent wand throughout.
+idea*, above), one a lesson (D342): a name for a value, a variable, on a
+number used three times; a method is its object's, a door's `open`; a
+method that gives something back, the thing found kept in a variable and
+made to glow, then on a thing the wizard cannot see; giving; a door and
+its key; a number the program cannot know when it is written, the steps
+to a key that is never twice in the same place, kept in a variable and
+used twice; a spell that reaches. What the child is asked to find is no
+variable until the program finds it and keeps it (D344), and from the
+reading room on two lists over the editor show what the program has and
+what is to find (D346). The wizard carries the friend's lent wand
+throughout.
 
 Its scenes (D84): `the-entrance`, the hall at night, for a story;
 `the-dormitory`, the common room between the girls' dormitory on the left
@@ -188,19 +213,24 @@ that stays locked.
 | `lesson:the-right-place` | Lesson 1 | Taught by the mate: an action may need the right place; `wizard.sleep()` only beside the trunk at a free bed's foot. Two pages and no *Try it*: sleeping where no bed is teaches nothing, and its last button goes on to the level (D173). | `wizard.sleep` |
 | `level:your-bed` | Practice 1 | In one's own dormitory, between the first two beds: a step to the free bed's trunk, and asleep; the other dormitory's doorway refuses the wizard. Bonus: no bumps. | |
 | `story:the-morning` | Story 3 | The mate needs a wand, and the wizard's is lent: out of the door to the library, together. | |
-| `story:at-the-library` | Story 4 | Wenna receives them, walks to the shut door into the main library and opens it for them: the other doors on their way they open themselves. | |
-| `lesson:what-things-know` | Lesson 2 | Eight pages before the lost book. An attribute: what an object knows about itself, read without brackets; `print` shows any value, a number, a sum or a string, run on the page in plain Python, with no wizard (D170). An action can give something back: `find_nearest` gives the nearest thing of a kind. A variable, a name that holds a value, a number or a string, printed; two variables added into a third, printed: both run on the page in plain Python (D170). The thing `find_nearest` gives back kept in a variable, `None` when there is none; `reveal` makes it glow where it lies, through whatever hides it (D110). Its last block keeps the nearest door, the one Wenna opened, and prints its attribute `locked`: `False` (D174). | `wizard.items`, `door.locked`, `concept:print`, `concept:variables`, `concept:arithmetic`, `wizard.find_nearest`, `thing.reveal` |
-| `level:the-lost-book` | Practice 2 | Eldra's book, by the pile of books in the corner, half behind it (1,13): found, made to glow, picked up from the hall's end just above it; the starting code guides each step in comments. Bonus: made to glow with `reveal`. | |
-| `lesson:giving-things` | Lesson 3 | Each level is a new program, so a name kept in the last one is gone: `find_item` gives the thing of a kind the wizard carries, as `find_nearest` gives the nearest on the map; a thing kept under a name is given to whoever stands beside the wizard with `give`. Three pages and no *Try it* (D174). | `wizard.find_item`, `wizard.give` |
-| `level:the-book-returned` | Practice 3 | The book in hand from the start, at the hall's left end above the pile: asked for with `find_item`, carried along the hall to its other end and given to Eldra; the starting code guides each step in comments. Bonus: in fewer than 5 lines. | |
-| `lesson:keys-and-doors` | Lesson 4 | A locked door opens with `door.open()` beside it, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. Two pages and no *Try it* (D174). | `door.open` |
-| `level:the-hidden-key` | Practice 4 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened; the starting code guides each step in comments. Bonus: found with `find_nearest`. | |
-| `lesson:the-distance` | Lesson 5 | `key.distance_to(wizard)` is a number the program cannot know when it is written: kept under a name and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
-| `level:the-moving-key` | Fix 1 | Eldra's room key lies two to five cells away, in four ways; Wenna's program from yesterday walks four: repaired with `distance_to` kept under a name, it ends with the key in hand. Bonus: no number written. | |
-| `lesson:counting-with-names` | Lesson 6 | A number made from a variable: `5 - steps`, `steps + 2`, kept in a variable or written in the brackets; `print` shows it (D133). | |
+| `story:at-the-library` | Story 4 | Wenna receives them and walks to the shut door into the main library, which she leaves closed: they will open it themselves, after two lessons. | |
+| `lesson:a-name-for-a-value` | Lesson 2 | Five pages in plain Python, with no wizard (D170), each passed by trying it (D354): `print` shows a value, a number, a sum or a string; a variable is a name for a value, the same variable printed and used; two variables added into a third; a variable's name is the programmer's to choose, and a name the program has not written is an error. | `concept:print`, `concept:variables`, `concept:arithmetic` |
+| `level:the-reading-room` | Practice 2 | *Between the tables*: round the tables to Wenna's door, two cells left, two up, two right, the one way there is. A move by a variable is required (D343). Bonus: one number written in the whole program. | |
+| `lesson:each-thing-its-methods` | Lesson 3 | Every method so far was the wizard's; each object has its own: the door is an object the program keeps in the variable `door`, and `door.open()` is the door's, from beside it; `wizard.open()` does not work. Three pages and no *Try it* (D174). | `door.open` |
+| `level:wennas-door` | Practice 3 | Beside Wenna's door: opened with its own method, and through it. | |
+| `lesson:finding-things` | Lesson 4 | A method can give something back: `find_nearest` gives the nearest thing of a kind, named by a word in quotes; what it gives is kept in a variable with a name of one's own, and `reveal` is that thing's method, which makes it glow where it lies, through whatever hides it (D110). Five pages; the page that keeps the find is passed by running it with another name for the variable (D354). | `wizard.find_nearest`, `thing.reveal` |
+| `level:the-fallen-book` | Practice 4 | A book fallen in the hall, in sight: the starting code holds the line that finds it and keeps it (D343); made to glow by the variable, walked to and picked up. Wenna keeps it. | |
+| `level:the-lost-book` | Practice 5 | Eldra's book, by the pile of books in the corner, half behind it (1,13): found, kept in a variable the child names (D345), made to glow, picked up from the hall's end just above it; the starting code guides each step in comments, with no line written. Bonus: made to glow with `reveal`. | |
+| `lesson:giving-things` | Lesson 5 | Each level is a new program, so a variable of the last one is gone: `find_item` gives the thing of a kind the wizard carries, as `find_nearest` gives the nearest on the map; a thing kept in a variable is given to whoever stands beside the wizard with `give`. Three pages and no *Try it* (D174). | `wizard.find_item`, `wizard.give` |
+| `level:the-book-returned` | Practice 6 | The book in hand from the start, at the hall's left end above the pile: asked for with `find_item`, carried along the hall to its other end and given to Eldra; the starting code guides each step in comments. Bonus: in fewer than 5 lines. | |
+| `lesson:keys-and-doors` | Lesson 6 | A locked door opens with its `open`, the method of lesson 3, once its key is carried; a thing the wizard cannot see is found all the same, and `reveal` shows it. Two pages and no *Try it* (D174). | |
+| `level:the-hidden-key` | Practice 7 | The centre door's key lies under the front bookcase, out of sight: found, revealed, picked up from the aisle beside it, the door opened; when the key lights, the mate says where it is and the way in between the two bookcases (D355); the starting code guides each step in comments. Bonus: found with `find_nearest`. | |
+| `lesson:the-distance` | Lesson 7 | The found key's `distance_to(wizard)` is a number the program cannot know when it is written: kept in a variable and used twice; a level played in several ways, which one program must win (D51). | `thing.distance_to` |
+| `level:the-moving-key` | Fix 1 | Eldra's room key lies two to five cells away, in four ways; Wenna's program from yesterday walks four: repaired with `distance_to` kept in a variable, it ends with the key in hand. Bonus: no number written. | |
+| `lesson:counting-with-names` | Lesson 8 | *Counting with variables*. A number made from a variable: `5 - steps`, `steps + 2`, kept in a variable or written in the brackets; `print` shows it (D133). | |
 | `level:eldras-door` | Improve 1 | The level played again from the start, the repaired program given whole: the key, then the rest of the five cells to the door, `rest = 5 - steps`, open it, and stand before it. The key lies two to five cells away. Bonus: in fewer than 8 ticks, which only the subtraction earns. | |
-| `lesson:fendra` | Lesson 7 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile; a spell moves things, and the hands carry them: the thing is picked up once it has come down. Two pages and no *Try it* (D174). | (the spell `fendra`) |
-| `level:eldras-room` | Practice 5 | The chapter together: Eldra's other lost book on the bookcase in her little room, among many standing like it, too high for hands: found, revealed, drawn down with *fendra* from the room's doorway, which the spell's line does not pass (D129), picked up, given to her in the aisle; the starting code guides each step in comments. Bonus: revealed with `reveal`. | |
+| `lesson:fendra` | Lesson 9 | A spell that reaches: `wizard.cast("fendra", book)` draws the thing it is told, in a straight line three tiles away at most, to the wizard's tile; a spell moves things, and the hands carry them: the thing is picked up once it has come down. Two pages and no *Try it* (D174). | (the spell `fendra`) |
+| `level:eldras-room` | Practice 8 | The chapter together: Eldra's other lost book on the bookcase in her little room, among many standing like it, too high for hands: found, revealed, drawn down with *fendra* from the room's doorway, which the spell's line does not pass (D129), picked up, given to her in the aisle; the starting code guides each step in comments. Bonus: revealed with `reveal`. | |
 | `story:the-wand-bank` | Story 5 | Eldra's thanks; the school wands; the friend comes out from behind the shelves, there for a book, having known the wizard's voice; the wizard introduces the mate; the spare wand given back; the chapter summed up; at dusk, the rumour of the passages. | |
 
 The world features chapter 2 needs: shelves and bookcases, tiles the
@@ -223,7 +253,8 @@ with the scene's plan, the scene itself drawn in ink with its people as themselv
 and every cell's numbers under the pointer, and pauses the run until it is closed
 (D134, D143). With it the child learns the grid: a system of coordinates, a cell's
 two numbers, x from the left and y from the top, both from 0; then, in a dark tunnel
-where nothing is seen, reads the wizard's own cell, `wizard.position`, and hears
+where nothing is seen, meets what an object knows about itself, an attribute, reads
+the wizard's own cell, `wizard.position`, and hears
 that a thing knows its cell too. The ideas after it, one a level: waiting;
 attributes that hold a word, comparing, an expression; choosing with `if`, then with
 `else`, a condition; repeating with `for` and `while`, a loop; two spells. The walks are short and straight, with little in the way: the levels'
@@ -248,7 +279,7 @@ one being the arch into the next.
 | `story:after-dark` | Story 1 | Night in the dormitory: a knock; the friend at the common room's door with the naughty child's map, found in a book about the castle, handed to the wizard; why the friend was looking; the passages, Dask, the rumours; consult the map at every step; the three go out. | |
 | `lesson:the-cells` | Lesson 1 | The map works with a system of coordinates: a cell is named by two numbers, x from the left and y from the top, both from 0; those numbers say how many steps lie between two cells; the map's word, `orvim`, cast with the wand, opens the plan of the place. Three pages and no *Try it*: the spell is cast in the level (D174). | (the spell `orvim`) |
 | `level:the-doors-corridor` | Practice 1 | No mark on the floor: the plan names the tunnel's mouth, and two straight moves walk there; the figures fade as they enter. Bonus: the map opened with its spell. | |
-| `lesson:where-i-am` | Lesson 2 | Nothing is seen in the dark tunnel, and the wizard still knows its own cell: `wizard.position`, x and y, an attribute; `print` shows it, in the block of its first page; a thing knows its cell too, `key.position`; the program sees what the map does not show. Two pages. | `wizard.position`, `thing.position` |
+| `lesson:where-i-am` | Lesson 2 | An attribute: what an object knows about itself, read without brackets, `wizard.items`, `door.locked`. Nothing is seen in the dark tunnel, and the wizard still knows its own cell: `wizard.position`, x and y; `print` shows it, in a block to try; a thing knows its cell too, the found key's `position`; the program sees what the map does not show. Four pages. | `wizard.items`, `door.locked`, `wizard.position`, `thing.position` |
 | `level:the-dark-tunnel` | Practice 2 | Played unseen, from a cell the child has not seen (D152): open the map to find the exit, print the position, count the steps and walk there; nothing is seen to move. Bonus: `position` looked at. | |
 | `lesson:waiting` | Lesson 3 | Waiting: `wizard.wait()` lets a tick go by while everything else moves, `wizard.wait(2)` two. One page and no *Try it* (D174). | `wizard.wait` |
 | `level:the-tunnel-exit` | Practice 3 | `wait` alone (D146): Dask comes up the crossing from the same place every time, looking up; wait two ticks for him to go by, then walk to the first statue. | |
@@ -398,7 +429,7 @@ painting of the castle where the last one ends (D74, D251).
 | --- | --- | --- | --- |
 | `story:the-tower` | Story 1 | The last day of the first year: in the dormitory by morning, the three alone (D311), the trunks half packed, the secret kept all year, the threads in a little box the friend carries; the three go out by its door and away by the left; at the entrance Zarek, who has lost a race and a bet with it, answers the three's question and names Rinlo, and the mate wants to tell Orla while the friend has no proof yet; up in the tower's hall Orla says that a familiar is not chosen but conjured, and first described, that `minka` calls it into the circle as a trial that lives only once it leaves the circle, the first year's limits, and that she looks over every description before a creature leaves the circle; Bimo has the last word. The story changes scene twice. | |
 | `lesson:a-kind-of-thing` | Lesson 1 | Orla's: everything in a program is an object, and every object comes from a description of its kind, a class: `class`, a name with a capital, a colon and `pass`; the class's name with brackets makes an object, and two objects of one class are not the same one (`print` shows each and `==` says `False`). Page 4: the six kinds a first-year may describe, and the description Orla gives them ready, the class `Familiar`. Page 5: `(Familiar)` after the class's name in the tower, and the spell *minka*. The metaphor once, the mould and the biscuits. | `concept:class`, `wizard.cast` |
-| `level:the-circle` | Practice 1 | A kind of familiar written as an empty class with `(Familiar)`, one object of it made and kept under a name, and called with `minka`: a pale trial, with no colour and no name, stands in the circle. Another kind gives a spark; a class without `(Familiar)` is not called; the class called in place of an object is refused; a method in the class stops the program (D261), and so do a second object, a second class (D297) and a move asked of the trial (D301), with Orla's words. Goal: a trial of a first-year kind. | |
+| `level:the-circle` | Practice 1 | A kind of familiar written as an empty class with `(Familiar)`, one object of it made and kept in a variable, and called with `minka`: a pale trial, with no colour and no name, stands in the circle. Another kind gives a spark; a class without `(Familiar)` is not called; the class called in place of an object is refused; a method in the class stops the program (D261), and so do a second object, a second class (D297) and a move asked of the trial (D301), with Orla's words. Goal: a trial of a first-year kind. | |
 | `lesson:what-it-knows` | Lesson 2 | Orla's: an object's attributes, what it knows of itself, written with the dot and `=` as they are read; an attribute is that object's own, and the program's name for the object is not the name it knows itself by. The block ends in the error meant to be seen, a crow given no name (`"try": "error"`, D272). Page 4: a first-year's familiar has `name` and `color`, a single word and one of its kind's colours, and the table of colours. | `concept:attributes`, `familiar.name`, `familiar.color` |
 | `level:the-name-and-the-colour` | Practice 2 | The object given its `name` and its `color` before the cast: the trial stands whole in its colour, steady, with its name over it. A colour not the kind's own, or a grey hare, comes pale and trembling with Orla's words and the book's colours; another attribute stops the program; a name of more than one word is refused by Orla, who cannot write it in the book; the name and colour given after the cast come too late. Orla praises the friend's grey hare before it, and after it says why the book wants every detail in the class: a description written in the book binds the creature for its whole life. Goal: a named, coloured trial. | |
 | `lesson:born-complete` | Lesson 3 | Orla's: the book conjures a familiar from a single line, so the class itself assigns the object's attributes; `__init__`, the method Python runs by itself when an object of the class is made, its first argument `self`, the object being born; what is kept in `self.` stays in it; the object made with its data in the brackets, `self` given by Python. Vesso black and Dalu white. | `concept:init` |
@@ -446,7 +477,7 @@ stairs* (moving tiles and functions), *Zarek's revenge* (the race again),
 
 ## The count
 
-Thirty-eight lessons and forty-five levels, the last of them the
+Forty lessons and forty-eight levels, the last of them the
 course's first challenge, then ten challenges more. The draft
 asked for 10 to 20 lessons; one idea per lesson, each with its theory,
 asks for more, and each is short: a few pages.

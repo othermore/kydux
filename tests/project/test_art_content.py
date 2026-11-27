@@ -20,6 +20,13 @@ SCENES = sorted(p.parent.name for p in (CONTENT / "art" / "scenes").glob("*/art.
 #: and how much of its lower half before something counts as standing on it.
 HIDDEN = 0.08
 STANDS = 0.2
+#: The cells a level puts its start, its mark, a thing or a friend on though a cut-out
+#: covers them, each seen over what is in front of it: the library's corridor behind
+#: Wenna's door, row 15, seen over the wall of her door (D342), and Wenna beside her door,
+#: over the reading room's table.
+SEEN_OVER = {
+    "the-library": {(x, 15) for x in range(1, 12)} | {(8, 17)},
+}
 
 
 def rows_of(scene: str) -> tuple[dict, dict[int, np.ndarray]]:
@@ -122,7 +129,7 @@ def test_a_level_s_start_mark_things_and_friend_are_never_hidden(scene):
             if "asleep" not in actor:
                 cells[actor["id"]] = actor["at"]
         for what, (x, y) in cells.items():
-            if what in art["things"]:
+            if what in art["things"] or (x, y) in SEEN_OVER.get(scene, set()):
                 continue
             by = drawn.get((x, y), 0.0)
             front = max(

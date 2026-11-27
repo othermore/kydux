@@ -25,9 +25,10 @@ def kinds(world):
     return [(e.kind, e.data) for e in world.events]
 
 
-def test_the_child_holds_the_wizard_and_every_thing_by_its_id():
+def test_the_child_holds_the_wizard_and_the_door_by_its_id_and_finds_the_rest():
+    """D344: a door is a variable by its id; a key and a book are found first."""
     world = World(ROOMS)
-    assert set(world.namespace()) == {"wizard", "key", "door", "book"}
+    assert set(world.namespace()) == {"wizard", "door"}
     assert world.namespace()["door"].kind == "door"
 
 
@@ -209,8 +210,9 @@ def test_every_name_the_child_may_use_is_a_member_with_a_docstring_and_an_exampl
     assert "`" in doc, f"{role}.{member}'s docstring has no example in backticks"
 
 
-def test_the_child_s_code_holds_the_level_s_things():
-    result = run_code(ROOMS, "print(door.locked, key.kind, book.position)")
+def test_the_child_s_code_holds_the_door_and_keeps_what_it_finds():
+    code = 'mine = wizard.find_nearest("key")\nread = wizard.find_nearest("book")\n'
+    result = run_code(ROOMS, code + "print(door.locked, mine.kind, read.position)")
     assert result.stdout == "True key (6, 3)\n"
 
 

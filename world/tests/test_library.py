@@ -287,7 +287,7 @@ def test_a_thing_in_hand_from_the_start_is_asked_for_with_find_item_and_given():
     assert wizard.find_nearest("book").name == "far"
     assert wizard.find_item("key") is None
     # No name is put into the program for it: the program asks for it.
-    assert "book" not in world.namespace() and "far" in world.namespace()
+    assert "book" not in world.namespace()
     wizard.give(book)
     assert last(world) == ("wizard", "give", {"id": "book", "to": "eldra", "at": [1, 1]})
     assert wizard.find_item("book") is None

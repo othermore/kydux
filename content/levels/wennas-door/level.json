@@ -1,0 +1,66 @@
+{
+  "id": "wennas-door",
+  "kind": "practice",
+  "scene": "the-library",
+  "start": [
+    7,
+    17
+  ],
+  "end": [
+    7,
+    15
+  ],
+  "speaker": "wenna",
+  "carrying": [
+    "wand"
+  ],
+  "things": [
+    {
+      "kind": "door",
+      "id": "door",
+      "at": [
+        7,
+        16
+      ],
+      "art": "wenna_door"
+    }
+  ],
+  "actors": [
+    {
+      "kind": "friend",
+      "id": "wenna",
+      "at": [
+        8,
+        17
+      ],
+      "facing": "left"
+    },
+    {
+      "kind": "friend",
+      "id": "mate",
+      "at": [
+        5,
+        17
+      ],
+      "facing": "right"
+    }
+  ],
+  "api": [
+    "wizard.move_right",
+    "wizard.move_left",
+    "wizard.move_up",
+    "wizard.move_down",
+    "door.open"
+  ],
+  "goals": [
+    {
+      "kind": "open",
+      "id": "door"
+    },
+    {
+      "kind": "reach",
+      "marker": "E"
+    }
+  ],
+  "tick_limit": 20
+}

@@ -375,10 +375,12 @@ test.describe('what the page draws of the chapter', () => {
 
   test('a door of two cells opens from either, and frees them both (D150)', async ({ page }) => {
     await open(page, 'the-three-doors');
-    await run(page, 'wizard.move_left()\ndoor_1.open()\nwizard.move_up(2)');
+    // The doors are to find (D344): the nearest, the first door, kept and opened.
+    const find = 'next_door = wizard.find_nearest("door")\n';
+    await run(page, `${find}wizard.move_left()\nnext_door.open()\nwizard.move_up(2)`);
     await expect(scene(page)).toHaveAttribute('data-doors', 'door_1');
     await expect(scene(page)).toHaveAttribute('data-wizard', '9,10');
-    await run(page, 'door_1.open()\nwizard.move_up(2)');
+    await run(page, `${find}next_door.open()\nwizard.move_up(2)`);
     await expect(scene(page)).toHaveAttribute('data-wizard', '10,10');
   });
 
@@ -408,7 +410,7 @@ test.describe('what the page draws of the chapter', () => {
     await expect(scene(page)).toHaveAttribute('data-marks-covered', '10,0');
     // The win card's words show their code as code, no backquote left (D140).
     const learned = page.locator('#card-learned');
-    await expect(learned.locator('code')).toHaveText('door');
+    await expect(learned.locator('code')).toHaveText('next_door');
     await expect(learned).not.toContainText('`');
     await expect(page.locator('#card-outro')).not.toContainText('`');
     await page.locator('.scene-frame').screenshot({ path: `${SHOTS}mark-under-the-arch-won.png` });

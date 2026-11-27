@@ -21,8 +21,6 @@ outputs:
 context:
   - docs/dev/story.md
   - docs/dev/course.md
-  - content/lessons/what-things-know/en.md
-  - content/lessons/what-things-know/es.md
   - content/lessons/the-cells/es.md
   - content/lessons/where-i-am/es.md
   - content/lessons/true-or-false/es.md

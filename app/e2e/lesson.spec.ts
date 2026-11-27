@@ -55,11 +55,11 @@ for (const [locale, tryIt, goOn] of [
     await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
     await page.locator('#lesson-try').click();
     await expect(page).toHaveURL(/#lesson\/if$/);
-    // What things know comes before The lost book: one Try button, on its last page, the
-    // eighth.
-    await page.goto('/#lesson/what-things-know');
+    // Finding things comes before The fallen book: one Try button, on its last page, the
+    // fifth.
+    await page.goto('/#lesson/finding-things');
     await expect(page.locator('.lesson-page')).toBeVisible();
-    for (let turn = 0; turn < 7; turn += 1) {
+    for (let turn = 0; turn < 4; turn += 1) {
       await expect(page.getByRole('button', { name: tryIt })).toHaveCount(0);
       await page.locator('#lesson-next').click();
     }
@@ -67,7 +67,7 @@ for (const [locale, tryIt, goOn] of [
     await expect(page.getByRole('button', { name: tryIt })).toHaveCount(1);
     await expect(page.locator('#lesson-try')).toHaveText(tryIt);
     await page.locator('#lesson-try').click();
-    await expect(page).toHaveURL(/#level\/the-lost-book$/);
+    await expect(page).toHaveURL(/#level\/the-fallen-book$/);
     await context.close();
   });
 }
@@ -95,9 +95,17 @@ for (const [locale, title, pageTwo, tryIt, goOn] of [
   });
 }
 
+test('things-to-carry has one page and no block, and goes on to the-wand (D174)', async ({ page }) => {
+  await page.goto('/#lesson/things-to-carry');
+  await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 1');
+  await expect(page.locator('.lesson-run')).toHaveCount(0);
+  await expect(page.locator('#lesson-try')).toHaveText('Go on');
+  await page.locator('#lesson-try').click();
+  await expect(page).toHaveURL(/#level\/the-wand$/);
+});
+
 for (const [lesson, level] of [
   ['words', 'the-password'],
-  ['things-to-carry', 'the-wand'],
   ['your-first-spell', 'the-sealed-door'],
   ['the-portal', 'the-night-walk'],
 ] as const) {
@@ -164,7 +172,7 @@ test('a lesson shows who teaches it; a story is told on its scene instead (D67, 
   await expect
     .poll(() => page.locator('#lesson-teacher img.portrait').evaluate((img: HTMLImageElement) => img.naturalWidth))
     .toBe(512);
-  await page.goto('/#lesson/what-things-know');
+  await page.goto('/#lesson/a-name-for-a-value');
   await expect(page.locator('#lesson-teacher figcaption')).toHaveText('Wenna');
   await page.goto('/#story/at-the-gate');
   await expect(page.locator('.story-screen #scene canvas')).toBeVisible();
@@ -174,9 +182,12 @@ test('a lesson shows who teaches it; a story is told on its scene instead (D67, 
 
 test.describe('a page runs its code (D142)', () => {
   test('a block prints on the page, in the level after the lesson, and can be changed', async ({ page }) => {
-    // Where I am's first page: the wizard's cell, in the dark tunnel.
+    // Where I am's third page: the wizard's cell, in the dark tunnel.
     await page.goto('/#lesson/where-i-am');
-    await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 2');
+    await expect(page.locator('#lesson-page')).toHaveText('Page 1 of 4');
+    await page.locator('#lesson-next').click();
+    await page.locator('#lesson-next').click();
+    await expect(page.locator('#lesson-page')).toHaveText('Page 3 of 4');
     await page.locator('.lesson-run button').click();
     await expect(page.locator('.lesson-printed')).toHaveText('(14, 2)', { timeout: ciTimes(90_000) });
     await expect(page.locator('.lesson-said')).toBeHidden();
@@ -385,6 +396,9 @@ test.describe('a page runs its code (D142)', () => {
     const page = await context.newPage();
     await page.goto('/#lesson/where-i-am');
     await expect(page.locator('.lesson-page')).toBeVisible();
+    // Its block is on its third page.
+    await page.locator('#lesson-next').click();
+    await page.locator('#lesson-next').click();
     await expect(page.locator('.lesson-run button')).toHaveText('Ejecutar');
     await context.close();
   });

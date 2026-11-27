@@ -56,10 +56,10 @@ export function blockedText(reason: string, kind: string | null, detail: Blocked
   const thing = kind ? thingWords(kind) : '';
   const spell = detail.spell ?? '';
   switch (reason) {
-    case 'which_one': {
-      const things = detail.things ?? [];
-      return t('blocked.which_one', { things: things.join(', '), first: things[0] ?? '' });
-    }
+    // The things in reach have no names in the child's program until it keeps them
+    // (D344): the words say to give the variable, with no thing's id.
+    case 'which_one':
+      return t('blocked.which_one');
     case 'no_wand':
       return t('blocked.no_wand');
     case 'no_map':

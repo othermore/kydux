@@ -1,4 +1,4 @@
-# Una acción propia
+# Una función propia
 
 ¿Y si queremos hacer una maniobra especial una y otra vez? Si escribimos `def quick_fly():` y, metidas debajo, unas líneas de código, ¡le damos un nombre a esas líneas! Los programadores lo llaman una función.
 

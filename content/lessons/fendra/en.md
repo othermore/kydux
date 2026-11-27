@@ -2,7 +2,7 @@
 
 A spell can reach across empty space! The spell *fendra*, cast with the wand, draws a thing to your wizard's own cell.
 
-Because the library's high shelves are full of books, the spell needs to know exactly which one you want. You must give it the variable your program keeps the thing in, as its second argument: `wizard.cast("fendra", book)`.
+Because the library's high shelves are full of books, the spell needs to know exactly which one you want. You must give it the variable your program keeps the thing in, as its second argument: `wizard.cast("fendra", other_book)`.
 
 ---
 ## Flying over things

@@ -1,0 +1,16 @@
+{
+  "title": "La puerta de Wenna",
+  "goals": [
+    "Abre la puerta.",
+    "Pasa por ella hacia el pasillo."
+  ],
+  "starting_code": "# Abre la puerta con su método `open`. Delante del punto va la variable de la puerta.\n\n# Sube dos pasos para pasar por ella.\n",
+  "hints": [
+    "Recuerda de quién es el método `open` y qué se escribe antes del punto.",
+    "Un método necesita sus paréntesis, incluso si no hay nada entre ellos.",
+    "El objeto se llama `door` y su método `open`: se escribe `door.open()`. Una vez abierta, sube dos pasos."
+  ],
+  "intro": "Las puertas de mi biblioteca las abre quien viene a aprender. Como esta puerta no está cerrada con llave, puedes abrirla simplemente usando su método `open`. Ábrela y pasa al pasillo. Y si no te sale a la primera, recuerda que puedes pedir una pista.",
+  "outro": "Ya estamos en el pasillo.",
+  "learned": "Ahora sabes que un objeto distinto a tu {mago|maga} tiene sus propios métodos, y que se escriben detrás de la variable que lo guarda."
+}

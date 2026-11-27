@@ -1,0 +1,16 @@
+{
+  "title": "El libro caído",
+  "goals": [
+    "Haz que el libro brille con `reveal`.",
+    "Recoge el libro."
+  ],
+  "starting_code": "# Esta línea ya está escrita: encuentra el libro y lo guarda en la variable `tesoro`.\ntesoro = wizard.find_nearest(\"book\")\n\n# Haz que brille con `reveal`. Es un método del libro, así que debes usarlo\n# poniendo un punto justo después de la variable en la que hemos guardado el libro.\n\n# Camina a la izquierda hasta el libro.\n\n# Recógelo con `pick_up`.\n",
+  "hints": [
+    "`reveal` es el método del libro, así que la variable, el objeto que quieres revelar, va antes del punto, igual que con `door`.",
+    "El libro está a cuatro pasos a la izquierda.",
+    "`pick_up` es el método de tu {mago|maga} y no necesita nada entre sus paréntesis."
+  ],
+  "intro": "Otra vez un libro en el suelo... La primera línea, que ya he escrito yo, lo encuentra y lo guarda en `tesoro`. Haz que brille, camina hacia él y recógelo. Lee los comentarios del programa: te dicen qué hacer en cada línea. Y si te atascas, pide una pista.",
+  "outro": "Déjamelo, lo pondré de nuevo en su estante.",
+  "learned": "Ahora sabes que un método puede devolver algo, que una variable lo guarda, y que la cosa guardada tiene sus propios métodos."
+}

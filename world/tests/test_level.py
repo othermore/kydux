@@ -102,7 +102,8 @@ def test_things_are_placed_by_marker_or_at():
         ThingSpec("door", "door", Position(7, 2), locked=True, cells=(Position(7, 2),)),
         ThingSpec("book", "book", Position(8, 1)),
     )
-    assert level.ids() == ["key", "door", "book", "teacher"]
+    # The program starts with the door and the teacher; the key and the book are found (D344).
+    assert level.ids() == ["door", "teacher"]
 
 
 def test_an_actor_s_patrol_is_every_tile_it_walks():

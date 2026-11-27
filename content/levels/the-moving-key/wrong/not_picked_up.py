@@ -1,3 +1,3 @@
-key = wizard.find_nearest("key")
-steps = key.distance_to(wizard)
+eldras_key = wizard.find_nearest("key")
+steps = eldras_key.distance_to(wizard)
 wizard.move_left(steps)

@@ -1,2 +1,2 @@
-broom = wizard.find_nearest("key")
-broom.untie()
+my_broom = wizard.find_nearest("key")
+my_broom.untie()

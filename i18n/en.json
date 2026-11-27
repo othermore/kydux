@@ -83,8 +83,8 @@
   "error": {
     "unknown_name": "There is nothing called `{name}` here.",
     "suggestion": "Did you mean `{suggestion}`?",
-    "read_only": "You cannot change `{object}.{name}` yourself. An action changes it.",
-    "not_called": "`{name}` is an action. An action is done with brackets after it, like `{example}`.",
+    "read_only": "You cannot change `{object}.{name}` yourself. A method changes it.",
+    "not_called": "`{name}` is a method. A method is used with brackets after it, like `{example}`.",
     "unclosed": "This line opens a `{what}` that never closes.",
     "missing_colon": "A line that starts with `{keyword}` ends with `:`.",
     "indentation": "The lines inside a `while`, an `if` or a `for` need four spaces in front.",
@@ -93,8 +93,8 @@
     "no_such_module": "There is no book called `{name}` in the school's library.",
     "other": "Python says: {type}: {message}",
     "line": " (line {line})",
-    "unknown_action": "`{object}` does not know an action called `{name}`.",
-    "no_new_attribute": "You cannot give `{object}` a new `{name}`. What `{object}` can do is in its notebook.",
+    "unknown_action": "`{object}` has no method called `{name}`.",
+    "no_new_attribute": "You cannot give `{object}` a new `{name}`. Its methods and its attributes are in the notebook.",
     "no_knot": "This broom has no knot, so there is nothing to untie, and the program stops here. Before taking the knot off a broom, look whether it has one.",
     "no_landing": "There is nowhere to set the broom down here, so the program stops here, still in the air. Land where there is ground.",
     "index_range": "The list doesn't have that many: it has {count}, and you wanted number {asked}.",
@@ -105,7 +105,7 @@
     "no_attribute": "This object has nothing called `{name}`.",
     "object_arguments": "Making a `{name}` takes {wanted} data between the brackets, and you gave it {given}.",
     "method_arguments": "`{name}` takes {wanted} data between the brackets, and you gave it {given}.",
-    "no_such_method": "{familiar} does not know how to `{name}`."
+    "no_such_method": "{familiar} has no method called `{name}`."
   },
   "things": {
     "door": "the door",
@@ -146,8 +146,8 @@
     "locked": "I cannot open {thing}: it is locked, and I have no key for it.",
     "open": "I do not need to: {thing} is already open.",
     "nothing": "There is nothing here to pick up.",
-    "unknown_action": "I do not know this action yet.",
-    "no_wand": "I do not know this action yet.",
+    "unknown_action": "I do not know this method yet.",
+    "no_wand": "I do not know this method yet.",
     "no_map": "That word is written on the map, and I am not carrying the map.",
     "unknown_spell": "I do not know a spell called “{spell}”.",
     "sealed": "I cannot open {thing} by hand: it is sealed, and needs a spell.",
@@ -156,7 +156,7 @@
     "out_of_reach": "The spell cannot reach {thing} from here.",
     "not_carried": "I cannot give {thing}: I am not carrying it.",
     "nobody": "There is no one beside me to give it to.",
-    "which_one": "There are several things here: {things}. Say which, like wizard.pick_up({first}).",
+    "which_one": "There are several things here. Say which: put between the brackets the variable you kept it in, like wizard.pick_up(my_key).",
     "unheard": "While its seal holds, {thing} cannot hear a word.",
     "not_my_dormitory": "I should not go into the {girls'|boys'} dormitory.",
     "door_leaf": "The open door's leaf is in the way.",
@@ -207,7 +207,7 @@
     "title": "The wizard's notebook",
     "open": "Notebook",
     "close": "Close",
-    "actions": "Actions",
+    "actions": "Methods",
     "attributes": "Attributes",
     "nothing": "Nothing to note here yet.",
     "wizard": {
@@ -217,7 +217,7 @@
       "move_down": "Walks down, one tile per step. Stops at a wall or a closed door.",
       "say": "Says something out loud.",
       "wait": "Stands still while the world moves on, one tick at a time; wizard.wait(2) waits two.",
-      "pick_up": "Picks up a thing on the wizard's tile or beside it, and carries it. With several in reach, say which: wizard.pick_up(key).",
+      "pick_up": "Picks up a thing on the wizard's tile or beside it, and carries it. With several in reach, say which: wizard.pick_up(my_key).",
       "find_nearest": "Finds the nearest thing of a kind, or None when there is none. Where a place has parts, like the shed's wall and its straw, it only finds those in the part where the wizard stands.",
       "find_item": "Finds the thing of a kind the wizard carries, or None when it carries none.",
       "find_all": "Finds every thing of a kind and gives them in a list, nearest first, even where something covers them: brooms = wizard.find_all(\"broom\"); len(brooms) says how many. Where a place has parts, like the shed's wall and its straw, it only finds those in the part where the wizard stands.",
@@ -225,7 +225,7 @@
       "position": "The cell the wizard stands on, as x and y, counted from 0 from the left and from the top: print(wizard.position) shows it.",
       "facing": "The way the wizard looks: up, down, left or right.",
       "items": "The things the wizard carries, in a list; len(wizard.items) says how many.",
-      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\"). The drevo spell lifts the broom, when the wizard carries it, and sets it down again when cast in the air: wizard.cast(\"drevo\").",
+      "cast": "Casts a spell with the wand, which the wizard must carry. What a spell does depends on where the wizard stands and what is near; it may do nothing at all. The fendra spell is also given the thing to bring: wizard.cast(\"fendra\", other_book). The orvim spell opens the map, when the wizard carries it: wizard.cast(\"orvim\"). The drevo spell lifts the broom, when the wizard carries it, and sets it down again when cast in the air: wizard.cast(\"drevo\").",
       "give": "Gives a thing the wizard carries to whoever stands right beside it.",
       "sleep": "Lies down and sleeps in a free bed.",
       "distance_to": "Gives the number of steps from the wizard to an object.",
@@ -300,7 +300,7 @@
       "x": "A cell's first number, its column: how many cells from the left, counting from 0.",
       "y": "A cell's second number, its row: how many cells from the top, counting from 0."
     },
-    "tab_actions": "Actions",
+    "tab_actions": "Objects",
     "tab_python": "Python",
     "tab_spells": "Spells and words",
     "spells": "Spells",
@@ -319,7 +319,7 @@
       "position": "The cell the broom lies on, as x and y, or None once the wizard carries it.",
       "distance_to": "Gives the number of steps from an object to the wizard.",
       "reveal": "Makes a thing glow where it lies, even through whatever hides it, so that you see where it is.",
-      "knotted": "True while the black thread is knotted in the broom's twigs: if broom.knotted:",
+      "knotted": "True while the black thread is knotted in the broom's twigs: if my_broom.knotted:",
       "untie": "Unties the knot in the broom. The wizard must stand on it, and the broom must have a knot: if it has none, that is an error."
     },
     "racer": {
@@ -338,7 +338,7 @@
       "move_up": "Your familiar walks up, one cell per step. It stops where it cannot go on.",
       "move_down": "Your familiar walks down, one cell per step. It stops where it cannot go on.",
       "pick_up": "Your familiar picks up what lies on its cell and carries it. It gives it to you when minka brings it back.",
-      "go_to": "The action you taught it yourself: it goes to the cell you tell it, first the column and then the row."
+      "go_to": "The method you taught it yourself: it goes to the cell you tell it, first the column and then the row."
     }
   },
   "start": {
@@ -368,7 +368,7 @@
   },
   "map": {
     "here": "You are here",
-    "back_level": "Back to the level",
+    "back_level": "✕ Back to the level",
     "leave_run": "Your program is still running. Leave the level?",
     "back": "Back to the start",
     "done": "done",
@@ -507,7 +507,7 @@
   "notebook_python": {
     "variables": {
       "does": "A variable keeps a value under a name: the name left of the `=`, the value right of it.",
-      "example": "book = wizard.find_nearest(\"book\")"
+      "example": "treasure = wizard.find_nearest(\"book\")"
     },
     "arithmetic": {
       "does": "Add and subtract numbers; the result is a number, to keep or to use.",
@@ -535,11 +535,11 @@
     },
     "for_range": {
       "does": "A loop: runs the lines moved in under it as many times as `range` says.",
-      "example": "for step in range(3):\n    wizard.move_right(2)"
+      "example": "for turn in range(3):\n    wizard.move_right(2)"
     },
     "for_each": {
       "does": "A loop over a list: runs its lines once for each element.",
-      "example": "for broom in brooms:\n    broom.untie()"
+      "example": "for each_broom in brooms:\n    each_broom.untie()"
     },
     "while": {
       "does": "A loop that runs its lines again and again while its expression is `True`.",
@@ -554,7 +554,7 @@
       "example": "def quick_fly():\n    wizard.move_right(2)\n    wizard.move_up(2)\n\nquick_fly()"
     },
     "def_arguments": {
-      "does": "The names in the `def`'s brackets are the function's arguments; a call gives them their values in order.",
+      "does": "The variables in the `def`'s brackets are the function's arguments; a call gives them their values in order.",
       "example": "def greet(name):\n    print(\"Hello\", name)\n\ngreet(\"Teku\")"
     },
     "class": {
@@ -570,7 +570,7 @@
       "example": "vesso.name = \"Vesso\"\nprint(vesso.name)"
     },
     "init": {
-      "does": "`__init__` is the action Python runs by itself each time an object of the class is born, with the data you give in the brackets.",
+      "does": "`__init__` is the method Python runs by itself each time an object of the class is born, with the data you give in the brackets.",
       "example": "class Crow:\n    def __init__(self, name):\n        self.name = name\n\nvesso = Crow(\"Vesso\")"
     },
     "self": {
@@ -582,7 +582,7 @@
       "example": "class Fox(Familiar):\n    pass"
     },
     "methods": {
-      "does": "A method is an action of the class: written with `def` inside it, its first datum is `self`, and it is called with the dot.",
+      "does": "A method is a function of the class: written with `def` inside it, its first datum is `self`, and it is called with the dot.",
       "example": "class Crow:\n    def hop(self, times):\n        print(\"hop\", times)\n\nvesso.hop(3)"
     }
   },
@@ -605,7 +605,7 @@
   },
   "spells": {
     "zelim": "breaks the seal of a door beside you.",
-    "fendra": "brings to your cell the thing you name, three cells away at most in a straight line.",
+    "fendra": "brings to your cell the thing you give it, three cells away at most in a straight line.",
     "kirra": "lights the dark room you are in.",
     "osto": "holds closed, for a while, a hole beside you that opens in the floor.",
     "orvim": "opens the naughty child's map on the plan of the place you are in, every cell with its numbers, if you carry the map.",
@@ -733,7 +733,7 @@
     "notebook": "Open the notebook to see all the instructions you can use in your program.",
     "spells": "In the notebook, you can also see all the available spells and magic words.",
     "click": "If you click on an instruction in the notebook, it writes itself into your program.",
-    "dot": "If you type an object's name followed by a dot, all the things that object has will appear so you don't have to type them.",
+    "dot": "If you type a variable followed by a dot, all the things that object has will appear so you don't have to type them.",
     "hint": "When your program doesn't win, you can press the *Hint* button under the program. Each press shows one more hint, up to three!",
     "keys": "To run your program, press Ctrl+Enter or Alt+R (Cmd+Enter or Option+R on a Mac). And with Alt+N (Option+N on a Mac) you can open and close the notebook.",
     "timeline": "After running a program, you can drag the bar under the scene to go over what happened moment by moment and find out what went wrong.",

@@ -65,7 +65,9 @@ def test_a_broom_untied_from_beside_it_is_refused_too_far_and_the_program_goes_o
 
 
 def test_untying_a_broom_with_no_knot_is_an_error_that_stops_the_program():
-    result = run_code(shed(), "wizard.move_up(2)\nbroom_3.untie()\nwizard.move_left()\n")
+    result = run_code(
+        shed(), 'wizard.move_up(2)\nwizard.find_nearest("broom").untie()\nwizard.move_left()\n'
+    )
     assert result.status == "error"
     assert result.error.explanation == {"kind": "no_knot", "params": {"thing": "broom_3"}}
     assert result.events[-1].kind == "blocked"
@@ -74,11 +76,11 @@ def test_untying_a_broom_with_no_knot_is_an_error_that_stops_the_program():
 
 
 def test_the_untied_goal_is_met_once_no_broom_is_knotted_and_failed_at_the_end_else():
-    untie = "wizard.move_up(2)\nwizard.move_left(2)\nbroom_1.untie()\n"
+    untie = 'wizard.move_up(2)\nwizard.move_left(2)\nwizard.find_nearest("broom").untie()\n'
     half = run_code(shed(), untie)
     assert half.status == "incomplete"
     assert half.goals[0].failed
-    whole = run_code(shed(), untie + "wizard.move_right()\nbroom_2.untie()\n")
+    whole = run_code(shed(), untie + 'wizard.move_right()\nwizard.find_nearest("broom").untie()\n')
     assert whole.status == "won"
     assert whole.goals[0].met_at_tick == 7
 
@@ -1439,7 +1441,7 @@ def test_a_thing_with_no_zone_is_found_from_anywhere_and_one_with_a_zone_only_fr
 
 
 def test_the_untied_goal_counts_only_the_brooms_it_names():
-    solved = "wizard.move_up(2)\nwizard.move_left(2)\nhung_1.untie()\n"
+    solved = 'wizard.move_up(2)\nwizard.move_left(2)\nwizard.find_nearest("broom").untie()\n'
     assert run_code(rack(), solved).status == "won"
     assert run_code(rack(goals=[{"kind": "untied"}]), solved).status != "won"
     with pytest.raises(LevelError, match="ids name brooms"):
@@ -1449,8 +1451,8 @@ def test_the_untied_goal_counts_only_the_brooms_it_names():
 def test_the_untied_goal_counts_the_brooms_of_a_zone_in_the_way_played():
     """D202: the wall's brooms untied, the straw's left knotted, meet a goal of the wall."""
     wall = {"kind": "untied", "zone": "wall"}
-    half = "wizard.move_up(2)\nwizard.move_left(2)\nhung_1.untie()\n"
-    solved = half + "wizard.move_right()\nhung_2.untie()\n"
+    half = 'wizard.move_up(2)\nwizard.move_left(2)\nwizard.find_nearest("broom").untie()\n'
+    solved = half + 'wizard.move_right()\nwizard.find_nearest("broom").untie()\n'
     assert run_code(rack(goals=[wall]), solved).status == "won"
     assert run_code(rack(goals=[{"kind": "untied"}]), solved).status != "won"
     assert run_code(rack(goals=[wall]), half).status != "won"

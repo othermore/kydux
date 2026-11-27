@@ -20,7 +20,7 @@ Una escoba cuya `x` es menor que la de tu {mago|maga} está a su izquierda; si e
 
 Aquí `True` significa que la escoba está a la izquierda. ¡Prueba a poner 12 en `escoba_x` y ejecútalo de nuevo!
 
-```python try
+```python try change
 mi_x = 9
 escoba_x = 6
 print(escoba_x < mi_x)
@@ -29,11 +29,11 @@ print(escoba_x < mi_x)
 ---
 ## Qué resta hacemos
 
-Con las funciones `move_`, como `move_left()`, te puedes mover 0 o más pasos. Si le das un número negativo, como en `wizard.move_left(-3)`, el juego no lo acepta y te dice que `move_left` no se usa así.
+Con los métodos `move_`, como `move_left()`, te puedes mover 0 o más pasos. Si le das un número negativo, como en `wizard.move_left(-3)`, el juego no lo acepta y te dice que `move_left` no se usa así.
 
 Así que para movernos a una posición desde donde estamos, hace falta primero ver si nos tenemos que mover a la izquierda o a la derecha. Así podemos calcular el número mayor menos el número menor, y que nos salga un número de pasos que es positivo. Lo podemos hacer con el `if` y el `else` que ya conoces.
 
-```python try
+```python try change
 mi_x = 9
 escoba_x = 6
 if escoba_x < mi_x:

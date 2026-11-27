@@ -41,6 +41,9 @@
     "wizard.find_nearest",
     "door.open"
   ],
+  "to_find": [
+    "door"
+  ],
   "goals": [
     {
       "kind": "reach",

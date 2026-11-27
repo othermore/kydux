@@ -31,12 +31,12 @@ test('the notebook lists what the level teaches, and a click puts an example in 
   await expect(notebook).toBeHidden();
 });
 
-test('the notebook of the hidden key has the door and the key', async ({ page }) => {
+test('the notebook of the hidden key has the door, and no key until the program finds one (D344)', async ({ page }) => {
   await open(page, 'the-hidden-key');
   await page.locator('#notebook-open').click();
   const notebook = page.locator('#notebook');
   await expect(notebook.locator('[data-example="door.open()"]')).toBeVisible();
-  await expect(notebook.locator('[data-example="key.reveal()"]')).toBeVisible();
+  await expect(notebook.locator('[data-example="key.reveal()"]')).toHaveCount(0);
   await expect(notebook.locator('[data-example="wizard.pick_up()"]')).toBeVisible();
 });
 
@@ -49,7 +49,8 @@ test('after a name and a dot, the editor offers what the level teaches of it', a
   const offered = page.locator('.cm-tooltip-autocomplete');
   await expect(offered).toBeVisible();
   await expect(offered).toContainText('open');
-  await expect(offered).toContainText('locked');
+  // A door's attributes are taught in chapter 3 (D342).
+  expect(await offered.locator('.cm-completionLabel').allTextContents()).not.toContain('locked');
   await expect(offered).not.toContainText('move_right');
   await page.keyboard.type('op');
   // Enter takes the offer chosen, once the list has caught up with what was typed.
